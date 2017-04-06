@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="1b8bfcf3-49a6-482b-ba79-f4f620ebe356" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LottoDeal/Front-End/css/shop-homepage.css" afterPath="$PROJECT_DIR$/LottoDeal/Front-End/css/shop-homepage.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LottoDeal/Front-End/login.html" afterPath="$PROJECT_DIR$/LottoDeal/Front-End/login.html" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -21,7 +20,7 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="943">
+            <state relative-caret-position="456">
               <caret line="242" column="24" lean-forward="true" selection-start-line="242" selection-start-column="24" selection-end-line="242" selection-end-column="24" />
               <folding>
                 <marker date="1491444047000" expanded="true" signature="2352:11299" ph="..." />
@@ -81,8 +80,8 @@
       <file leaf-file-name="shop-homepage.css" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/css/shop-homepage.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="312">
-              <caret line="91" column="0" lean-forward="false" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
+            <state relative-caret-position="194">
+              <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -91,8 +90,8 @@
       <file leaf-file-name="login.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/login.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="244">
-              <caret line="62" column="39" lean-forward="true" selection-start-line="62" selection-start-column="39" selection-end-line="62" selection-end-column="39" />
+            <state relative-caret-position="367">
+              <caret line="78" column="23" lean-forward="true" selection-start-line="78" selection-start-column="23" selection-end-line="78" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -249,12 +248,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1491440664796</updated>
-      <workItem from="1491440665979" duration="3929000" />
+      <workItem from="1491440665979" duration="4326000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3929000" />
+    <option name="totallyTimeSpent" value="4326000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="24" y="47" width="1260" height="658" extended-state="0" />
@@ -355,7 +354,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="943">
+        <state relative-caret-position="456">
           <caret line="242" column="24" lean-forward="true" selection-start-line="242" selection-start-column="24" selection-end-line="242" selection-end-column="24" />
           <folding>
             <marker date="1491444047000" expanded="true" signature="2352:11299" ph="..." />
@@ -413,16 +412,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/login.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="244">
-          <caret line="62" column="39" lean-forward="true" selection-start-line="62" selection-start-column="39" selection-end-line="62" selection-end-column="39" />
+        <state relative-caret-position="367">
+          <caret line="78" column="23" lean-forward="true" selection-start-line="78" selection-start-column="23" selection-end-line="78" selection-end-column="23" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/css/shop-homepage.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="91" column="0" lean-forward="false" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
+        <state relative-caret-position="194">
+          <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
           <folding />
         </state>
       </provider>

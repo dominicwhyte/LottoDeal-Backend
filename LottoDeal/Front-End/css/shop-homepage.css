@@ -48,7 +48,10 @@ body {
 }
 
 footer {
-    margin: 50px 0;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
 }
 
 /* Login page CSS --------------------------------------------------------------- */
@@ -86,9 +89,6 @@ footer {
     margin-bottom: 10px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
-}
-
-.form-signin .btn {
 }
 
 .form-signin-heading {
