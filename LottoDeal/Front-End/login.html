@@ -24,7 +24,8 @@
   </head>
 
   <body class ="login" ng-controller="loginController">
-
+  
+    
   <!-- Navigation -->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container">
@@ -71,6 +72,8 @@
           </label>
         </div>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <div class="fb-login-button" data-max-rows="1" data-size="xlarge" data-show-faces="false" data-auto-logout-link="false"></div>
+        <label>test</label>
       </form>
 
     </div> <!-- /container -->
@@ -86,7 +89,28 @@
         </footer>
     </div>
 
+
+
   </body>
+
+  <script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '228917890846081',
+      xfbml      : true,
+      version    : 'v2.8'
+    });
+    FB.AppEvents.logPageView();
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src="https://connect.facebook.net/en_US/all.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
 
   <!-- INCLUDE DEPENDENCIES -->
   <!-- AngularJS Include -->
