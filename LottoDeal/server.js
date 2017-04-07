@@ -65,6 +65,14 @@ app.post('/createPost', function(request, response) {
 
 // Will add a new user to our database
 app.post('/createUser', function(request, response) {
+    // Parse the response
+    console.log(request.body);
+    var name = request.body.name;
+    var id = request.body.fbid;
+    var url = request.body.url;
+
+    createUser(name, id, url);
+
     response.send("You have created a new user")
 })
 
@@ -72,6 +80,11 @@ app.post('/createUser', function(request, response) {
 app.post('/addBid', function(request, response) {
     // get into database, access object, update it's bid field and add to user bids
 
+    var itemID = request.body.itemID;
+    var userID = request.body.userID;
+    var newAmount = request.body.newAmount;
+
+    addBidForItem(itemID, userID, newAmount);
 
     response.send("Bid added")
 })
@@ -81,12 +94,16 @@ app.get('/getPosts', function(request, response) {
     // get all of the posts and return them to frontend to load on feed
     // might not need to include bids
 
+    var items = findAllItems();
 
     response.send("Here are all of the posts")
 })
 
 // Send back either a serialized or full version of all users
 app.get('/getUsers', function(request, response) {
+
+    var users = findAllUsers();
+
     response.send("Here are all of the users")
 })
 
@@ -94,6 +111,10 @@ app.get('/getUsers', function(request, response) {
 // see the people that bid on his item
 app.get('/getBids', function(request, response) {
     response.send("Here are all of the bids on this item")
+
+    var title = request.body.title;
+    var item = findItem(title);
+
 })
 
 // Start the server at localhost:8000
@@ -146,8 +167,8 @@ var userSchema = new Schema({
     fbid: String, // facebook given
     pictureURL: String, //profile pic URL from Facebook (String)
     bids: [{
-	itemID: String,
-	amount: Number
+    	itemID: String,
+    	amount: Number
     }], //Bid object as dictionary containing all current bids of that user (indexed by itemID).  If a person bids twice on an item, the bid for that itemID is increased (Dictionary)
 });
 
@@ -160,8 +181,8 @@ var itemSchema = new Schema({
     datePosted: Date, //date the item was posted (String - parse into Date object)
     expirationDate: Date, // date when if the item was not sold then everyone gets refunded (String- parse into Date object)
     userIDs: [{
-	ID: String,
-	amount: Number,
+    	ID: String,
+    	amount: Number,
     }], //Dictionary of fbid’s of users who have placed bids (Dictionary)
     pictureURL: String, // picture of item (we can make it more than one if needed (String)
     descrip: String, // text string of what exactly is being sold (String)
@@ -290,8 +311,9 @@ var findUsers = function(fbid) {
 var findAllUsers = function() {
     // get all the users
     User.find({}, function(err, user) {
-	if (err) throw err;
-	console.log(user);
+    	if (err) throw err;
+    	console.log(user);
+        return user;
     });
 }
 
@@ -305,19 +327,21 @@ var deleteAllUsers = function() {
 
 }
 
-var findItems = function(title) {
+var findItem = function(title) {
     // get all the Items
-    Item.find({title: title}, function(err, items) {
+    Item.find({title: title}, function(err, item) {
 	if (err) throw err;
 	// object of all the users
 	console.log(items);
+    return item;
     });
 }
 
 var findAllItems = function() {
     // get all the items
     Item.find({}, function(err, item) {
-	if (err) throw err;
-	console.log(item);
+    	if (err) throw err;
+    	console.log(item);
+        return item;
     });
 }
