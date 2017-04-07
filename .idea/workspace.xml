@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1b8bfcf3-49a6-482b-ba79-f4f620ebe356" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LottoDeal/Front-End/login.html" afterPath="$PROJECT_DIR$/LottoDeal/Front-End/login.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LottoDeal/database.js" afterPath="$PROJECT_DIR$/LottoDeal/database.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LottoDeal/Front-End/css/main.css" afterPath="$PROJECT_DIR$/LottoDeal/Front-End/css/main.css" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -22,7 +21,7 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1250">
+            <state relative-caret-position="1199">
               <caret line="97" column="0" lean-forward="true" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
               <folding>
                 <element signature="e#12146#12152#0" expanded="true" />
@@ -31,23 +30,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="login.html" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/login.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="89" column="10" lean-forward="false" selection-start-line="89" selection-start-column="10" selection-end-line="89" selection-end-column="10" />
-              <folding>
-                <element signature="e#3349#3355#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="main.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/css/main.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="252">
-              <caret line="113" column="16" lean-forward="false" selection-start-line="113" selection-start-column="16" selection-end-line="113" selection-end-column="16" />
+            <state relative-caret-position="1770">
+              <caret line="118" column="26" lean-forward="true" selection-start-line="118" selection-start-column="26" selection-end-line="118" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -56,14 +43,32 @@
       <file leaf-file-name="database.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LottoDeal/database.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1629">
-              <caret line="120" column="21" lean-forward="false" selection-start-line="120" selection-start-column="21" selection-end-line="120" selection-end-column="21" />
+            <state relative-caret-position="362">
+              <caret line="59" column="3" lean-forward="false" selection-start-line="59" selection-start-column="3" selection-end-line="59" selection-end-column="3" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="login.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/login.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="167">
+              <caret line="84" column="39" lean-forward="true" selection-start-line="84" selection-start-column="39" selection-end-line="84" selection-end-column="39" />
               <folding>
-                <marker date="1491530014000" expanded="true" signature="4252:4412" ph="{...}" />
-                <marker date="1491530014000" expanded="true" signature="4323:4406" ph="{...}" />
-                <marker date="1491530014000" expanded="true" signature="4446:4622" ph="{...}" />
-                <marker date="1491530014000" expanded="true" signature="4508:4618" ph="{...}" />
-                <marker date="1491530014000" expanded="true" signature="4562:4614" ph="//..." />
+                <element signature="e#3349#3355#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="about.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/about.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1890">
+              <caret line="126" column="23" lean-forward="true" selection-start-line="126" selection-start-column="23" selection-end-line="126" selection-end-column="23" />
+              <folding>
+                <element signature="e#5605#5611#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -96,10 +101,11 @@
         <option value="$PROJECT_DIR$/LottoDeal/Front-End/css/signin.css" />
         <option value="$PROJECT_DIR$/LottoDeal/Front-End/css/shop-homepage.css" />
         <option value="$PROJECT_DIR$/LottoDeal/Front-End/index.html" />
-        <option value="$PROJECT_DIR$/LottoDeal/Front-End/css/main.css" />
         <option value="$PROJECT_DIR$/LottoDeal/server.js" />
-        <option value="$PROJECT_DIR$/LottoDeal/database.js" />
         <option value="$PROJECT_DIR$/LottoDeal/Front-End/login.html" />
+        <option value="$PROJECT_DIR$/LottoDeal/Front-End/css/main.css" />
+        <option value="$PROJECT_DIR$/LottoDeal/database.js" />
+        <option value="$PROJECT_DIR$/LottoDeal/Front-End/about.html" />
       </list>
     </option>
   </component>
@@ -236,7 +242,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="10864000" />
+    <option name="totallyTimeSpent" value="12874000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="24" y="47" width="1260" height="658" extended-state="0" />
@@ -289,22 +295,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/css/shop-homepage.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Downloads/bootstrap-3.3.7/docs/examples/signin/signin.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/signin.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -405,7 +395,7 @@
         <state relative-caret-position="513">
           <caret line="35" column="36" lean-forward="false" selection-start-line="35" selection-start-column="36" selection-end-line="35" selection-end-column="36" />
           <folding>
-            <element signature="n#!!doc" expanded="true" />
+            <element signature="n#!!doc" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -414,13 +404,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1629">
           <caret line="120" column="21" lean-forward="false" selection-start-line="120" selection-start-column="21" selection-end-line="120" selection-end-column="21" />
-          <folding>
-            <marker date="1491530014000" expanded="true" signature="4252:4412" ph="{...}" />
-            <marker date="1491530014000" expanded="true" signature="4323:4406" ph="{...}" />
-            <marker date="1491530014000" expanded="true" signature="4446:4622" ph="{...}" />
-            <marker date="1491530014000" expanded="true" signature="4508:4618" ph="{...}" />
-            <marker date="1491530014000" expanded="true" signature="4562:4614" ph="//..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -481,41 +465,19 @@
     <entry file="file://$USER_HOME$/Downloads/bootstrap-3.3.7/docs/examples/signin/index.html" />
     <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/css/signin.css" />
     <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/css/shop-homepage.css" />
-    <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/css/main.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="113" column="16" lean-forward="false" selection-start-line="113" selection-start-column="16" selection-end-line="113" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LottoDeal/database.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1629">
-          <caret line="120" column="21" lean-forward="false" selection-start-line="120" selection-start-column="21" selection-end-line="120" selection-end-column="21" />
-          <folding>
-            <marker date="1491530014000" expanded="true" signature="4252:4412" ph="{...}" />
-            <marker date="1491530014000" expanded="true" signature="4323:4406" ph="{...}" />
-            <marker date="1491530014000" expanded="true" signature="4446:4622" ph="{...}" />
-            <marker date="1491530014000" expanded="true" signature="4508:4618" ph="{...}" />
-            <marker date="1491530014000" expanded="true" signature="4562:4614" ph="//..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/LottoDeal/server.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="513">
           <caret line="35" column="36" lean-forward="false" selection-start-line="35" selection-start-column="36" selection-end-line="35" selection-end-column="36" />
           <folding>
-            <element signature="n#!!doc" expanded="true" />
+            <element signature="n#!!doc" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1250">
+        <state relative-caret-position="1199">
           <caret line="97" column="0" lean-forward="true" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
           <folding>
             <element signature="e#12146#12152#0" expanded="true" />
@@ -523,12 +485,46 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/css/main.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1770">
+          <caret line="118" column="26" lean-forward="true" selection-start-line="118" selection-start-column="26" selection-end-line="118" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Downloads/startbootstrap-round-about-gh-pages/css/round-about.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LottoDeal/database.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="362">
+          <caret line="59" column="3" lean-forward="false" selection-start-line="59" selection-start-column="3" selection-end-line="59" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/login.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="89" column="10" lean-forward="false" selection-start-line="89" selection-start-column="10" selection-end-line="89" selection-end-column="10" />
+        <state relative-caret-position="167">
+          <caret line="84" column="39" lean-forward="true" selection-start-line="84" selection-start-column="39" selection-end-line="84" selection-end-column="39" />
           <folding>
             <element signature="e#3349#3355#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LottoDeal/Front-End/about.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1890">
+          <caret line="126" column="23" lean-forward="true" selection-start-line="126" selection-start-column="23" selection-end-line="126" selection-end-column="23" />
+          <folding>
+            <element signature="e#5605#5611#0" expanded="true" />
           </folding>
         </state>
       </provider>

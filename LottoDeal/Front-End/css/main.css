@@ -108,6 +108,8 @@ footer.signin {
 
 /* Navbar CSS ----------------------------------------------------------------------------------------- */
 
+/* The entire navbar */
+
 .navbar {
     background-color: black;
     border-color: rgba(34, 34, 34, 0.05); /* black */
@@ -117,11 +119,27 @@ footer.signin {
     transition: all 0.35s;
 }
 
-.navbar-nav > li > a:hover,
-.navbar-nav > li > a:focus:hover {
-    background-color: white;
-}
+/* non home button navbar styling */
 
 .navbar .nav > li > a {
     color: white;
 }
+
+.navbar .nav > li > a:hover,
+.navbar .nav > li > a:focus:hover {
+    background-color: white;
+    color: black;
+}
+
+/* home button styling */
+
+.navbar-inverse .navbar-header > a {
+    color: white;
+}
+
+.navbar-inverse .navbar-header > a:hover {
+    color: black;
+    background-color: white;
+}
+
+
