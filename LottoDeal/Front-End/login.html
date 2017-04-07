@@ -25,7 +25,8 @@
 
   <body class ="login" ng-controller="loginController">
   
-    
+  <div id="loginElements">
+
   <!-- Navigation -->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container">
@@ -88,29 +89,33 @@
             </div>
         </footer>
     </div>
+
+  </div>
+
   </body>
 
   <!-- facebook payment system script -->
   <script>
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '228917890846081',
-      xfbml      : true,
-      version    : 'v2.8'
-    });
-    FB.AppEvents.logPageView();
-  };
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '228917890846081',
+          xfbml      : true,
+          version    : 'v2.8'
+        });
+        FB.AppEvents.logPageView();
+      };
 
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src="https://connect.facebook.net/en_US/all.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
-</script>
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src="https://connect.facebook.net/en_US/all.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+    </script>
 
   <!-- INCLUDE DEPENDENCIES -->
+
   <!-- AngularJS Include -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.min.js"></script>
 
