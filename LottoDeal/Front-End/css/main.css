@@ -121,6 +121,10 @@ footer.signin {
 
 /* non home button navbar styling */
 
+/*.navbar .nav > li {*/
+    /*text-align: right;*/
+/*}*/
+
 .navbar .nav > li > a {
     color: white;
 }
