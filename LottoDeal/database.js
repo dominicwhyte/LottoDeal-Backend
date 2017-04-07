@@ -13,17 +13,15 @@ var url = 'mongodb://localhost:27017/LottoDeal';
 
 // Use connect method to connect to the server
 
-
-
 mongoose.Promise = global.Promise;
 
 
 mongoose.connect(url, function(err, db) {
     assert.equal(null, err);
 
-    createUser("dom", "1234", "google.com");
-    findUsers();
+//    createUser("dom", "1234", "google.com");
 
+    findAllUsers();
     console.log("Connected successfully to server");
 
 });
@@ -75,7 +73,7 @@ var createUser = function(name, id, url) {
 }
 
 var createItem = function(title, price, datePosted, expirationDate, pictureURL, descrip) {
-  var newItem = new Item ({title : "bike", price : 100, datePosted : new Date(), expirationDate: new Date(), pictureURL: "google", descrip: "hello"});
+  var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, pictureURL: pictureURL, descrip: descrip});
   // call the built-in save method to save to the database
   newItem.save(function(err) {
       if (err) throw err;
@@ -112,7 +110,6 @@ var addBidForItem = function(itemID, userID, newAmount) {
   });
 
 
-
   // get a user with ID and update the bids array
   User.findById(userID, function(err, user) {
     if (err) throw err;
@@ -143,7 +140,7 @@ var addBidForItem = function(itemID, userID, newAmount) {
 
 
 
-var deleteUser = function(id, callback) {
+var deleteUser = function(id) {
   // Remove User
   User.findById(id, function(err, user) {
     if (err) throw err;
@@ -157,7 +154,7 @@ var deleteUser = function(id, callback) {
 }
 
 
-var deleteItem = function(db, id, callback) {
+var deleteItem = function(id) {
   // Remove Item
   Item.findById(id, function(err, item) {
     if (err) throw err;
@@ -172,21 +169,45 @@ var deleteItem = function(db, id, callback) {
 }
 
 
-var findUsers = function() {
+var findUsers = function(fbid) {
   // get all the users
-  User.find({}, function(err, users) {
+  User.find({fbid: fbid}, function(err, user) {
     if (err) throw err;
-    console.log(users);
-    // object of all the users
-  //  console.log(users);
+    console.log(user);
   });
 }
-var findItems = function() {
-  // get all the Items
-  Item.find({}, function(err, items) {
-    if (err) throw err;
 
+var findAllUsers = function() {
+  // get all the users
+  User.find({}, function(err, user) {
+    if (err) throw err;
+    console.log(user);
+  });
+}
+
+var deleteAllUsers = function() {
+  // get all the users
+
+  User.remove({}, function(err) {
+    if (err) throw err;
+    console.log('All User successfully deleted!');
+  });
+
+}
+
+var findItems = function(title) {
+  // get all the Items
+  Item.find({title: title}, function(err, items) {
+    if (err) throw err;
     // object of all the users
     console.log(items);
+  });
+}
+
+var findAllItems = function() {
+  // get all the items
+  Item.find({}, function(err, item) {
+    if (err) throw err;
+    console.log(item);
   });
 }
