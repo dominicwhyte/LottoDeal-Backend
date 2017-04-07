@@ -58,7 +58,7 @@ app.post('/createPost', function(request, response) {
     console.log(post)
 
 // should be giving it a date instead of a time
-    createItem(title, price, date, expirationDate, pictureURL, description);
+    createItem("title", 123, date, date, "pictureURL", "description");
     
     response.send("You have created a new post.")
 })
