@@ -33,28 +33,28 @@
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <button id = "home" type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">LottoDeal</a>
+                <a class="navbar-brand" href="index.html">Home</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
                     <li>
-                        <a href="about.html">About</a>
+                        <a id = "about" href="about.html">About</a>
                     </li>
                     <li>
-                        <a href="sell.html">Sell</a>
+                        <a id = "sell" href="sell.html">Sell</a>
                     </li>
                     <li>
-                        <a href="contact.html">Contact</a>
+                        <a id = "contact" href="contact.html">Contact</a>
                     </li>
                     <li>
-                        <a href="login.html">Login</a>
+                        <a id = "login" href="login.html">Login</a>
                     </li>
                 </ul>
             </div>
@@ -64,7 +64,7 @@
     </nav>
 
     <!-- Page Content -->
-    <div class="container">
+    <div class="container content">
 
         <div class="row">
 
@@ -263,7 +263,8 @@
     <!-- Custom script -->
     <script src="./js/index.js"></script>
 
-
+    <!-- dynamic loading of pages -->
+    <script src="js/tabs.js"></script>
 
 </body>
 
