@@ -1,43 +1,42 @@
-var app = angular.module("app", [])
+var app = angular.module("app", []);
 
-    app.controller("sellController", function($scope) {
-	    $("#myform").submit(function(e) {
+app.controller("sellController", function($scope, $http) {
+	console.log("got here")
 
-		    //prevent Default functionality
-		    e.preventDefault();
+    $("#submitForm").submit(function(e) {
+    	console.log("got here")
+	    e.preventDefault();
 
+    	var url = "https://104.236.12.104:8000/createPost";
 
-        var actionurl = "http://104.236.12.104:8000/createPost"
+	    var price = $("#price").val()
+	    var title = $("#title").val()
+	    var description = $("#description").val()
+	    var date = $("#expirDate").val()
+	    var pictureURL = $("#pictureURL").val()
 
-		    var price = $("#price").val()
-		    var title = $("#Title").val()
-		    var description = $("#Description").val()
+	    data = {
+	    	price: price,
+	    	title: title,
+	    	description: description,
+	    	expirationDate: date,
+	    	pictureURL: pictureURL
+	    }
 
-		    //do your own request an handle the results
-		    $.ajax({
-			    url: actionurl,
-			    type: 'post',
-			    dataType: 'json',
-			    data: {
-				price: price,
-				title: title,
-				description: description
-			    },
-			    success: function(data) {
+	    // AJAX POST TO SERVER
+	    $.ajax({
+		    url: url,
+		    type: 'post',
+		    data: data,
+		    success: function(data) {
 				console.log(data)
-			    },
-			    error: function(response, error) {
+		    },
+		    error: function(response, error) {
 				console.log(response)
 				console.log(error)
-			    }
-			});
-
+		    }
 		});
 
-
-
-
-
-
-	})
+	});
+})
 
