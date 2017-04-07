@@ -7,7 +7,7 @@ app.controller("sellController", function($scope, $http) {
     	console.log("got here")
 	    e.preventDefault();
 
-    	var url = "https://104.236.12.104:8000/createPost";
+    	var url = "https://localhost:8000/createPost";
 
 	    var price = $("#price").val()
 	    var title = $("#title").val()
