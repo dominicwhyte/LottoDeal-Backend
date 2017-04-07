@@ -25,8 +25,37 @@ window.fbAsyncInit = function() {
 }(document, 'script', 'facebook-jssdk'));
 
 function myFacebookLogin() {
+
+  console.log("got here bro")
+
+      var url = "https://localhost:8000/createUser";
+
+      var username = "Bob"
+      var userFbid = "1324"
+      var profileurl = "www.github.com"
+
+      data = {
+        name: username,
+        fbid: userFbid,
+        url: profileurl
+      }
+
+      // AJAX POST TO SERVER
+      $.ajax({
+        url: url,
+        type: 'post',
+        data: data,
+        success: function(data) {
+        console.log(data)
+        },
+        error: function(response, error) {
+        console.log(response)
+        console.log(error)
+        }
+    });
+
     console.log('test3')
-  FB.login(function(){}, {scope: 'publish_actions'});
+  // FB.login(function(){}, {scope: 'publish_actions'});
 }
 
 
@@ -39,6 +68,7 @@ app.controller("loginController", function($scope) {
 	
 })
 
+var app = angular.module("app", []);
 
 
  //   FB.getLoginStatus(function(response) {
