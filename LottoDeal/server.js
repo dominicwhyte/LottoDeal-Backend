@@ -167,13 +167,8 @@ var userSchema = new Schema({
     fbid: String, // facebook given
     pictureURL: String, //profile pic URL from Facebook (String)
     bids: [{
-<<<<<<< HEAD
-    	itemID: String,
-    	amount: Number
-=======
         itemID: String,
         amount: Number
->>>>>>> 201ab31df3590107699a285b325f9bae19db56b1
     }], //Bid object as dictionary containing all current bids of that user (indexed by itemID).  If a person bids twice on an item, the bid for that itemID is increased (Dictionary)
 });
 
@@ -186,13 +181,8 @@ var itemSchema = new Schema({
     datePosted: Date, //date the item was posted (String - parse into Date object)
     expirationDate: Date, // date when if the item was not sold then everyone gets refunded (String- parse into Date object)
     userIDs: [{
-<<<<<<< HEAD
-    	ID: String,
-    	amount: Number,
-=======
         ID: String,
         amount: Number,
->>>>>>> 201ab31df3590107699a285b325f9bae19db56b1
     }], //Dictionary of fbid’s of users who have placed bids (Dictionary)
     pictureURL: String, // picture of item (we can make it more than one if needed (String)
     descrip: String, // text string of what exactly is being sold (String)
@@ -321,13 +311,8 @@ var findUsers = function(fbid) {
 var findAllUsers = function() {
     // get all the users
     User.find({}, function(err, user) {
-<<<<<<< HEAD
-    	if (err) throw err;
-    	console.log(user);
-=======
         if (err) throw err;
         console.log(user);
->>>>>>> 201ab31df3590107699a285b325f9bae19db56b1
         return user;
     });
 }
@@ -345,15 +330,9 @@ var deleteAllUsers = function() {
 var findItem = function(title) {
     // get all the Items
     Item.find({title: title}, function(err, item) {
-<<<<<<< HEAD
-	if (err) throw err;
-	// object of all the users
-	console.log(items);
-=======
     if (err) throw err;
     // object of all the users
     console.log(items);
->>>>>>> 201ab31df3590107699a285b325f9bae19db56b1
     return item;
     });
 }
@@ -361,13 +340,8 @@ var findItem = function(title) {
 var findAllItems = function() {
     // get all the items
     Item.find({}, function(err, item) {
-<<<<<<< HEAD
-    	if (err) throw err;
-    	console.log(item);
-=======
         if (err) throw err;
         console.log(item);
->>>>>>> 201ab31df3590107699a285b325f9bae19db56b1
         return item;
     });
 }
