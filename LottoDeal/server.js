@@ -8,6 +8,11 @@ var bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json())
 app.use(json())
+
+
+var fs = require('fs'); // add for file system
+
+
 //app.use(express.bodyParser());
 
 var options = {
@@ -44,21 +49,21 @@ app.post('/createPost', function(request, response) {
     var expirationDate = request.body.expirationDate;
     var title = request.body.title;
     var price = request.body.price;
-    var pictureURL = request.body.pictureURL; // should just store multipart
+    var image = request.body.picture; 
     var description = request.body.description;
 
     var post = {
-    timecreated: timecreated,
-    expirationDate: expirationDate,
-    title: title,
-    price: price,
-    pictureURL: pictureURL,
-    description: description
-    }
-    console.log(post)
+        timecreated: timecreated,
+        expirationDate: expirationDate,
+        title: title,
+        price: price,
+        image: image,
+        description: description
+        }
+//    console.log(post)
 
 // should be giving it a date instead of a time
-    createItem("title", 123, date, date, "pictureURL", "description");
+//    createItem("title", 123, date, date, image, "description");
     
     response.send("You have created a new post.")
 })
@@ -184,8 +189,9 @@ var itemSchema = new Schema({
         ID: String,
         amount: Number,
     }], //Dictionary of fbid’s of users who have placed bids (Dictionary)
-    pictureURL: String, // picture of item (we can make it more than one if needed (String)
     descrip: String, // text string of what exactly is being sold (String)
+    img: {data: Buffer, // stores an image here
+        contentType: String}
 });
 
 var Item = mongoose.model('Item', itemSchema);
@@ -203,15 +209,27 @@ var createUser = function(name, id, url) {
     });
 }
 
-var createItem = function(title, price, datePosted, expirationDate, pictureURL, descrip) {
-    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, pictureURL: pictureURL, descrip: descrip});
+var createItem = function(title, price, datePosted, expirationDate, image, descrip) {
+    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, descrip: descrip});
     // call the built-in save method to save to the database
+    newItem.img.data = fs.readFileSync(image);
+    newItem.img.contentType = 'image/png';
+    newItem.save(function (err, newItem) {
+      if (err) throw err;});
+
     newItem.save(function(err) {
     if (err) throw err;
 
     console.log('Item saved successfully!');
     });
 }
+
+
+        // A.findById(a, function (err, doc) {
+        //   if (err) return next(err);
+        //   res.contentType(doc.img.contentType);
+        //   res.send(doc.img.data);
+        //   // how to send it back to the sever from my computer
 
 var addBidForItem = function(itemID, userID, newAmount) {
     // get a item with ID and update the userID array
