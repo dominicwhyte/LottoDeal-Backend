@@ -146,4 +146,12 @@ footer.signin {
     background-color: white;
 }
 
+#thumbnail-bar {
+    max-height: 10%;
+    margin-bottom: 8px;
+}
 
+#item-button {
+    padding-left: 10%;
+    padding-right: 10%;
+}

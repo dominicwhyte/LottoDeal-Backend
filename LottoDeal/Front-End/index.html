@@ -44,6 +44,21 @@
                 </button>
                 <a class="navbar-brand" href="index.html">Home</a>
             </div>
+            <center>
+            <div class="col-sm-6 col-lg-4 col-md-4">
+              <form class="navbar-form" role="search" method="get" id="search-form" name="search-form">
+                  <div class="btn-group pull-left" style="margin-right:10px; min-width: 100%;">
+
+                  <div class="input-group">
+                      <input type="text" class="form-control" placeholder="Search for Lotteries!" id="query" name="query" value="">
+                       <div class="input-group-btn">
+                      <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search"></span></button>
+                      </div>
+                    </div>
+                  </div>
+                  </form>
+                  </div>
+                  </center>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
@@ -107,14 +122,22 @@
                 <div class="row">
 
                     <div class="col-sm-4 col-lg-4 col-md-4">
-                        <div class="thumbnail">
+                        <div class="thumbnail" id="item">
                             <img src="http://placehold.it/320x150" alt="">
                             <div class="caption">
-                                <h4 class="pull-right">$24.99</h4>
+                                <h5 class="pull-right">$24.99</h5>
                                 <h4><a href="#">First Product</a>
                                 </h4>
-                                <p>See more snippets like this online store item at <a target="_blank" href="http://www.bootsnipp.com">Bootsnipp - http://bootsnipp.com</a>.</p>
-                            </div>
+                                <div class="progress" id="thumbnail-bar">
+                                    <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="40"
+                                    aria-valuemin="0" aria-valuemax="100" style="width:40%">
+                                    </div>
+                                </div>
+                                <h5 class="pull-right">Time Left:</h5>
+                                <button type="button" class="btn btn-success btn-sm" id="item-button">BID</button>
+
+                              <p align="justify">This is a short description of the item you want to sell</p>
+                            </div> </a>
                             <div class="ratings">
                                 <p class="pull-right">15 reviews</p>
                                 <p>
