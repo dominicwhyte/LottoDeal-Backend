@@ -90,9 +90,14 @@
                     <input type="checkbox" value="remember-me"> Remember me
                 </label>
             </div>
-            <button class="btn btn-lg btn-primary btn-block" type="submit" onclick="myFacebookLogin()">Sign in</button>
-            <br>
-            <div id="fbButton" class="fb-login-button" data-max-rows="1" data-size="xlarge" data-show-faces="false" data-auto-logout-link="false"></div>
+            <!-- Display login status -->
+            <div id="status"></div>
+
+            <!-- Facebook login or logout button -->
+            <button id="fbLink" class="btn btn-lg btn-primary btn-block" type="submit" onclick="fbLogin()">Facebook Sign in</button>
+
+            <!-- Display user profile data -->
+            <div id="userData"></div>
         </form>
 
     </div> <!-- /container -->
