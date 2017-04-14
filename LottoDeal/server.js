@@ -130,7 +130,7 @@ app.get('/getBids', function(request, response) {
 
     var title = request.body.title;
     var item = findItem(title);
-
+    
 })
 
 // Start the server at localhost:8000

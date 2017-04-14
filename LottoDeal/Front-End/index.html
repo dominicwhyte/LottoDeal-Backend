@@ -119,6 +119,7 @@
 
                 </div>
 
+
                 <div class="row">
                     <div ng-repeat="post in posts">
                         <div class="col-sm-4 col-lg-4 col-md-4">
@@ -134,7 +135,7 @@
                                     </div>
                                 </div>
                                 <h5 class="pull-right">Time Left: {{scope.expirationDate}}</h5>
-                                <button type="button" class="btn btn-success btn-sm" id="item-button">BID</button>
+                                <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="$scope.bid(post._id)$" id="{{post._id}}">BID</button>
 
                                 <p align="justify">{{scope.description}}</p>
                             </div> </a>
