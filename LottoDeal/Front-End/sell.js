@@ -9,22 +9,25 @@ app.controller("sellController", function($scope, $http) {
 
     	var url = "https://localhost:8000/createPost";
 
-	    var price = $("#price").val()
-	    var title = $("#title").val()
-	    var description = $("#description").val()
-	    var date = $("#expirDate").val()
-	    var image = $("#itemPicture").val()
+	    // var price = $("#price").val()
+	    // var title = $("#title").val()
+	    // var description = $("#description").val()
+	    // var date = $("#expirDate").val()
+	    // var image = $("#itemPicture").val()
 
-	    console.log(image)
+	    // console.log(image)
 
-	    data = {
-	    	price: price,
-	    	title: title,
-	    	description: description,
-	    	expirationDate: date,
-	    	image: image
-	    }
+	    // data = {
+	    // 	price: price,
+	    // 	title: title,
+	    // 	description: description,
+	    // 	expirationDate: date,
+	    // 	image: image
+	    // }
 
+	    var formData = new FormData($(this)[0]);
+	    var data = formData
+	    console.log(formData)
 
 	    // AJAX POST TO SERVER
 	    $.ajax({

@@ -54,25 +54,25 @@ app.post('/createPost', function(request, response) {
 
     // create a new post in the database
     var date = new Date();
-    var timecreated = date.getTime();
+  //  var timecreated = date.getTime();
     var expirationDate = request.body.expirationDate;
     var title = request.body.title;
     var price = request.body.price;
-    var image = request.body.picture; 
+    //var image = request.body.picture; 
     var description = request.body.description;
 
-    var post = {
-        timecreated: timecreated,
-        expirationDate: expirationDate,
-        title: title,
-        price: price,
-        image: image,
-        description: description
-    }
+    // var post = {
+    //     timecreated: timecreated,
+    //     expirationDate: expirationDate,
+    //     title: title,
+    //     price: price,
+    //    // image: image,
+    //     description: description
+    // }
 //    console.log(post)
 
 // should be giving it a date instead of a time
-//    createItem("title", 123, date, date, image, "description");
+createItem(title, price, date, expirationDate, "description");
 
 response.send("You have created a new post.")
 })
@@ -179,7 +179,9 @@ mongoose.connect(url, function(err, db) {
 
 
     // findAllUsers()
-    //findAllItems()
+    findAllItems(function (items) {
+        console.log(items);
+    });
     //checkIfServerShouldPerformLottery();
 });
 
