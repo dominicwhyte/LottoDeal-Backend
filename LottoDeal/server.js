@@ -55,9 +55,9 @@ app.post('/createPost', function(request, response) {
     // create a new post in the database
     var date = new Date();
   //  var timecreated = date.getTime();
-    var expirationDate = request.body.expirationDate;
-    var title = request.body.title;
-    var price = request.body.price;
+  var expirationDate = request.body.expirationDate;
+  var title = request.body.title;
+  var price = request.body.price;
     //var image = request.body.picture; 
     var description = request.body.description;
 
@@ -109,7 +109,7 @@ app.get('/getPosts', function(request, response) {
     // might not need to include bids
 
     var items = findAllItems(function(items) {
-        console.log(items);
+       // console.log(items);
         response.send(JSON.stringify(items))
     });
     
@@ -179,9 +179,9 @@ mongoose.connect(url, function(err, db) {
 
 
     // findAllUsers()
-    findAllItems(function (items) {
-        console.log(items);
-    });
+    // findAllItems(function (items) {
+    //     console.log(items);
+    // });
     //checkIfServerShouldPerformLottery();
 });
 
