@@ -72,7 +72,7 @@ app.post('/createPost', function(request, response) {
 //    console.log(post)
 
 // should be giving it a date instead of a time
-createItem(title, price, date, expirationDate, "description");
+createItem(title, price, date, expirationDate, description);
 
 response.send("You have created a new post.")
 })
@@ -187,14 +187,17 @@ mongoose.connect(url, function(err, db) {
 
     //addBidForItem("58efe4435363382e3d61137a", "58e8054642a9960421d3a566", 3);
     var date = new Date();
-    //createItem("Dildo", 123, date, date, "description");
+  
+ 
 
     findAllUsers(function(users) {
         console.log(users)
     });
-    // findAllItems(function (items) {
-    //     console.log(items);
-    // });
+    
+
+    findAllItems(function (items) {
+        console.log(items);
+    });
     //checkIfServerShouldPerformLottery();
 });
 
@@ -221,10 +224,8 @@ var itemSchema = new Schema({
     price: Number, //price in USD (int)
     datePosted: Date, //date the item was posted (String - parse into Date object)
     expirationDate: Date, // date when if the item was not sold then everyone gets refunded (String- parse into Date object)
+    amountRaised: Number, //total amount raised
     bids: [{
-        ID: String
-    }],
-    userIDs: [{
         ID: String,
         amount: Number,
     }], //Dictionary of fbid’s of users who have placed bids (Dictionary)
@@ -249,7 +250,7 @@ var createUser = function(name, id, url) {
 }
 
 var createItem = function(title, price, datePosted, expirationDate, descrip) {
-    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, descrip: descrip, bids : []});
+    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, amountRaised : 0, descrip: descrip, bids : []});
     // call the built-in save method to save to the database
     // newItem.img.data = fs.readFileSync(image);
     // newItem.img.contentType = 'image/png';
@@ -290,13 +291,14 @@ var addBidForItem = function(itemID, userID, newAmount) {
         if (err) throw err;
         var array = item.bids;
         var found = false;
-        
+
         if (item.bids != null) {
             for (i = 0; i < item.bids.length; i++) {
-                if (item.userIDs[i].ID == userID) {
-                    var curAmount = item.userIDs[i].amount;
+                if (item.bids[i].ID == userID) {
+                    var curAmount = item.bids[i].amount;
                     curAmount += newAmount;
-                    item.userIDs[i].amount = curAmount;
+                    item.bids[i].amount = curAmount;
+                    item.amountRaised += newAmount;
                     item.save();
                     found = true;
                     break;
@@ -308,6 +310,7 @@ var addBidForItem = function(itemID, userID, newAmount) {
             var data = {ID: userID, amount: newAmount};
             console.log(data);
             item.bids.push(data);
+            item.amountRaised += newAmount;
             item.save();
         }
 
@@ -317,42 +320,75 @@ var addBidForItem = function(itemID, userID, newAmount) {
 
     });
 
+    var users = findAllUsers(function (users) {
+        var usersLength = users.length;
+
+        for (var i = 0; i < usersLength; i++) {
+            if (users[i].fbid === userID) {
+                //response.send("User already exists");
+                var user = users[i]
+                var array = user.bids;
+                var found = 0;
+                if (user.bids != null) {
+                    for (i = 0; i < user.bids.length; i++) {
+                        if (user.bids[i].itemID == itemID) {
+                            var curAmount = user.bids[i].amount;
+                            curAmount += newAmount;
+                            user.bids[i].amount = curAmount;
+                            user.save();
+                            found = 1;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        var data = {itemID: itemID, amount: newAmount};
+                        console.log(data);
+                        user.bids.push(data);
+                        user.save();
+                    }
+
+                    console.log('bid successfully updated!');
+                }
+            }
+        }
+    });
+
 
     // get a user with ID and update the bids array
-    User.findById(userID, function(err, user) {
-        if (err) throw err;
-        
-        if (user != null) {
-            var array = user.bids;
-            var found = 0;
-            if (user.bids != null) {
-                for (i = 0; i < user.bids.length; i++) {
-                    if (user.bids[i].itemID == itemID) {
-                        var curAmount = user.bids[i].amount;
-                        curAmount += newAmount;
-                        user.bids[i].amount = curAmount;
-                        user.save();
-                        found = 1;
-                        break;
-                    }
-                }
-                if (!found) {
-                    var data = {itemID: itemID, amount: newAmount};
-                    console.log(data);
-                    user.bids.push(data);
-                    user.save();
-                }
+    // User.findById(userID, function(err, user) {
+    //     if (err) throw err;
 
-                console.log('bid successfully updated!');
-            }
-            
-        }
-        else {
-            console.log('user not found');
-        }
-        
+    //     if (user != null) {
+    //         var array = user.bids;
+    //         var found = 0;
+    //         if (user.bids != null) {
+    //             for (i = 0; i < user.bids.length; i++) {
+    //                 if (user.bids[i].itemID == itemID) {
+    //                     var curAmount = user.bids[i].amount;
+    //                     curAmount += newAmount;
+    //                     user.bids[i].amount = curAmount;
+    //                     user.save();
+    //                     found = 1;
+    //                     break;
+    //                 }
+    //             }
+    //             if (!found) {
+    //                 var data = {itemID: itemID, amount: newAmount};
+    //                 console.log(data);
+    //                 user.bids.push(data);
+    //                 user.save();
+    //             }
 
-    });
+    //             console.log('bid successfully updated!');
+    //         }
+
+    //     }
+    //     else {
+    //         console.log('user not found');
+    //     }
+
+
+    // });
 }
 
 

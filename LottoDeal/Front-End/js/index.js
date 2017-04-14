@@ -25,7 +25,7 @@ app.controller("indexController", function($scope) {
     		console.log(error)
     	}
     });
-
+    
 
     $scope.bid = function (event) {
         console.log('hi')
