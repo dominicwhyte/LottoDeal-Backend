@@ -38,6 +38,8 @@ window.fbAsyncInit = function() {
 
 // Facebook login with JavaScript SDK
 function fbLogin() {
+
+
     var window = FB.login(function (response) {
         if (response.authResponse) {
             // Get and display the user profile data
@@ -83,6 +85,7 @@ function getFbUserData(){
             document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.first_name + '!';
             document.getElementById('userData').innerHTML = '<p><b>FB ID:</b> '+response.id+'</p><p><b>Name:</b> '+response.first_name+' '+response.last_name+'</p><p><b>Email:</b> '+response.email+'</p><p><b>Gender:</b> '+response.gender+'</p><p><b>Locale:</b> '+response.locale+'</p><p><b>Picture:</b> <img src="'+response.picture.data.url+'"/></p><p><b>FB Profile:</b> <a target="_blank" href="'+response.link+'">click to view profile</a></p>';
 
+            localStorage.setItem("curUserID", response.id);
             // Save user data
             saveUserData(response);
         });
@@ -90,6 +93,10 @@ function getFbUserData(){
 
 // Logout from facebook
 function fbLogout() {
+
+    //delete local storage
+    delete localStorage.curUserID;
+
     FB.logout(function() {
         document.getElementById('fbLink').setAttribute("onclick","fbLogin()");
         document.getElementById('fbLink').innerHTML = 'Facebook Login';
