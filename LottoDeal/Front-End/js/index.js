@@ -3,7 +3,30 @@ var app = angular.module("index_app", [])
 app.controller("indexController", function($scope) {
 	$scope.selectedTab = 0
 
-})
+	$scope.posts = []
+
+	var url = "https://localhost:8000/getPosts";
+
+
+    console.log('test')
+
+    // AJAX POST TO SERVER
+    $.ajax({
+    	url: url,
+    	type: 'GET',
+    	success: function(data) {
+            var items = JSON.parse(data)
+            $scope.posts = items;
+            console.log($scope.posts)
+            $scope.$apply()
+    	},
+    	error: function(response, error) {
+    		console.log(response)
+    		console.log(error)
+    	}
+    });
+
+})	
 
 // /* Create Tabs */
 

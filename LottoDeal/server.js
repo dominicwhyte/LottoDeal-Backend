@@ -3,6 +3,7 @@ var express = require('express')
 var app = express()
 var https = require('https')
 var fs = require('fs')
+const SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES = 3;
 var json = require('express-json')
 var bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({extended:false}));
@@ -11,6 +12,14 @@ app.use(json())
 
 
 var fs = require('fs'); // add for file system
+
+//Check if lotteries should be performed
+function checkIfServerShouldPerformLottery(){
+    // do whatever you like here
+    console.log('test')
+    checkLotteries();
+    setTimeout(checkIfServerShouldPerformLottery, SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES * 1000);
+}
 
 
 //app.use(express.bodyParser());
@@ -24,7 +33,7 @@ app.use(function(req, res, next) {
     var allowedOrigins = ['https://dominicwhyte.github.io'];
     var origin = req.headers.origin;
     if(allowedOrigins.indexOf(origin) > -1){
-    res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Origin', origin);
     }
     //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
     res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -59,13 +68,13 @@ app.post('/createPost', function(request, response) {
         price: price,
         image: image,
         description: description
-        }
+    }
 //    console.log(post)
 
 // should be giving it a date instead of a time
 //    createItem("title", 123, date, date, image, "description");
-    
-    response.send("You have created a new post.")
+
+response.send("You have created a new post.")
 })
 
 // Will add a new user to our database
@@ -99,9 +108,11 @@ app.get('/getPosts', function(request, response) {
     // get all of the posts and return them to frontend to load on feed
     // might not need to include bids
 
-    var items = findAllItems();
-
-    response.send("Here are all of the posts")
+    var items = findAllItems(function(items) {
+        console.log(items);
+        response.send(JSON.stringify(items))
+    });
+    
 })
 
 // Send back either a serialized or full version of all users
@@ -157,9 +168,19 @@ mongoose.connect(url, function(err, db) {
 
     //    createUser("dom", "1234", "google.com");
 
-    findAllUsers();
+    //findAllUsers();
     console.log("Connected successfully to server");
 
+    //addBidForItem("58efe4435363382e3d61137a", "58e8054642a9960421d3a566", 3);
+    var date = new Date();
+
+    //createItem("Dildo", 123, date, date, "description");
+
+
+
+    // findAllUsers()
+    //findAllItems()
+    //checkIfServerShouldPerformLottery();
 });
 
 
@@ -185,6 +206,9 @@ var itemSchema = new Schema({
     price: Number, //price in USD (int)
     datePosted: Date, //date the item was posted (String - parse into Date object)
     expirationDate: Date, // date when if the item was not sold then everyone gets refunded (String- parse into Date object)
+    bids: [{
+        ID: String
+    }],
     userIDs: [{
         ID: String,
         amount: Number,
@@ -192,7 +216,7 @@ var itemSchema = new Schema({
     descrip: String, // text string of what exactly is being sold (String)
     img: {data: Buffer, // stores an image here
         contentType: String}
-});
+    });
 
 var Item = mongoose.model('Item', itemSchema);
 
@@ -204,24 +228,38 @@ var createUser = function(name, id, url) {
     var newUser = new User ({fullName : name, fbid : id, pictureURL : url});
     // call the built-in save method to save to the database
     newUser.save(function(err) {
-    if (err) throw err;
-    console.log('User saved successfully!');
+        if (err) throw err;
+        console.log('User saved successfully!');
     });
 }
 
-var createItem = function(title, price, datePosted, expirationDate, image, descrip) {
-    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, descrip: descrip});
+var createItem = function(title, price, datePosted, expirationDate, descrip) {
+    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, descrip: descrip, bids : []});
     // call the built-in save method to save to the database
-    newItem.img.data = fs.readFileSync(image);
-    newItem.img.contentType = 'image/png';
+    // newItem.img.data = fs.readFileSync(image);
+    // newItem.img.contentType = 'image/png';
     newItem.save(function (err, newItem) {
       if (err) throw err;});
 
     newItem.save(function(err) {
-    if (err) throw err;
+        if (err) throw err;
 
-    console.log('Item saved successfully!');
+        console.log('Item saved successfully!');
     });
+}
+//Check database for if lotteries should be performed
+var checkLotteries = function() {
+    Item.find({}, function(err, items) {
+        if (err) throw err;
+        
+        for (i = 0; i < items.length; i++) {
+            var date = new Date(items[i].expirationDate)
+            if (date < Date.now()) {
+              console.log('Date has past');
+          }
+      }
+      return items;
+  });
 }
 
 
@@ -231,57 +269,73 @@ var createItem = function(title, price, datePosted, expirationDate, image, descr
         //   res.send(doc.img.data);
         //   // how to send it back to the sever from my computer
 
-var addBidForItem = function(itemID, userID, newAmount) {
+        var addBidForItem = function(itemID, userID, newAmount) {
     // get a item with ID and update the userID array
     Item.findById(itemID, function(err, item) {
-    if (err) throw err;
-    var array = item.bids;
-    var found = 0;
-    for (i = 0; i < item.bids.length; i++) {
-        if (item.userIDs[i].ID == userID) {
-        var curAmount = item.userIDs[i].amount;
-        curAmount += newAmount;
-        item.userIDs[i].amount = curAmount;
-        item.save();
-        found = 1;
-        break;
+        if (err) throw err;
+        var array = item.bids;
+        var found = false;
+        
+        if (item.bids != null) {
+            for (i = 0; i < item.bids.length; i++) {
+                if (item.userIDs[i].ID == userID) {
+                    var curAmount = item.userIDs[i].amount;
+                    curAmount += newAmount;
+                    item.userIDs[i].amount = curAmount;
+                    item.save();
+                    found = true;
+                    break;
+                }
+            }
         }
-    }
-    if (!found) {
-        var data = {ID: userID, amount: newAmount};
-        console.log(data);
-        item.bids.push(data);
-        item.save();
-    }
 
-    console.log('bid successfully updated!');
+        if (!found) {
+            var data = {ID: userID, amount: newAmount};
+            console.log(data);
+            item.bids.push(data);
+            item.save();
+        }
+
+        console.log('bid successfully updated!');
+        
+
 
     });
 
 
     // get a user with ID and update the bids array
     User.findById(userID, function(err, user) {
-    if (err) throw err;
-    var array = user.bids;
-    var found = 0;
-    for (i = 0; i < user.bids.length; i++) {
-        if (user.bids[i].itemID == itemID) {
-        var curAmount = user.bids[i].amount;
-        curAmount += newAmount;
-        user.bids[i].amount = curAmount;
-        user.save();
-        found = 1;
-        break;
-        }
-    }
-    if (!found) {
-        var data = {itemID: itemID, amount: newAmount};
-        console.log(data);
-        user.bids.push(data);
-        user.save();
-    }
+        if (err) throw err;
+        
+        if (user != null) {
+            var array = user.bids;
+            var found = 0;
+            if (user.bids != null) {
+                for (i = 0; i < user.bids.length; i++) {
+                    if (user.bids[i].itemID == itemID) {
+                        var curAmount = user.bids[i].amount;
+                        curAmount += newAmount;
+                        user.bids[i].amount = curAmount;
+                        user.save();
+                        found = 1;
+                        break;
+                    }
+                }
+                if (!found) {
+                    var data = {itemID: itemID, amount: newAmount};
+                    console.log(data);
+                    user.bids.push(data);
+                    user.save();
+                }
 
-    console.log('bid successfully updated!');
+                console.log('bid successfully updated!');
+            }
+            
+        }
+        else {
+            console.log('user not found');
+        }
+        
 
     });
 
@@ -292,21 +346,21 @@ var addBidForItem = function(itemID, userID, newAmount) {
 var deleteUser = function(id) {
     // Remove User
     User.findById(id, function(err, user) {
-    if (err) throw err;
+        if (err) throw err;
 
     // delete
     user.remove(function(err) {
         if (err) throw err;
         console.log('User successfully deleted!');
     });
-    });
+});
 }
 
 
 var deleteItem = function(id) {
     // Remove Item
     Item.findById(id, function(err, item) {
-    if (err) throw err;
+        if (err) throw err;
 
     // delete
     item.remove(function(err) {
@@ -314,15 +368,15 @@ var deleteItem = function(id) {
 
         console.log('Item successfully deleted!');
     });
-    });
+});
 }
 
 
 var findUsers = function(fbid) {
     // get all the users
     User.find({fbid: fbid}, function(err, user) {
-    if (err) throw err;
-    console.log(user);
+        if (err) throw err;
+        console.log(user);
     });
 }
 
@@ -339,8 +393,18 @@ var deleteAllUsers = function() {
     // get all the users
 
     User.remove({}, function(err) {
-    if (err) throw err;
-    console.log('All User successfully deleted!');
+        if (err) throw err;
+        console.log('All User successfully deleted!');
+    });
+
+}
+
+var deleteAllItems = function() {
+    // get all the users
+
+    Item.remove({}, function(err) {
+        if (err) throw err;
+        console.log('All Items successfully deleted!');
     });
 
 }
@@ -348,18 +412,19 @@ var deleteAllUsers = function() {
 var findItem = function(title) {
     // get all the Items
     Item.find({title: title}, function(err, item) {
-    if (err) throw err;
+        if (err) throw err;
     // object of all the users
     console.log(items);
     return item;
-    });
+});
 }
 
-var findAllItems = function() {
+var findAllItems = function(callback) {
     // get all the items
-    Item.find({}, function(err, item) {
+    Item.find({}, function(err, items) {
         if (err) throw err;
-        console.log(item);
-        return item;
+        //console.log(items);
+        callback(items)
     });
+
 }
