@@ -18,16 +18,6 @@ app.controller("indexController", function($scope) {
             var items = JSON.parse(data)
             $scope.posts = items;
             console.log($scope.posts)
-            $("button[buttonType='bidButton']").click(function(e) {
-        console.log(this)
-
-        idattr = this.attr("id");
-        console.log(idattr)
-    })
-
-
-
-
             $scope.$apply()
     	},
     	error: function(response, error) {
@@ -36,30 +26,35 @@ app.controller("indexController", function($scope) {
     	}
     });
 
-    $("button[buttonType='bidButton']").click(function(e) {
-        console.log(this)
-
-        idattr = this.attr("id");
-        console.log(idattr)
-    })
-
-
 
     $scope.bid = function (event) {
+        console.log('hi')
         console.log(event)
 
+        var url = "https://localhost:8000/addBid";
 
+        data = {
+         itemID: event,
+         userID: "233244",
+         newAmount: 4
+        }
+
+        $.ajax({
+        url: url,
+        data: data,
+        type: 'POST',
+        success: function(data) {
+            console.log('Bid added for ' + event)
+        },
+        error: function(response, error) {
+            console.log(response)
+            console.log(error)
+        }
+        });
 
     }
 
 })	
-
- $("button[buttonType='bidButton']").click(function(e) {
-        console.log(this)
-
-        idattr = this.attr("id");
-        console.log(idattr)
-    })
 
 // /* Create Tabs */
 

@@ -77,6 +77,8 @@ createItem(title, price, date, expirationDate, "description");
 response.send("You have created a new post.")
 })
 
+
+
 // Will add a new user to our database
 app.post('/createUser', function(request, response) {
     // Parse the response
@@ -85,9 +87,22 @@ app.post('/createUser', function(request, response) {
     var id = request.body.fbid;
     var url = request.body.url;
 
-    createUser(name, id, url);
+    var users = findAllUsers(function (users) {
+        var usersLength = users.length;
+        var found = 0;
 
-    response.send("You have created a new user")
+        for (var i = 0; i < usersLength; i++) {
+            if (users[i].fbid === id) {
+                //response.send("User already exists");
+                found = 1;
+            }
+        }
+
+        if (!found) {
+            createUser(name, id, url);
+            //response.send("You have created a new user");
+        }
+    });
 })
 
 // A user has bid on an item, add this bid to database
@@ -110,17 +125,18 @@ app.get('/getPosts', function(request, response) {
 
     var items = findAllItems(function(items) {
        // console.log(items);
-        response.send(JSON.stringify(items))
-    });
+       response.send(JSON.stringify(items))
+   });
     
 })
 
 // Send back either a serialized or full version of all users
 app.get('/getUsers', function(request, response) {
 
-    var users = findAllUsers();
-
-    response.send("Here are all of the users")
+    var users = findAllUsers(function(users){
+        response.send(JSON.stringify(users))
+    });
+    
 })
 
 // Send back the bids on the passed in item parameter, in case user wants to
@@ -130,7 +146,7 @@ app.get('/getBids', function(request, response) {
 
     var title = request.body.title;
     var item = findItem(title);
-    
+
 })
 
 // Start the server at localhost:8000
@@ -166,19 +182,16 @@ mongoose.Promise = global.Promise;
 mongoose.connect(url, function(err, db) {
     assert.equal(null, err);
 
-    //    createUser("dom", "1234", "google.com");
-
     //findAllUsers();
     console.log("Connected successfully to server");
 
     //addBidForItem("58efe4435363382e3d61137a", "58e8054642a9960421d3a566", 3);
     var date = new Date();
-
     //createItem("Dildo", 123, date, date, "description");
 
-
-
-    // findAllUsers()
+    findAllUsers(function(users) {
+        console.log(users)
+    });
     // findAllItems(function (items) {
     //     console.log(items);
     // });
@@ -271,7 +284,7 @@ var checkLotteries = function() {
         //   res.send(doc.img.data);
         //   // how to send it back to the sever from my computer
 
-        var addBidForItem = function(itemID, userID, newAmount) {
+var addBidForItem = function(itemID, userID, newAmount) {
     // get a item with ID and update the userID array
     Item.findById(itemID, function(err, item) {
         if (err) throw err;
@@ -340,7 +353,6 @@ var checkLotteries = function() {
         
 
     });
-
 }
 
 
@@ -382,12 +394,11 @@ var findUsers = function(fbid) {
     });
 }
 
-var findAllUsers = function() {
+var findAllUsers = function(callback) {
     // get all the users
-    User.find({}, function(err, user) {
+    User.find({}, function(err, users) {
         if (err) throw err;
-        console.log(user);
-        return user;
+        callback(users)
     });
 }
 
