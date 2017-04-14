@@ -15,7 +15,7 @@ app.controller("sellController", function($scope, $http) {
 	    var date = $("#expirDate").val()
 	    //var image = $("#itemPicture").val()
 
-	    console.log(image)
+	   // console.log(image)
 
 	    data = {
 	    	price: price,
