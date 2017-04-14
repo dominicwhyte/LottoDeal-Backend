@@ -187,9 +187,8 @@ mongoose.connect(url, function(err, db) {
 
     //addBidForItem("58efe4435363382e3d61137a", "58e8054642a9960421d3a566", 3);
     var date = new Date();
-  
- 
 
+ 
     findAllUsers(function(users) {
         console.log(users)
     });
@@ -298,7 +297,7 @@ var addBidForItem = function(itemID, userID, newAmount) {
                     var curAmount = item.bids[i].amount;
                     curAmount += newAmount;
                     item.bids[i].amount = curAmount;
-                    item.amountRaised += newAmount;
+                    item.amountRaised += Number(newAmount);
                     item.save();
                     found = true;
                     break;
@@ -349,6 +348,7 @@ var addBidForItem = function(itemID, userID, newAmount) {
 
                     console.log('bid successfully updated!');
                 }
+                break;
             }
         }
     });

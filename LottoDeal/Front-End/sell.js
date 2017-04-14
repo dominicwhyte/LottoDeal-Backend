@@ -12,7 +12,18 @@ app.controller("sellController", function($scope, $http) {
 	    var price = $("#price").val()
 	    var title = $("#title").val()
 	    var description = $("#description").val()
-	    var date = $("#expirDate").val()
+	    var date = new Date()
+	    var offset = $("#expirDate").val()
+	    if (offset == 1) {
+	    	date.setDate(date.getDate() + 1); 
+	    }
+	    else if (offset == 2) {
+	    	date.setDate(date.getDate() + 7); 
+	    }
+	    else {
+	    	date.setDate(date.getDate() + 30); 
+	    }
+
 	    //var image = $("#itemPicture").val()
 
 	   // console.log(image)
