@@ -1,6 +1,40 @@
-var app = angular.module("index_app", [])
+var app = angular.module("index_app", ["ngRoute"])
 
-app.controller("indexController", function($scope) {
+// app.config(function($routeProvider) {
+//     $routeProvider
+//     .when('/', {
+//         templateUrl: 'pages/template.html',
+//         controller: 'indexController',
+//         reloadOnSearch: false,
+//     })
+//     .otherwise({
+//         templateUrl: 'pages/item.html',
+//         controller: 'indexController',
+//         reloadOnSearch: false,
+//     })
+// })
+
+// app.run(['$rootScope', '$location', '$routeParams', function($rootScope, $location, $routeParams) {
+//     $rootScope.$on('$routeChangeStart', function(e, current, pre) {
+//         console.log('Current route name: ' + $location.path());
+//         var path = $location.path().substring(1, $location.path().length)
+//         console.log(path)
+//         console.log(e)
+//         console.log(current)
+//         console.log(pre)
+
+
+//         // if item is in database, display that webpage
+
+
+
+//         // otherwise, go back to home page
+
+
+//     });
+// }])
+
+app.controller("indexController", ["$scope", "$rootScope", "$location", function($scope, $rootScope, $location) {
 	$scope.selectedTab = 0
 
 	$scope.posts = []
@@ -31,10 +65,74 @@ app.controller("indexController", function($scope) {
           console.log(response)
           console.log(error)
       }
-  });
+    });
     
 
-    $scope.bid = function (event, amount) {
+    $scope.targetPost = null;
+
+    // HANDLE ROUTING
+    // $rootScope.$on('$routeChangeStart', function(e, current, pre) {
+    //     console.log('Current route name: ' + $location.path());
+    //     var path = $location.path().substring(1, $location.path().length)
+    //     console.log(path)
+    //     console.log(e)
+    //     console.log(current)
+
+    //     var foundItem = false;
+
+    //     // can make this a param in url instead of part of path (?itemId = 123)
+
+    //     // if item is in database, display that webpage
+    //     for (var i = 0; i < $scope.posts.length; i++) {
+    //         var post = $scope.posts[i]
+    //         var postId = post["_id"]
+    //         console.log(postId)
+    //         console.log(path)
+    //         if (path == postId) {
+    //             $scope.targetPost = post;
+    //             foundItem = true;
+    //             $location.path("/" + path)
+    //             // $scope.$apply()
+    //             break;
+    //         }
+    //     }
+
+    //     // otherwise, go back to home page
+    //     if (!foundItem) {
+    //         console.log("Going back to home page")
+    //         $location.path('/')
+    //     }
+    // });
+
+
+
+    $scope.bid = function (event, amount, amountRaised, price) {
+        // DISPLAY BID ON FRONT-END
+        var progressbar = $("#progress-bar-" + event)
+        // console.log(progressbar)
+        var currentAmount = progressbar.css("width")
+        // console.log(currentAmount)
+        var totalWidth = (parseInt(currentAmount.substring(0, currentAmount.length - 2)) * parseInt(price)) / parseInt(amountRaised)
+        var percentage = progressbar.width() / progressbar.parent().width() * 100
+        var newAmount = parseInt(amountRaised) + parseInt(amount)
+        // console.log(newAmount)
+        var newPercent = ((newAmount * 1.0) / (parseInt(price) * 1.0))
+        // console.log(newPercent)
+        // var newWidth = progressbar.parent().width() * newPercent
+        var newWidth = totalWidth * newPercent
+        // console.log("newwidth: " + newWidth)
+        var pixelWidth = ""  + newWidth + "px"
+        progressbar.css("width", pixelWidth)
+
+        // change the amount raised
+        var amountText = $("#amountRaised-" + event)
+        // console.log(amountText)
+        amountText.text("$" + newAmount + " of $" + price + " raised")
+
+
+
+
+        // ADD BID TO DATABASE
         console.log("Adding bid for item " + event + " for " + amount)
 
 
@@ -67,7 +165,7 @@ app.controller("indexController", function($scope) {
 
 }
 
-})	
+}])	
 
 //Code modified from http://ditio.net/2010/05/02/javascript-date-difference-calculation/
 var DateDiff = {

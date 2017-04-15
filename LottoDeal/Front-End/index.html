@@ -24,12 +24,18 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+
+
+    <!-- why are these at the top and not at the bottom -->
     <!-- AngularJS Include -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.min.js"></script>
 
+    <!-- Angular route -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular-route.min.js"></script>
+
 </head>
 
-<body ng-controller="indexController">
+<body ng-controller="indexController" ng-cloak> <!-- hides until content loads -->
 
     <!-- Navigation -->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -44,19 +50,21 @@
                 </button>
                 <a class="navbar-brand" href="index.html">Home</a>
             </div>
+            <center>
             <div class="col-sm-6 col-lg-4 col-md-4">
               <form class="navbar-form" role="search" method="get" id="search-form" name="search-form">
                   <div class="btn-group pull-left" style="margin-right:10px; min-width: 100%;">
 
                   <div class="input-group">
-                      <input type="text" class="form-control" placeholder="Search for Lotteries!" id="query" name="query" value="">
+                      <input type="text" class="form-control" placeholder="Search for Lotteries!" id="query" name="query" ng-model="searchText" value="">
                        <div class="input-group-btn">
                       <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search"></span></button>
                       </div>
+                    </div>
                   </div>
+                  </form>
                   </div>
-              </form>
-            </div>
+                  </center>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
@@ -116,20 +124,18 @@
                     </div>
 
                 </div>
-                <h1>test</h1>
-
 
                 <div class="row">
-                    <div ng-repeat="post in posts">
+                    <div ng-repeat="post in posts | filter:searchText">
                         <div class="col-sm-4 col-lg-4 col-md-4">
                             <div class="thumbnail" id="item">
                                 <img src="http://placehold.it/320x150" alt="">
                                 <div class="caption">
-                                    <h5 class="pull-right">${{post.amountRaised}} of ${{post.price}} raised</h5>
+                                    <h5 class="pull-right" id="amountRaised-{{post._id}}">${{post.amountRaised}} of ${{post.price}} raised</h5>
                                     <h4><a href="#">{{post.title}}</a>
                                     </h4>
                                     <div class="progress" id="thumbnail-bar">
-                                        <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="40"
+                                        <div class="progress-bar progress-bar-success progress-bar-striped" id="progress-bar-{{post._id}}" role="progressbar" aria-valuenow="40"
                                         aria-valuemin="0" aria-valuemax="100" style="width:{{post.percentageRaised}}%">
                                     </div>
                                 </div>
@@ -138,9 +144,9 @@
 
                                 <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Bid</button>
                                         <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                                          <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="bid(post._id, 1);" id="{{post._id}}">$1.00</button>
-                                          <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="bid(post._id, 2);" id="{{post._id}}">$2.00</button>
-                                          <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="bid(post._id, 5);" id="{{post._id}}">$5.00</button>
+                                          <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="bid(post._id, 1, post.amountRaised, post.price);" id="{{post._id}}">$1.00</button>
+                                          <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="bid(post._id, 2, post.amountRaised, post.price);" id="{{post._id}}">$2.00</button>
+                                          <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="bid(post._id, 5, post.amountRaised, post.price);" id="{{post._id}}">$5.00</button>
                                       </ul>
                                 </div>
 
@@ -166,6 +172,8 @@
             </div>
 
         </div>
+
+    <div ng-view></div>
 
     </div>
     <!-- /.container -->

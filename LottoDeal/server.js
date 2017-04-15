@@ -42,6 +42,29 @@ app.use(function(req, res, next) {
     return next();
 });
 
+// A user has bid on an item, add this bid to database
+app.post('/createReview', function(request, response) {
+    // get into database, access object, update it's bid field and add to user bids
+
+    var sellerID = request.body.sellerID;
+    var reviewerID = request.body.reviewerID;
+    var stars = request.body.stars;
+    var reviewDes = request.body.reviewDes;
+
+    createReview(sellerID, reviewerID, stars, reviewDes);
+
+    response.send("review added!")
+})
+
+
+// Send back the reviews on the passed in item parameter, in case user wants to
+// see the people that bid on his item
+app.get('/getReviews', function(request, response) {
+    var sellerID = request.body.sellerID;
+    var users = findUsers(sellerID);
+    response.send(JSON.stringify(users.reviews));
+
+})
 
 app.get('/', function(request, response) {
     response.send("API is working!")
@@ -197,7 +220,7 @@ mongoose.connect(url, function(err, db) {
     findAllItems(function (items) {
         console.log(items);
     });
-    //checkIfServerShouldPerformLottery();
+    checkIfServerShouldPerformLottery();
 });
 
 
@@ -213,7 +236,15 @@ var userSchema = new Schema({
         itemID: String,
         amount: Number
     }], //Bid object as dictionary containing all current bids of that user (indexed by itemID).  If a person bids twice on an item, the bid for that itemID is increased (Dictionary)
+    reviews: [{ // reviews on sellers
+        userID: String,
+        stars: Number,
+        reviewDes: String,
+    }],
+    numReview: Number, // total number of reviews
 });
+
+
 
 var User = mongoose.model('User', userSchema);
 
@@ -262,20 +293,82 @@ var createItem = function(title, price, datePosted, expirationDate, descrip) {
         console.log('Item saved successfully!');
     });
 }
+
+
+var createReview = function(sellerID, reviewerID, stars, reviewDes) {
+    User.find({fbid:sellerID}, function(err, user) {
+        if (err) throw err;
+        var data = {fbid: reviewerID, stars: stars, reviewDes: reviewDes};
+
+       user[0].numReview += 1;
+       user[0].reviews.push(data);
+       user[0].save();
+    });
+}
+
+
 //Check database for if lotteries should be performed
 var checkLotteries = function() {
     Item.find({}, function(err, items) {
         if (err) throw err;
         
         for (i = 0; i < items.length; i++) {
-            var date = new Date(items[i].expirationDate)
-            if (date < Date.now()) {
-              console.log('Date has past');
-          }
+            var item = items[i]
+            var expirDate = new Date(item.expirationDate)
+            if (item.amountRaised >= item.price) {
+                var winner = performLottery(item);
+                console.log('Item sold to ' + winner)
+            }
+            else if (expirDate < Date.now()) {
+                console.log('Date has past')
+            }
+            else {
+                console.log('Item checked - no changes')
+            }
       }
-      return items;
   });
 }
+
+//Shuffle array - modified from http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+var shuffleArray = function(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
+//returns the userID of the winner
+var performLottery = function(item) {
+    var bids = item.bids;
+    //Shuffle to ensure no bias (extra precaution)
+    var shuffledBids = shuffleArray(bids);
+    var randomNum = Math.random();
+    var num = 0.0;
+    var winner = "";
+    for (var j = 0; j < shuffledBids.length; j++) {
+        console.log('checking')
+        var bidderID = shuffledBids[j].ID;
+        var bidderAmount = shuffledBids[j].amount;
+        num += bidderAmount / item.price;
+        if (randomNum < num) {
+            winner = bidderID;
+            break;
+        }
+    }
+    if (winner == "") {
+        console.log('No winner - defaulting to first bidder in random array')
+        if (bids.length != 0) {
+            winner = shuffledBids[0].bidderID
+        }
+    }
+    return winner
+
+}
+
+
 
 
         // A.findById(a, function (err, doc) {
@@ -390,6 +483,7 @@ var addBidForItem = function(itemID, userID, newAmount) {
 
     // });
 }
+
 
 
 
