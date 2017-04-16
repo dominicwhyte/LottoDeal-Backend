@@ -22,51 +22,51 @@
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+        <![endif]-->
 
 
 
-    <!-- why are these at the top and not at the bottom -->
-    <!-- AngularJS Include -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.min.js"></script>
+        <!-- why are these at the top and not at the bottom -->
+        <!-- AngularJS Include -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.min.js"></script>
 
-    <!-- Angular route -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular-route.min.js"></script>
+        <!-- Angular route -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular-route.min.js"></script>
 
-</head>
+    </head>
 
-<body ng-controller="indexController" ng-cloak> <!-- hides until content loads -->
+    <body ng-controller="indexController" ng-cloak> <!-- hides until content loads -->
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button id = "home" type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="index.html">Home</a>
-            </div>
-            <center>
-            <div class="col-sm-6 col-lg-4 col-md-4">
-              <form class="navbar-form" role="search" method="get" id="search-form" name="search-form">
-                  <div class="btn-group pull-left" style="margin-right:10px; min-width: 100%;">
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button id = "home" type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="index.html">Home</a>
+                </div>
+                <center>
+                    <div class="col-sm-6 col-lg-4 col-md-4">
+                      <form class="navbar-form" role="search" method="get" id="search-form" name="search-form">
+                          <div class="btn-group pull-left" style="margin-right:10px; min-width: 100%;">
 
-                  <div class="input-group">
-                      <input type="text" class="form-control" placeholder="Search for Lotteries!" id="query" name="query" ng-model="searchText" value="">
-                       <div class="input-group-btn">
-                      <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search"></span></button>
-                      </div>
-                    </div>
+                              <div class="input-group">
+                                  <input type="text" class="form-control" placeholder="Search for Lotteries!" id="query" name="query" ng-model="searchText" value="">
+                                  <div class="input-group-btn">
+                                      <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search"></span></button>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
                   </div>
-                  </form>
-                  </div>
-                  </center>
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              </center>
+              <!-- Collect the nav links, forms, and other content for toggling -->
+              <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a id = "about" href="about.html">About</a>
@@ -77,6 +77,35 @@
                     <li>
                         <a id = "contact" href="contact.html">Contact</a>
                     </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-fw fa-bell-o"></i>Notifications <span class="badge">0</span></a>
+
+                        <ul class="dropdown-menu notifications" role="menu">
+                            <div class="notification-heading"><h4 class="menu-title">Notifications</h4><h4 class="menu-title pull-right">View all<i class="glyphicon glyphicon-circle-arrow-right"></i></h4>
+                            </div>
+                            <li class="divider"></li>
+                            <div class="notifications-wrapper">
+                               
+                               <a class="content" href="#">
+                                <div class="notification-item">
+                                    <h4 class="item-title">Evaluation Deadline 1 · day ago</h4>
+                                    <p class="item-info">Marketing 101, Video Assignment</p>
+                                </div>
+                                </a>
+
+                                <a class="content" href="#">
+                                <div class="notification-item">
+                                    <h4 class="item-title">Evaluation Deadline 1 · day ago</h4>
+                                    <p class="item-info">Marketing 101, Video Assignment</p>
+                                </div>
+                                </a>
+
+                            </div>
+                            <li class="divider"></li>
+                            <div class="notification-footer"><h4 class="menu-title">View all<i class="glyphicon glyphicon-circle-arrow-right"></i></h4></div>
+                        </ul>
+                    </li>
+                    
                     <li>
                         <a id = "profile" href="profile.html">Account</a>
                     </li>
@@ -145,63 +174,63 @@
                                 <h5 class="pull-right">{{post.expirationDate}}</h5>
                                 <div class="dropdown">
 
-                                <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Bid</button>
-                                        <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                                          <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="bid(post._id, 1, post.amountRaised, post.price);" id="{{post._id}}">$1.00</button>
-                                          <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="bid(post._id, 2, post.amountRaised, post.price);" id="{{post._id}}">$2.00</button>
-                                          <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="bid(post._id, 5, post.amountRaised, post.price);" id="{{post._id}}">$5.00</button>
-                                      </ul>
-                                </div>
+                                    <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Bid</button>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                      <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="bid(post._id, 1, post.amountRaised, post.price);" id="{{post._id}}">$1.00</button>
+                                      <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="bid(post._id, 2, post.amountRaised, post.price);" id="{{post._id}}">$2.00</button>
+                                      <button type="button" class="btn btn-success btn-sm" buttonType="bidButton" ng-click="bid(post._id, 5, post.amountRaised, post.price);" id="{{post._id}}">$5.00</button>
+                                  </ul>
+                              </div>
 
-                                <p align="justify">{{post.description}}</p>
-                            </div> </a>
-                            <div class="ratings">
-                                <p class="pull-right">15 reviews</p>
-                                <p>
-                                    <span class="glyphicon glyphicon-star"></span>
-                                    <span class="glyphicon glyphicon-star"></span>
-                                    <span class="glyphicon glyphicon-star"></span>
-                                    <span class="glyphicon glyphicon-star"></span>
-                                    <span class="glyphicon glyphicon-star"></span>
-                                </p>
-                            </div>
+                              <p align="justify">{{post.description}}</p>
+                          </div> </a>
+                          <div class="ratings">
+                            <p class="pull-right">15 reviews</p>
+                            <p>
+                                <span class="glyphicon glyphicon-star"></span>
+                                <span class="glyphicon glyphicon-star"></span>
+                                <span class="glyphicon glyphicon-star"></span>
+                                <span class="glyphicon glyphicon-star"></span>
+                                <span class="glyphicon glyphicon-star"></span>
+                            </p>
                         </div>
                     </div>
-
-                    
-
                 </div>
+
+
 
             </div>
 
         </div>
 
+    </div>
+
     <div ng-view></div>
 
+</div>
+<!-- /.container -->
+
+<!-- Footer -->
+<footer>
+    <hr>
+    <div>
+        <div class="col-lg-12">
+            <p>Copyright &copy; Your Website 2014</p>
+        </div>
     </div>
-    <!-- /.container -->
+</footer>
 
-        <!-- Footer -->
-        <footer>
-        <hr>
-            <div>
-                <div class="col-lg-12">
-                    <p>Copyright &copy; Your Website 2014</p>
-                </div>
-            </div>
-        </footer>
+<!-- jQuery -->
+<script src="js/jquery.js"></script>
 
-    <!-- jQuery -->
-    <script src="js/jquery.js"></script>
+<!-- Bootstrap Core JavaScript -->
+<script src="js/bootstrap.min.js"></script>
 
-    <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
+<!-- Custom script -->
+<script src="./js/index.js"></script>
 
-    <!-- Custom script -->
-    <script src="./js/index.js"></script>
-
-    <!-- dynamic loading of pages -->
-    <script src="js/tabs.js"></script>
+<!-- dynamic loading of pages -->
+<script src="js/tabs.js"></script>
 
 </body>
 
