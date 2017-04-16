@@ -521,7 +521,7 @@ var addBidForItem = function(itemID, userID, newAmount) {
                     for (i = 0; i < user.bids.length; i++) {
                         if (user.bids[i].itemID == itemID) {
                             var curAmount = user.bids[i].amount;
-                            curAmount += newAmount;
+                            curAmount += Number(newAmount);
                             user.bids[i].amount = curAmount;
                             user.save();
                             found = 1;
@@ -661,7 +661,7 @@ var findItem = function(title) {
 
 var findItembyID = function(id) {
     // get all the Items
-    Item.findbyID(id, function(err, item) {
+    Item.findbyId(id, function(err, item) {
         if (err) throw err;
     // object of all the users
     console.log(item);
