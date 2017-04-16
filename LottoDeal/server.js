@@ -80,6 +80,16 @@ app.get('/getNotifications', function(request, response) {
     });
 })
 
+app.get('/getBidsofUserByID', function(request, response) {
+    var userID = request.query["userID"];
+    findUser(userID, function(user) {
+        getBidsForUsers(userID, function(bids) {
+        console.log('bids = ' + JSON.stringify(notifications))
+        response.send(JSON.stringify(bids));
+         });
+    });
+})
+
 app.get('/', function(request, response) {
     response.send("API is working!")
 })
@@ -351,6 +361,13 @@ var getNotificationsForUsers = function(userID, callback) {
     User.find({fbid:userID}, function(err, user) {
         console.log('Got notifications for user' + userID) 
         callback(user[0].notifications)
+    });
+}
+
+var getBidsForUsers = function(userID, callback) {
+    User.find({fbid:userID}, function(err, user) {
+        console.log('Got bids for user' + userID) 
+        callback(user[0].bids)
     });
 }
 
