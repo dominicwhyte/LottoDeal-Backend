@@ -95,14 +95,16 @@ app.get('/getBidsofUsers', function(request, response) {
 
 app.get('/getBiddedItemsofUsers', function(request, response) {
     var userID = request.query["userID"];
+
     getBidsForUsers(userID, function(bids) {
         var items = [];
+
         for (i = 0; i < bids.length; i++) {
             var id = bids[i].itemID;
-            console.log(id)
-            var curItem = findItembyID(id);
-            console.log(curItem);
-            items.push(curItem);
+            var curItem = findItembyID(id, function(curItem) {
+                console.log(curItem);
+                items.push(curItem);
+            });
         }
         response.send(JSON.stringify(items));
     });
@@ -666,13 +668,13 @@ var findItem = function(title) {
 });
 }
 
-var findItembyID = function(id) {
+var findItembyID = function(id, callback) {
     // get all the Items
     Item.findById(id, function(err, item) {
         if (err) throw err;
     // object of all the users
     console.log(item);
-    return item;
+    callback(item);
 });
 }
 
