@@ -80,30 +80,37 @@ app.get('/getNotifications', function(request, response) {
     });
 })
 
+
+
+
+
 app.get('/getBidsofUsers', function(request, response) {
     var userID = request.query["userID"];
-    findUser(userID, function(user) {
-        getBidsForUsers(userID, function(bids) {
+    getBidsForUsers(userID, function(bids) {
         console.log('bids = ' + JSON.stringify(bids))
         response.send(JSON.stringify(bids));
-         });
-    });
+     });
 })
+
 
 app.get('/getBiddedItemsofUsers', function(request, response) {
     var userID = request.query["userID"];
-    findUser(userID, function(user) {
-        getBidsForUsers(userID, function(bids) {
-        console.log('bids = ' + JSON.stringify(bids))
+    getBidsForUsers(userID, function(bids) {
         var items = [];
         for (i = 0; i < bids.length; i++) {
-            var curItem = findItembyID(bids[i].itemID);
+            var id = bids[i].itemID;
+            console.log(id)
+            var curItem = findItembyID(id);
+            console.log(curItem);
             items.push(curItem);
         }
         response.send(JSON.stringify(items));
-         });
     });
 })
+
+
+
+
 
 app.get('/', function(request, response) {
     response.send("API is working!")
