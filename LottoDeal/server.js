@@ -97,7 +97,7 @@ app.get('/getBiddedItemsofUsers', function(request, response) {
         console.log('bids = ' + JSON.stringify(bids))
         var items = [];
         for (i = 0; i < bids.length; i++) {
-            var curItem = findItembyID(bids[i].ID);
+            var curItem = findItembyID(bids[i].itemID);
             items.push(curItem);
         }
         response.send(JSON.stringify(items));
