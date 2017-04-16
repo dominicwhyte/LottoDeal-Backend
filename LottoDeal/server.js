@@ -80,12 +80,27 @@ app.get('/getNotifications', function(request, response) {
     });
 })
 
-app.get('/getBidsofUserByID', function(request, response) {
+app.get('/getBidsofUsers', function(request, response) {
     var userID = request.query["userID"];
     findUser(userID, function(user) {
         getBidsForUsers(userID, function(bids) {
-        console.log('bids = ' + JSON.stringify(notifications))
+        console.log('bids = ' + JSON.stringify(bids))
         response.send(JSON.stringify(bids));
+         });
+    });
+})
+
+app.get('/getBiddedItemsofUsers', function(request, response) {
+    var userID = request.query["userID"];
+    findUser(userID, function(user) {
+        getBidsForUsers(userID, function(bids) {
+        console.log('bids = ' + JSON.stringify(bids))
+        var items = [];
+        for (i = 0; i < bids.length; i++) {
+            var curItem = findItembyID(bids[i].ID);
+            items.push(curItem);
+        }
+        response.send(JSON.stringify(items));
          });
     });
 })
@@ -640,6 +655,16 @@ var findItem = function(title) {
         if (err) throw err;
     // object of all the users
     console.log(items);
+    return item;
+});
+}
+
+var findItembyID = function(id) {
+    // get all the Items
+    Item.findbyID(id, function(err, item) {
+        if (err) throw err;
+    // object of all the users
+    console.log(item);
     return item;
 });
 }
