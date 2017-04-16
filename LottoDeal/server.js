@@ -483,9 +483,9 @@ var addBidForItem = function(itemID, userID, newAmount) {
         if (item.bids != null) {
             for (i = 0; i < item.bids.length; i++) {
                 if (item.bids[i].ID == userID) {
-                    var curAmount = item.bids[i].amount;
-                    curAmount += newAmount;
-                    item.bids[i].amount = curAmount;
+                    var curAmount = Number(item.bids[i].amount);
+                    curAmount += Number(newAmount);
+                    item.bids[i].amount = Number(curAmount);
                     item.amountRaised += Number(newAmount);
                     item.save();
                     found = true;
@@ -661,7 +661,7 @@ var findItem = function(title) {
 
 var findItembyID = function(id) {
     // get all the Items
-    Item.findbyId(id, function(err, item) {
+    Item.findById(id, function(err, item) {
         if (err) throw err;
     // object of all the users
     console.log(item);
