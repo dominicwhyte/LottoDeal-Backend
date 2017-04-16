@@ -61,9 +61,21 @@ app.post('/createReview', function(request, response) {
 // see the people that bid on his item
 app.get('/getReviews', function(request, response) {
     var sellerID = request.body.sellerID;
-    var users = findUsers(sellerID);
-    response.send(JSON.stringify(users.reviews));
+    findUser(sellerID, function(user) {
+        response.send(JSON.stringify(user.reviews));
+    });
+})
 
+app.get('/getNotifications', function(request, response) {
+    console.log('getting notifications');
+    var userID = '1641988472497790';
+    console.log(request.body);
+    findUser(userID, function(user) {
+        getNotificationsForUsers(userID, function(notifications) {
+        console.log('notifications = ' + JSON.stringify(notifications))
+        response.send(JSON.stringify(notifications));
+         });
+    });
 })
 
 app.get('/', function(request, response) {
@@ -137,6 +149,7 @@ app.post('/addBid', function(request, response) {
     var newAmount = request.body.newAmount;
 
     addBidForItem(itemID, userID, newAmount);
+    addNotificationToUser(userID, "New Bid", "you just bid " + newAmount + "dollars");
 
     response.send("Bid added")
 })
@@ -208,15 +221,17 @@ mongoose.connect(url, function(err, db) {
 
     var postmark = require("postmark");
 
-// Example request
-    var client = new postmark.Client("27c10544-6caa-46b9-8640-67b000036be3");
+// // Example request
+//     var client = new postmark.Client("27c10544-6caa-46b9-8640-67b000036be3");
 
-    client.sendEmail({
-        "From": "dwhyte@princeton.edu",
-        "To": "whyte42@gmail.com",
-        "Subject": "Test", 
-        "TextBody": "Hello from Postmark!"
-    });
+//     client.sendEmail({
+//         "From": "dwhyte@princeton.edu",
+//         "To": "whyte42@gmail.com",
+//         "Subject": "Test", 
+//         "TextBody": "Hello from Postmark!"
+//     });
+    
+    
 
 
 
@@ -322,11 +337,18 @@ var addNotificationToUser = function(userID, titleText, descriptionText) {
         }
         else {
             if (err) throw err;
-            var data = {read: False, title: titleText, description: descriptionText};
+            var data = {read: false, title: titleText, description: descriptionText};
 
             user[0].notifications.push(data);
             user[0].save();
         }        
+    });
+}
+
+var getNotificationsForUsers = function(userID, callback) {
+    User.find({fbid:userID}, function(err, user) {
+        console.log('Got notifications for user' + userID) 
+        callback(user[0].notifications)
     });
 }
 
@@ -556,11 +578,12 @@ var deleteItem = function(id) {
 }
 
 
-var findUsers = function(fbid) {
+var findUser = function(fbid, callback) {
     // get all the users
     User.find({fbid: fbid}, function(err, user) {
         if (err) throw err;
-        console.log(user);
+        console.log(user[0]);    
+        callback(user[0]);
     });
 }
 
