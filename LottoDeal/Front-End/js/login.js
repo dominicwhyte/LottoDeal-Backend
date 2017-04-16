@@ -1,4 +1,9 @@
 
+
+
+
+
+
 // For Facebook login
 
 // Facebook Javascript SDK configuration and setup
@@ -15,6 +20,7 @@ window.fbAsyncInit = function() {
         if (response.status === 'connected') {
             //display user data
             getFbUserData();
+
             // Get and display the user profile data
             document.getElementById('fbLink').setAttribute("onclick","fbLogout()");
             document.getElementById('fbLink').innerHTML = 'Facebook Logout';
@@ -78,10 +84,14 @@ function saveUserData(response) {
     });
 }
 
+
+
+
 // Fetch the user profile data from facebook
 function getFbUserData(){
     FB.api('/me', {locale: 'en_US', fields: 'id,first_name,last_name,email,link,gender,locale,picture'},
         function (response) {
+
             document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.first_name + '!';
             document.getElementById('userData').innerHTML = '<p><b>FB ID:</b> '+response.id+'</p><p><b>Name:</b> '+response.first_name+' '+response.last_name+'</p><p><b>Email:</b> '+response.email+'</p><p><b>Gender:</b> '+response.gender+'</p><p><b>Locale:</b> '+response.locale+'</p><p><b>Picture:</b> <img src="'+response.picture.data.url+'"/></p><p><b>FB Profile:</b> <a target="_blank" href="'+response.link+'">click to view profile</a></p>';
 

@@ -16,7 +16,7 @@ var fs = require('fs'); // add for file system
 //Check if lotteries should be performed
 function checkIfServerShouldPerformLottery(){
     // do whatever you like here
-    console.log('test')
+    console.log('Checking if lottery should be performed')
     checkLotteries();
     setTimeout(checkIfServerShouldPerformLottery, SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES * 1000);
 }
@@ -205,6 +205,21 @@ mongoose.Promise = global.Promise;
 mongoose.connect(url, function(err, db) {
     assert.equal(null, err);
 
+
+    var postmark = require("postmark");
+
+// Example request
+    var client = new postmark.Client("27c10544-6caa-46b9-8640-67b000036be3");
+
+    client.sendEmail({
+        "From": "dwhyte@princeton.edu",
+        "To": "whyte42@gmail.com",
+        "Subject": "Test", 
+        "TextBody": "Hello from Postmark!"
+    });
+
+
+
     //findAllUsers();
     console.log("Connected successfully to server");
 
@@ -220,7 +235,8 @@ mongoose.connect(url, function(err, db) {
     findAllItems(function (items) {
         console.log(items);
     });
-    checkIfServerShouldPerformLottery();
+
+    //checkIfServerShouldPerformLottery();
 });
 
 
@@ -241,7 +257,11 @@ var userSchema = new Schema({
         stars: Number,
         reviewDes: String,
     }],
-    numReview: Number, // total number of reviews
+    notifications: [{ // notifications to show user
+        read: Boolean,
+        title: String,
+        description: String,
+    }]
 });
 
 
@@ -271,7 +291,7 @@ module.exports = Item;
 
 
 var createUser = function(name, id, url) {
-    var newUser = new User ({fullName : name, fbid : id, pictureURL : url});
+    var newUser = new User ({fullName : name, fbid : id, pictureURL : url, bids : [], review : [], notifications : []});
     // call the built-in save method to save to the database
     newUser.save(function(err) {
         if (err) throw err;
@@ -295,14 +315,34 @@ var createItem = function(title, price, datePosted, expirationDate, descrip) {
 }
 
 
+var addNotificationToUser = function(userID, titleText, descriptionText) {
+    User.find({fbid:userID}, function(err, user) {
+        if (user.length != 1) {
+            console.log('ERROR: multiple users with FBID')
+        }
+        else {
+            if (err) throw err;
+            var data = {read: False, title: titleText, description: descriptionText};
+
+            user[0].notifications.push(data);
+            user[0].save();
+        }        
+    });
+}
+
 var createReview = function(sellerID, reviewerID, stars, reviewDes) {
     User.find({fbid:sellerID}, function(err, user) {
-        if (err) throw err;
-        var data = {fbid: reviewerID, stars: stars, reviewDes: reviewDes};
+        if (user.length != 1) {
+            console.log('ERROR: multiple users with FBID')
+        }
+        else {
+            if (err) throw err;
+             var data = {userID: reviewerID, stars: stars, reviewDes: reviewDes};
 
-       user[0].numReview += 1;
-       user[0].reviews.push(data);
-       user[0].save();
+            user[0].reviews.push(data);
+            user[0].save();
+        }
+        
     });
 }
 

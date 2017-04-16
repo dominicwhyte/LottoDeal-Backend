@@ -24,6 +24,13 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+<!-- emailjs import -->
+<script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script type="text/javascript">
+   (function(){
+      emailjs.init("user_d3NiKAoltdraqX5iFYuSK");
+   })();
+</script>
 
 </head>
 
@@ -45,17 +52,20 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
-                    <li id = "about">
-                        <a href="about.html">About</a>
+                    <li>
+                        <a id = "about" href="about.html">About</a>
                     </li>
-                    <li id = "sell">
-                        <a href="sell.html">Sell</a>
+                    <li>
+                        <a id = "sell" href="sell.html">Sell</a>
                     </li>
-                    <li id = "contact">
-                        <a href="contact.html">Contact</a>
+                    <li>
+                        <a id = "contact" href="contact.html">Contact</a>
                     </li>
-                    <li id = "login">
-                        <a href="login.html">Login</a>
+                    <li>
+                        <a id = "profile" href="profile.html">Account</a>
+                    </li>
+                    <li>
+                        <a id = "login" href="login.html">Login</a>
                     </li>
                 </ul>
             </div>
@@ -68,7 +78,8 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="well well-sm">
-                    <form class="form-horizontal" action="email_handler.php" method="post">
+                <!-- //action="email_handler.php" -->
+                    <form class="form-horizontal"  method="post">
                         <fieldset>
                             <legend class="text-center header">Contact us</legend>
 
@@ -97,7 +108,7 @@
 
                             <div class="form-group">
                                 <div class="col-md-12 text-center">
-                                    <button type="submit" name="submit" class="btn btn-primary btn-lg">Submit</button>
+                                    <button type="submit" name="submit" class="btn btn-primary btn-lg" onClick="sendEmail()">Submit</button>
                                 </div>
                             </div>
                         </fieldset>
@@ -124,6 +135,7 @@
 
     <!-- dynamic loading of pages -->
     <script src="js/tabs.js"></script>
+    <script src="js/contact.js"></script>
 
 </body>
 </html>
