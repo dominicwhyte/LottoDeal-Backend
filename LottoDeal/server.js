@@ -68,8 +68,10 @@ app.get('/getReviews', function(request, response) {
 
 app.get('/getNotifications', function(request, response) {
     console.log('getting notifications');
-    var userID = '1641988472497790';
-    console.log(request.body);
+    // var userID = '1641988472497790';
+    // console.log(request)
+    // console.log(request.body);
+    var userID = request.query["userID"];
     findUser(userID, function(user) {
         getNotificationsForUsers(userID, function(notifications) {
         console.log('notifications = ' + JSON.stringify(notifications))
@@ -149,7 +151,7 @@ app.post('/addBid', function(request, response) {
     var newAmount = request.body.newAmount;
 
     addBidForItem(itemID, userID, newAmount);
-    addNotificationToUser(userID, "New Bid", "you just bid " + newAmount + "dollars");
+    addNotificationToUser(userID, "New Bid", "You just bid " + newAmount + " dollar(s)");
 
     response.send("Bid added")
 })
