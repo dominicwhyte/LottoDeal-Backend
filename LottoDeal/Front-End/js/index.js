@@ -77,9 +77,7 @@ app.controller("indexController", ["$scope", "$rootScope", "$location", function
     console.log('Asking for notifications')
     $.ajax({
         url: notificationUrl,
-        data: { 
-            userID : 'test'
-        },
+        data: dataGET,
         type: 'GET',
         success: function(data) {
             var notifications = JSON.parse(data)
@@ -87,7 +85,7 @@ app.controller("indexController", ["$scope", "$rootScope", "$location", function
             console.log($scope.notifications)
             $scope.$apply()
         },
-        error: function(response, error) {
+        error: function(response,  error) {
           console.log(response)
           console.log(error)
       }
