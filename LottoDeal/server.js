@@ -89,23 +89,14 @@ app.get('/getBidsofUsers', function(request, response) {
     getBidsForUsers(userID, function(bids) {
         console.log('bids = ' + JSON.stringify(bids))
         response.send(JSON.stringify(bids));
-     });
+    });
 })
 
 
 app.get('/getBiddedItemsofUsers', function(request, response) {
     var userID = request.query["userID"];
-
-    getBidsForUsers(userID, function(bids) {
-        var items = [];
-
-        for (i = 0; i < bids.length; i++) {
-            var id = bids[i].itemID;
-            var curItem = findItembyID(id, function(curItem) {
-                console.log(curItem);
-                items.push(curItem);
-            });
-        }
+    getItemsForUsers(userID, function(items) {
+        console.log("items = " + JSON.stringify(items));
         response.send(JSON.stringify(items));
     });
 })
@@ -277,6 +268,9 @@ mongoose.connect(url, function(err, db) {
     //addBidForItem("58efe4435363382e3d61137a", "58e8054642a9960421d3a566", 3);
     var date = new Date();
 
+
+    // deleteAllItems();
+    // deleteAllUsers();
  
     findAllUsers(function(users) {
         console.log(users)
@@ -394,6 +388,32 @@ var getBidsForUsers = function(userID, callback) {
         callback(user[0].bids)
     });
 }
+
+
+var getItemsForUsers = function(userID, callback) {
+    User.find({fbid:userID}, function(err, user) {
+        var items = [];
+        var bids = user[0].bids;
+        for (i = 0; i < bids.length; i++) {
+            var id = bids[i].itemID;
+
+
+
+            Item.findById(id, function(err, item) {
+                if (err) throw err;
+                // object of all the users
+                console.log("Here's your tiem" + item);
+                items.push(item);
+            });
+
+        }
+        console.log("THIS IS THE ITEMS ARRAY" + items)
+        console.log('Got items for user' + userID) 
+        callback(items)
+    });
+}
+
+
 
 var createReview = function(sellerID, reviewerID, stars, reviewDes) {
     User.find({fbid:sellerID}, function(err, user) {
@@ -668,13 +688,13 @@ var findItem = function(title) {
 });
 }
 
-var findItembyID = function(id, callback) {
+var findItembyID = function(id) {
     // get all the Items
     Item.findById(id, function(err, item) {
         if (err) throw err;
     // object of all the users
     console.log(item);
-    callback(item);
+    return item;
 });
 }
 
