@@ -106,10 +106,10 @@ app.get('/getBiddedItemsofUsers', function(request, response) {
 
 app.get('/getSoldItemsofUser', function(request, response) {
     var userID = request.query["userID"];
-    getSoldItemsForUsers(userID, function(items, bidslength, i) {
-        if (i == bidslength) {
-        console.log("sold items = " + JSON.stringify(items));
-        response.send(JSON.stringify(items));
+    getSoldItemsForUsers(userID, function(items, listedItemLength, i) {
+        if (i == listedItemLength) {
+            console.log("sold items = " + JSON.stringify(items));
+            response.send(JSON.stringify(items));
         }
     });
 })
@@ -135,6 +135,7 @@ app.post('/createPost', function(request, response) {
   var price = request.body.price;
     //var image = request.body.picture; 
     var description = request.body.description;
+    var sellerID = request.body.sellerID;
 
     // var post = {
     //     timecreated: timecreated,
@@ -147,7 +148,7 @@ app.post('/createPost', function(request, response) {
 //    console.log(post)
 
 // should be giving it a date instead of a time
-createItem(title, price, date, expirationDate, description);
+createItem(title, price, date, expirationDate, description, sellerID);
 
 response.send("You have created a new post.")
 })
@@ -319,6 +320,9 @@ var userSchema = new Schema({
         read: Boolean,
         title: String,
         description: String,
+    }],
+    listedItems: [{ // currently selling items
+        itemID: String, // id of item being sold
     }]
 });
 
@@ -340,8 +344,8 @@ var itemSchema = new Schema({
     descrip: String, // text string of what exactly is being sold (String)
     img: {data: Buffer, // stores an image here
         contentType: String},
-    sold: Boolean,
-
+    sold: Boolean, // has the item been sold
+    sellerID: String, // who's selling the item
     });
 
 var Item = mongoose.model('Item', itemSchema);
@@ -359,8 +363,8 @@ var createUser = function(name, id, url) {
     });
 }
 
-var createItem = function(title, price, datePosted, expirationDate, descrip) {
-    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, amountRaised : 0, descrip: descrip, bids : [], sold: false});
+var createItem = function(title, price, datePosted, expirationDate, descrip, sellerID) {
+    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, amountRaised : 0, descrip: descrip, bids : [], sold: false, sellerID: sellerID});
     // call the built-in save method to save to the database
     // newItem.img.data = fs.readFileSync(image);
     // newItem.img.contentType = 'image/png';
@@ -439,28 +443,28 @@ var getItemsForUsers = function(userID, callback) {
 var getSoldItemsForUsers = function(userID, callback) {
     User.find({fbid:userID}, function(err, user) {
         var items = [];
-        var bids = user[0].bids;
-        for (i = 0; i < bids.length; i++) {
-            var id = bids[i].itemID;
+        var listedItems = user[0].listedItems;
+        for (i = 0; i < listedItems.length; i++) {
+            var id = listedItems[i].itemID;
             var temp = i;
                 console.log(i)
-                console.log(bids.length)
+                console.log(listedItems.length)
 
             Item.findById(id, function(err, item) {
                 console.log(temp)
                 console.log(i)
-                console.log(bids.length)
+                console.log(listedItems.length)
                 if (err) throw err;
                 // object of all the users
                 if (item.sold) {
-                    console.log("Here's your tiem" + item);
+                    console.log("Here's your sold item" + item);
                     items.push(item);
                 }
                     console.log("THIS IS THE SOLD ITEMS ARRAY" + items)
                     console.log('Got SOLD items for user' + userID)
 
                     // i is weird and incremented
-                    callback(items, bids.length-1, temp)
+                    callback(items, listedItems.length-1, temp)
                 
             });
         }  
@@ -543,6 +547,8 @@ var performLottery = function(item) {
             winner = shuffledBids[0].bidderID
         }
     }
+    item.sold = true;
+    item.save();
     return winner
 
 }
