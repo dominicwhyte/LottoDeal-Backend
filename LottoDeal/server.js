@@ -273,7 +273,8 @@ mongoose.connect(url, function(err, db) {
 //     });
     
     
-
+    // deleteAllUsers();
+    // deleteAllItems();
 
 
     //findAllUsers();
@@ -356,7 +357,7 @@ module.exports = Item;
 
 
 var createUser = function(name, id, url) {
-    var newUser = new User ({fullName : name, fbid : id, pictureURL : url, bids : [], review : [], notifications : []});
+    var newUser = new User ({fullName : name, fbid : id, pictureURL : url, bids : [], review : [], notifications : [], listedItems : []});
     // call the built-in save method to save to the database
     newUser.save(function(err) {
         if (err) throw err;
@@ -371,7 +372,8 @@ var createItem = function(title, price, datePosted, expirationDate, descrip, sel
     // newItem.img.contentType = 'image/png';
     
     findUser(sellerID, function(user) { 
-        user.listedItems.push(newItem._id.str);
+        data = {itemID: newItem._id.str};
+        user.listedItems.push(data);
     });
 
     newItem.save(function (err, newItem) {
