@@ -104,11 +104,11 @@ app.get('/getBiddedItemsofUsers', function(request, response) {
 })
 
 
-app.get('/getSoldItemsofUser', function(request, response) {
+app.get('/getListedItemsForUsers', function(request, response) {
     var userID = request.query["userID"];
     getSoldItemsForUsers(userID, function(items, listedItemLength, i) {
         if (i == listedItemLength) {
-            console.log("sold items = " + JSON.stringify(items));
+            console.log("selling items = " + JSON.stringify(items));
             response.send(JSON.stringify(items));
         }
     });
@@ -346,6 +346,7 @@ var itemSchema = new Schema({
         contentType: String},
     sold: Boolean, // has the item been sold
     sellerID: String, // who's selling the item
+    winnerID: String, // who the winner of an item is
     });
 
 var Item = mongoose.model('Item', itemSchema);
@@ -368,6 +369,11 @@ var createItem = function(title, price, datePosted, expirationDate, descrip, sel
     // call the built-in save method to save to the database
     // newItem.img.data = fs.readFileSync(image);
     // newItem.img.contentType = 'image/png';
+    
+    findUser(sellerID, function(user) {
+        user.listedItems.push(newItem.id);
+    });
+
     newItem.save(function (err, newItem) {
       if (err) throw err;});
 
@@ -440,7 +446,7 @@ var getItemsForUsers = function(userID, callback) {
     });
 }
 
-var getSoldItemsForUsers = function(userID, callback) {
+var getListedItemsForUsers = function(userID, callback) {
     User.find({fbid:userID}, function(err, user) {
         var items = [];
         var listedItems = user[0].listedItems;
@@ -456,12 +462,10 @@ var getSoldItemsForUsers = function(userID, callback) {
                 console.log(listedItems.length)
                 if (err) throw err;
                 // object of all the users
-                if (item.sold) {
-                    console.log("Here's your sold item" + item);
+                    console.log("Here's your item selling" + item);
                     items.push(item);
-                }
-                    console.log("THIS IS THE SOLD ITEMS ARRAY" + items)
-                    console.log('Got SOLD items for user' + userID)
+                    console.log("THIS IS THE ITEMS  Youre selling ARRAY" + items)
+                    console.log('Got selling items for user' + userID)
 
                     // i is weird and incremented
                     callback(items, listedItems.length-1, temp)
@@ -548,6 +552,8 @@ var performLottery = function(item) {
         }
     }
     item.sold = true;
+    var winnerID = "1234";
+    item.winner = winnerID;
     item.save();
     return winner
 
