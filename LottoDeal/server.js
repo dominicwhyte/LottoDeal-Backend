@@ -95,9 +95,11 @@ app.get('/getBidsofUsers', function(request, response) {
 
 app.get('/getBiddedItemsofUsers', function(request, response) {
     var userID = request.query["userID"];
-    getItemsForUsers(userID, function(items) {
+    getItemsForUsers(userID, function(items, bidslength, i) {
+        if (i == bidslength) {
         console.log("items = " + JSON.stringify(items));
         response.send(JSON.stringify(items));
+        }
     });
 })
 
@@ -396,20 +398,28 @@ var getItemsForUsers = function(userID, callback) {
         var bids = user[0].bids;
         for (i = 0; i < bids.length; i++) {
             var id = bids[i].itemID;
-
-
+            var temp = i;
+                console.log(i)
+                console.log(bids.length)
 
             Item.findById(id, function(err, item) {
+                console.log(temp)
+                console.log(i)
+                console.log(bids.length)
                 if (err) throw err;
                 // object of all the users
                 console.log("Here's your tiem" + item);
                 items.push(item);
-            });
 
-        }
-        console.log("THIS IS THE ITEMS ARRAY" + items)
-        console.log('Got items for user' + userID) 
-        callback(items)
+                    console.log("THIS IS THE ITEMS ARRAY" + items)
+                    console.log('Got items for user' + userID)
+
+                    // i is weird and incremented
+                    callback(items, bids.length-1, temp)
+                
+            });
+        }  
+
     });
 }
 
