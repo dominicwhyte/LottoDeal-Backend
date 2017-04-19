@@ -97,7 +97,7 @@ app.get('/getBiddedItemsofUsers', function(request, response) {
     var userID = request.query["userID"];
     getItemsForUsers(userID, function(items, bidslength, i) {
         if (i == bidslength) {
-        console.log("items = " + JSON.stringify(items));
+        console.log("items your'e bidding on = " + JSON.stringify(items));
         response.send(JSON.stringify(items));
         }
     });
@@ -105,9 +105,14 @@ app.get('/getBiddedItemsofUsers', function(request, response) {
 
 
 app.get('/getListedItemsForUsers', function(request, response) {
+
     var userID = request.query["userID"];
-    getSoldItemsForUsers(userID, function(items, listedItemLength, i) {
-        if (i == listedItemLength) {
+    console.log(userID);
+    console.log("fetching listed itemSchema")
+    getListedItemsForUsers(userID, function(items, listedItemLength, j) {
+        if (j == listedItemLength) {
+
+                console.log("fetching listed itemSchema")
             console.log("selling items = " + JSON.stringify(items));
             response.send(JSON.stringify(items));
         }
@@ -421,7 +426,7 @@ var getItemsForUsers = function(userID, callback) {
     User.find({fbid:userID}, function(err, user) {
         var items = [];
         var bids = user[0].bids;
-        for (i = 0; i < bids.length; i++) {
+        for (var i = 0; i < bids.length; i++) {
             var id = bids[i].itemID;
             var temp = i;
                 console.log(i)
@@ -433,11 +438,11 @@ var getItemsForUsers = function(userID, callback) {
                 console.log(bids.length)
                 if (err) throw err;
                 // object of all the users
-                console.log("Here's your tiem" + item);
+                console.log("Here's your tiem for bidding" + item);
                 items.push(item);
 
-                    console.log("THIS IS THE ITEMS ARRAY" + items)
-                    console.log('Got items for user' + userID)
+                    console.log("THIS IS THE ITEMS ARRAY for bidding" + items)
+                    console.log('Got items for user for bidding' + userID)
 
                     // i is weird and incremented
                     callback(items, bids.length-1, temp)
@@ -450,17 +455,18 @@ var getItemsForUsers = function(userID, callback) {
 
 var getListedItemsForUsers = function(userID, callback) {
     User.find({fbid:userID}, function(err, user) {
+        console.log("I'm in listed items")
         var items = [];
         var listedItems = user[0].listedItems;
-        for (i = 0; i < listedItems.length; i++) {
+        for (var j = 0; j < listedItems.length; j++) {
             var id = listedItems[i].itemID;
-            var temp = i;
-                console.log(i)
+            var temp = j;
+                console.log(j)
                 console.log(listedItems.length)
 
             Item.findById(id, function(err, item) {
                 console.log(temp)
-                console.log(i)
+                console.log(j)
                 console.log(listedItems.length)
                 if (err) throw err;
                 // object of all the users
