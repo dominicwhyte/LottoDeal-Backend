@@ -104,6 +104,17 @@ app.get('/getBiddedItemsofUsers', function(request, response) {
 })
 
 
+app.get('/getSoldItemsofUser', function(request, response) {
+    var userID = request.query["userID"];
+    getSoldItemsForUsers(userID, function(items, bidslength, i) {
+        if (i == bidslength) {
+        console.log("sold items = " + JSON.stringify(items));
+        response.send(JSON.stringify(items));
+        }
+    });
+})
+
+
 
 
 
@@ -328,7 +339,9 @@ var itemSchema = new Schema({
     }], //Dictionary of fbid’s of users who have placed bids (Dictionary)
     descrip: String, // text string of what exactly is being sold (String)
     img: {data: Buffer, // stores an image here
-        contentType: String}
+        contentType: String},
+    sold: Boolean,
+
     });
 
 var Item = mongoose.model('Item', itemSchema);
@@ -347,7 +360,7 @@ var createUser = function(name, id, url) {
 }
 
 var createItem = function(title, price, datePosted, expirationDate, descrip) {
-    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, amountRaised : 0, descrip: descrip, bids : []});
+    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, amountRaised : 0, descrip: descrip, bids : [], sold: false});
     // call the built-in save method to save to the database
     // newItem.img.data = fs.readFileSync(image);
     // newItem.img.contentType = 'image/png';
@@ -423,6 +436,37 @@ var getItemsForUsers = function(userID, callback) {
     });
 }
 
+var getSoldItemsForUsers = function(userID, callback) {
+    User.find({fbid:userID}, function(err, user) {
+        var items = [];
+        var bids = user[0].bids;
+        for (i = 0; i < bids.length; i++) {
+            var id = bids[i].itemID;
+            var temp = i;
+                console.log(i)
+                console.log(bids.length)
+
+            Item.findById(id, function(err, item) {
+                console.log(temp)
+                console.log(i)
+                console.log(bids.length)
+                if (err) throw err;
+                // object of all the users
+                if (item.sold) {
+                    console.log("Here's your tiem" + item);
+                    items.push(item);
+                }
+                    console.log("THIS IS THE SOLD ITEMS ARRAY" + items)
+                    console.log('Got SOLD items for user' + userID)
+
+                    // i is weird and incremented
+                    callback(items, bids.length-1, temp)
+                
+            });
+        }  
+
+    });
+}
 
 
 var createReview = function(sellerID, reviewerID, stars, reviewDes) {
