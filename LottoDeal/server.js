@@ -370,8 +370,8 @@ var createItem = function(title, price, datePosted, expirationDate, descrip, sel
     // newItem.img.data = fs.readFileSync(image);
     // newItem.img.contentType = 'image/png';
     
-    findUser(sellerID, function(user) {
-        user.listedItems.push(newItem.id);
+    findUser(sellerID, function(user) { 
+        user.listedItems.push(newItem._id.str);
     });
 
     newItem.save(function (err, newItem) {
