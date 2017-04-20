@@ -1,5 +1,23 @@
 var app = angular.module("index_app", ["ngRoute"])
 
+
+window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '228917890846081',
+      xfbml      : true,
+      cookie     : true,
+      version    : 'v2.8'
+  });
+
+(function(d, s, id){
+ var js, fjs = d.getElementsByTagName(s)[0];
+ if (d.getElementById(id)) {return;}
+ js = d.createElement(s); js.id = id;
+ js.src="https://connect.facebook.net/en_US/all.js";
+ fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+
 // app.config(function($routeProvider) {
 //     $routeProvider
 //     .when('/', {
@@ -35,20 +53,20 @@ var app = angular.module("index_app", ["ngRoute"])
 // }])
 
 app.controller("indexController", ["$scope", "$rootScope", "$location", function($scope, $rootScope, $location) {
-	$scope.selectedTab = 0
+    $scope.selectedTab = 0
 
-	$scope.posts = []
+    $scope.posts = []
 
-	var url = "https://localhost:8000/getPosts";
+    var url = "https://localhost:8000/getPosts";
 
 
     console.log('test')
 
     // AJAX POST TO SERVER
     $.ajax({
-    	url: url,
-    	type: 'GET',
-    	success: function(data) {
+        url: url,
+        type: 'GET',
+        success: function(data) {
             var items = JSON.parse(data)
             for (i = 0; i < items.length; i++) {
                 items[i].percentageRaised = (Number(items[i].amountRaised) / Number(items[i].price)) * 100;
@@ -77,6 +95,9 @@ app.controller("indexController", ["$scope", "$rootScope", "$location", function
     console.log('Asking for notifications')
     $.ajax({
         url: notificationUrl,
+        // data: { 
+        //     userID : 'test'
+        // },
         data: dataGET,
         type: 'GET',
         success: function(data) {
@@ -85,7 +106,7 @@ app.controller("indexController", ["$scope", "$rootScope", "$location", function
             console.log($scope.notifications)
             $scope.$apply()
         },
-        error: function(response,  error) {
+        error: function(response, error) {
           console.log(response)
           console.log(error)
       }
@@ -155,6 +176,27 @@ app.controller("indexController", ["$scope", "$rootScope", "$location", function
 
 
 
+FB.getLoginStatus(function(response) {
+  if (response.status === 'connected') {
+    // the user is logged in and has authenticated your
+    // app, and response.authResponse supplies
+    // the user's ID, a valid access token, a signed
+    // request, and the time the access token 
+    // and signed request each expire
+    var uid = response.authResponse.userID;
+    var accessToken = response.authResponse.accessToken;
+    console.log('connected')
+  } else if (response.status === 'not_authorized') {
+    // the user is logged in to Facebook, 
+    // but has not authenticated your app
+    console.log('not authenticated')
+  } else {
+    // the user isn't logged in to Facebook.
+     console.log('connected')
+  }
+ });
+
+
 
         // ADD BID TO DATABASE
         console.log("Adding bid for item " + event + " for " + amount)
@@ -189,7 +231,7 @@ app.controller("indexController", ["$scope", "$rootScope", "$location", function
 
 }
 
-}])	
+}]) 
 
 //Code modified from http://ditio.net/2010/05/02/javascript-date-difference-calculation/
 var DateDiff = {

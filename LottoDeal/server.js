@@ -21,6 +21,27 @@ function checkIfServerShouldPerformLottery(){
     setTimeout(checkIfServerShouldPerformLottery, SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES * 1000);
 }
 
+function sendEmailToAddress(email, subjectText, contentText) {
+    var helper = require('sendgrid').mail;
+    from_email = new helper.Email("info@lottodeal.com");
+    to_email = new helper.Email(email);
+    subject = subjectText;
+    content = new helper.Content("text/plain", contentText);
+    mail = new helper.Mail(from_email, subject, to_email, content);
+
+    var sg = require('sendgrid')('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');
+    var request = sg.emptyRequest({
+      method: 'POST',
+      path: '/v3/mail/send',
+      body: mail.toJSON()
+  });
+
+    sg.API(request, function(error, response) {
+      console.log(response.statusCode);
+      console.log(response.body);
+      console.log(response.headers);
+  })
+}
 
 //app.use(express.bodyParser());
 
@@ -633,7 +654,7 @@ var addBidForItem = function(itemID, userID, newAmount) {
                         user.bids.push(data);
                         user.save();
                     }
-
+                    sendEmailToAddress(user.email, "Congrats!", "You bid $" + newAmount + " on " + item.title)
                     console.log('bid successfully updated!');
                 }
                 break;
