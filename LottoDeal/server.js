@@ -299,7 +299,19 @@ mongoose.connect(url, function(err, db) {
     findAllUsers(function(users) {
         console.log(users)
     });
-    
+
+    User.find({fbid: 1467343223328608}, function(err, user) {
+        if (err) throw err;
+        // object of all the users
+
+        data = {
+            userID : "Dom",
+            stars : 100,
+            reviewDes : "supaa good",
+        };
+        user[0].reviews.push(data);
+
+    });
 
     findAllItems(function (items) {
         console.log(items);
@@ -363,7 +375,7 @@ module.exports = Item;
 
 
 var createUser = function(name, id, url) {
-    var newUser = new User ({fullName : name, fbid : id, pictureURL : url, bids : [], review : [], notifications : []});
+    var newUser = new User ({fullName : name, fbid : id, pictureURL : url, bids : [], reviews : [], notifications : []});
     // call the built-in save method to save to the database
     newUser.save(function(err) {
         if (err) throw err;
