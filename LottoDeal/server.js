@@ -364,11 +364,6 @@ var createItem = function(title, price, datePosted, expirationDate, descrip, sel
     // call the built-in save method to save to the database
     // newItem.img.data = fs.readFileSync(image);
     // newItem.img.contentType = 'image/png';
-    
-    findUser(sellerID, function(user) { 
-        data = {itemID: newItem._id.str};
-        user.listedItems.push(data);
-    });
 
     newItem.save(function (err, newItem) {
       if (err) throw err;});
