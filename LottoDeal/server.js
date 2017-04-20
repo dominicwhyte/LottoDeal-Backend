@@ -309,12 +309,12 @@ mongoose.connect(url, function(err, db) {
 //     });
     
     
-    // deleteAllUsers();
-    // deleteAllItems();
+    deleteAllUsers();
+    deleteAllItems();
 
     //findAllUsers();
     console.log("Connected successfully to server");
-
+    
     //addBidForItem("58efe4435363382e3d61137a", "58e8054642a9960421d3a566", 3);
     var date = new Date();
  
@@ -397,13 +397,13 @@ module.exports = User;
 module.exports = Item;
 
 
-<<<<<<< HEAD
+
 var createUser = function(name, id, url) {
     var newUser = new User ({fullName : name, fbid : id, pictureURL : url, bids : [], reviews : [], notifications : []});
-=======
+
 var createUser = function(name, id, url, email) {
     var newUser = new User ({fullName : name, email: email, fbid : id, pictureURL : url, bids : [], review : [], notifications : []});
->>>>>>> 86793f650027705803f6ac59d9ce94648940a319
+
     // call the built-in save method to save to the database
     newUser.save(function(err) {
         if (err) throw err;
