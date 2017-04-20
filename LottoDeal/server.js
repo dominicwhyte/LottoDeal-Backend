@@ -113,8 +113,7 @@ app.get('/getListedItemsForUsers', function(request, response) {
             console.log("fetching listed itemSchema")
             console.log("selling items = " + JSON.stringify(items));
             response.send(JSON.stringify(items));
-        }
-    });
+        });
 })
 
 
@@ -279,16 +278,11 @@ mongoose.connect(url, function(err, db) {
     // deleteAllUsers();
     // deleteAllItems();
 
-
     //findAllUsers();
     console.log("Connected successfully to server");
 
     //addBidForItem("58efe4435363382e3d61137a", "58e8054642a9960421d3a566", 3);
     var date = new Date();
-
-
-    // deleteAllItems();
-    // deleteAllUsers();
  
     findAllUsers(function(users) {
         console.log(users)
@@ -451,7 +445,6 @@ var getItemsForUsers = function(userID, callback) {
 var getListedItemsForUsers = function(userID, callback) {
     Item.find({sellerID:userID}, function(err, items) { 
         callback(items)           
-        }  
     });
 }
 
