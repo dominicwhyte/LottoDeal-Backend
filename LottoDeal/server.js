@@ -287,8 +287,8 @@ mongoose.connect(url, function(err, db) {
 //     });
     
     
-    deleteAllUsers();
-    deleteAllItems();
+    // deleteAllUsers();
+    // deleteAllItems();
 
     //findAllUsers();
     console.log("Connected successfully to server");
