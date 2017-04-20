@@ -109,10 +109,8 @@ app.get('/getListedItemsForUsers', function(request, response) {
     var userID = request.query["userID"];
     console.log(userID);
     console.log("fetching listed itemSchema")
-    getListedItemsForUsers(userID, function(items, listedItemLength, j) {
-        if (j == listedItemLength) {
-
-                console.log("fetching listed itemSchema")
+    getListedItemsForUsers(userID, function(items) {
+            console.log("fetching listed itemSchema")
             console.log("selling items = " + JSON.stringify(items));
             response.send(JSON.stringify(items));
         }
@@ -327,9 +325,6 @@ var userSchema = new Schema({
         title: String,
         description: String,
     }],
-    listedItems: [{ // currently selling items
-        itemID: String, // id of item being sold
-    }]
 });
 
 
@@ -362,7 +357,7 @@ module.exports = Item;
 
 
 var createUser = function(name, id, url) {
-    var newUser = new User ({fullName : name, fbid : id, pictureURL : url, bids : [], review : [], notifications : [], listedItems : []});
+    var newUser = new User ({fullName : name, fbid : id, pictureURL : url, bids : [], review : [], notifications : []});
     // call the built-in save method to save to the database
     newUser.save(function(err) {
         if (err) throw err;
@@ -454,33 +449,9 @@ var getItemsForUsers = function(userID, callback) {
 }
 
 var getListedItemsForUsers = function(userID, callback) {
-    User.find({fbid:userID}, function(err, user) {
-        console.log("I'm in listed items")
-        var items = [];
-        var listedItems = user[0].listedItems;
-        for (var j = 0; j < listedItems.length; j++) {
-            var id = listedItems[i].itemID;
-            var temp = j;
-                console.log(j)
-                console.log(listedItems.length)
-
-            Item.findById(id, function(err, item) {
-                console.log(temp)
-                console.log(j)
-                console.log(listedItems.length)
-                if (err) throw err;
-                // object of all the users
-                    console.log("Here's your item selling" + item);
-                    items.push(item);
-                    console.log("THIS IS THE ITEMS  Youre selling ARRAY" + items)
-                    console.log('Got selling items for user' + userID)
-
-                    // i is weird and incremented
-                    callback(items, listedItems.length-1, temp)
-                
-            });
+    Item.find({sellerID:userID}, function(err, items) { 
+        callback(items)           
         }  
-
     });
 }
 
