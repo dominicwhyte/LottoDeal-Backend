@@ -275,8 +275,8 @@ mongoose.connect(url, function(err, db) {
 //     });
     
     
-    // deleteAllUsers();
-    // deleteAllItems();
+    deleteAllUsers();
+    deleteAllItems();
 
     //findAllUsers();
     console.log("Connected successfully to server");
@@ -439,7 +439,12 @@ var getItemsForUsers = function(userID, callback) {
 
 var getListedItemsForUsers = function(userID, callback) {
     Item.find({sellerID:userID}, function(err, items) { 
+<<<<<<< HEAD
+            callback(items)           
+        }  
+=======
         callback(items)           
+>>>>>>> 8cab409c7b6d99edaed0207b7be301ebe1b2c3cd
     });
 }
 
