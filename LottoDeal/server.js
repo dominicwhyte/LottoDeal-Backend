@@ -276,8 +276,8 @@ mongoose.connect(url, function(err, db) {
 //     });
     
     
-    // deleteAllUsers();
-    // deleteAllItems();
+    deleteAllUsers();
+    deleteAllItems();
 
 
     //findAllUsers();
@@ -450,7 +450,7 @@ var getItemsForUsers = function(userID, callback) {
 
 var getListedItemsForUsers = function(userID, callback) {
     Item.find({sellerID:userID}, function(err, items) { 
-        callback(items)           
+            callback(items)           
         }  
     });
 }
