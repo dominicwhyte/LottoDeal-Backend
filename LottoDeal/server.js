@@ -309,8 +309,8 @@ mongoose.connect(url, function(err, db) {
 //     });
     
     
-    deleteAllUsers();
-    deleteAllItems();
+    // deleteAllUsers();
+    // deleteAllItems();
 
     //findAllUsers();
     console.log("Connected successfully to server");
@@ -322,7 +322,7 @@ mongoose.connect(url, function(err, db) {
         console.log(users)
     });
 
-    User.find({fbid: 1467343223328608}, function(err, user) {
+    User.find({fbid: 1355884977768129}, function(err, user) {
         if (err) throw err;
         // object of all the users
 
@@ -332,7 +332,7 @@ mongoose.connect(url, function(err, db) {
             reviewDes : "supaa good",
         };
         user[0].reviews.push(data);
-
+        user[0].save();
     });
 
     findAllItems(function (items) {
@@ -396,19 +396,13 @@ var Item = mongoose.model('Item', itemSchema);
 module.exports = User;
 module.exports = Item;
 
-<<<<<<< HEAD
+
+
+
+
 var createUser = function(name, id, url, email) {
     var newUser = new User ({fullName : name, email: email, fbid : id, pictureURL : url, bids : [], reviews : [], notifications : []});
-=======
 
-
-var createUser = function(name, id, url) {
-    var newUser = new User ({fullName : name, fbid : id, pictureURL : url, bids : [], reviews : [], notifications : []});
-
-var createUser = function(name, id, url, email) {
-    var newUser = new User ({fullName : name, email: email, fbid : id, pictureURL : url, bids : [], review : [], notifications : []});
-
->>>>>>> b9b4cedc3bc01f78ec7fb6c613ca69a36e01daab
     // call the built-in save method to save to the database
     newUser.save(function(err) {
         if (err) throw err;
@@ -463,36 +457,62 @@ var getBidsForUsers = function(userID, callback) {
 }
 
 
+
+
+
+
+
+
 var getItemsForUsers = function(userID, callback) {
-    User.find({fbid:userID}, function(err, user) {
-        var items = [];
-        var bids = user[0].bids;
-        for (var i = 0; i < bids.length; i++) {
-            var id = bids[i].itemID;
-            var temp = i;
-                console.log(i)
-                console.log(bids.length)
 
-            Item.findById(id, function(err, item) {
-                console.log(temp)
-                console.log(i)
-                console.log(bids.length)
-                if (err) throw err;
-                // object of all the users
-                console.log("Here's your tiem for bidding" + item);
-                items.push(item);
+   User.find({fbid:userID}, function(err, user) {
+    var itemIDs = [];
+    var bids = user[0].bids;
+    for (var i = 0; i < bids.length; i++) {
+        itemIDs.push(bids[i].itemID);
+    }
 
-                    console.log("THIS IS THE ITEMS ARRAY for bidding" + items)
-                    console.log('Got items for user for bidding' + userID)
-
-                    // i is weird and incremented
-                    callback(items, bids.length-1, temp)
-                
-            });
-        }  
-
+    Item.find({'_id' : itemIDs}, function(err, items){
+        console.log("here are all your items" + items)
+        callback(items);
     });
+
+
+
+});
+
 }
+
+// var getItemsForUsers = function(userID, callback) {
+//     User.find({fbid:userID}, function(err, user) {
+//         var items = [];
+//         var bids = user[0].bids;
+//         for (var i = 0; i < bids.length; i++) {
+//             var id = bids[i].itemID;
+//             var temp = i;
+//                 console.log(i)
+//                 console.log(bids.length)
+
+//             Item.findById(id, function(err, item) {
+//                 console.log(temp)
+//                 console.log(i)
+//                 console.log(bids.length)
+//                 if (err) throw err;
+//                 // object of all the users
+//                 console.log("Here's your tiem for bidding" + item);
+//                 items.push(item);
+
+//                     console.log("THIS IS THE ITEMS ARRAY for bidding" + items)
+//                     console.log('Got items for user for bidding' + userID)
+
+//                     // i is weird and incremented
+//                     callback(items, bids.length-1, temp)
+                
+//             });
+//         }  
+
+//     });
+// }
 
 var getListedItemsForUsers = function(userID, callback) {
     Item.find({sellerID:userID, sold:false}, function(err, items) {
