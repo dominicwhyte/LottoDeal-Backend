@@ -122,7 +122,7 @@ app.get('/getSoldItemsForUsers', function(request, response) {
     var userID = request.query["userID"];
     console.log(userID);
     console.log("fetching sold itemSchema")
-    getListedItemsForUsers(userID, function(items) {
+    getSoldItemsForUsers(userID, function(items) {
             console.log("fetching sold itemSchema")
             console.log("sold items = " + JSON.stringify(items));
             response.send(JSON.stringify(items));
