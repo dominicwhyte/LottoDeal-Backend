@@ -21,6 +21,27 @@ function checkIfServerShouldPerformLottery(){
     setTimeout(checkIfServerShouldPerformLottery, SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES * 1000);
 }
 
+function sendEmailToAddress(email, subjectText, contentText) {
+    var helper = require('sendgrid').mail;
+    from_email = new helper.Email("info@lottodeal.com");
+    to_email = new helper.Email(email);
+    subject = subjectText;
+    content = new helper.Content("text/plain", contentText);
+    mail = new helper.Mail(from_email, subject, to_email, content);
+
+    var sg = require('sendgrid')('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');
+    var request = sg.emptyRequest({
+      method: 'POST',
+      path: '/v3/mail/send',
+      body: mail.toJSON()
+  });
+
+    sg.API(request, function(error, response) {
+      console.log(response.statusCode);
+      console.log(response.body);
+      console.log(response.headers);
+  })
+}
 
 //app.use(express.bodyParser());
 
@@ -288,12 +309,12 @@ mongoose.connect(url, function(err, db) {
 //     });
     
     
-    // deleteAllUsers();
-    // deleteAllItems();
+    deleteAllUsers();
+    deleteAllItems();
 
     //findAllUsers();
     console.log("Connected successfully to server");
-
+    
     //addBidForItem("58efe4435363382e3d61137a", "58e8054642a9960421d3a566", 3);
     var date = new Date();
  
@@ -375,8 +396,19 @@ var Item = mongoose.model('Item', itemSchema);
 module.exports = User;
 module.exports = Item;
 
+<<<<<<< HEAD
 var createUser = function(name, id, url, email) {
     var newUser = new User ({fullName : name, email: email, fbid : id, pictureURL : url, bids : [], reviews : [], notifications : []});
+=======
+
+
+var createUser = function(name, id, url) {
+    var newUser = new User ({fullName : name, fbid : id, pictureURL : url, bids : [], reviews : [], notifications : []});
+
+var createUser = function(name, id, url, email) {
+    var newUser = new User ({fullName : name, email: email, fbid : id, pictureURL : url, bids : [], review : [], notifications : []});
+
+>>>>>>> b9b4cedc3bc01f78ec7fb6c613ca69a36e01daab
     // call the built-in save method to save to the database
     newUser.save(function(err) {
         if (err) throw err;
@@ -627,7 +659,7 @@ var addBidForItem = function(itemID, userID, newAmount) {
                         user.bids.push(data);
                         user.save();
                     }
-
+                    sendEmailToAddress(user.email, "Congrats!", "You bid $" + newAmount + " on " + item.title)
                     console.log('bid successfully updated!');
                 }
                 break;
