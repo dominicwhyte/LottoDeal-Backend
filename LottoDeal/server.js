@@ -176,6 +176,7 @@ app.post('/createUser', function(request, response) {
     var name = request.body.name;
     var id = request.body.fbid;
     var url = request.body.url;
+    var email = request.body.email;
 
     var users = findAllUsers(function (users) {
         var usersLength = users.length;
@@ -189,7 +190,7 @@ app.post('/createUser', function(request, response) {
         }
 
         if (!found) {
-            createUser(name, id, url);
+            createUser(name, id, url, email);
             //response.send("You have created a new user");
         }
     });
@@ -328,6 +329,7 @@ var Schema = mongoose.Schema;
 var userSchema = new Schema({
     fullName: String, // facebook given (String)
     fbid: String, // facebook given
+    email: String, // facebook given email
     pictureURL: String, //profile pic URL from Facebook (String)
     bids: [{
         itemID: String,
@@ -374,8 +376,13 @@ module.exports = User;
 module.exports = Item;
 
 
+<<<<<<< HEAD
 var createUser = function(name, id, url) {
     var newUser = new User ({fullName : name, fbid : id, pictureURL : url, bids : [], reviews : [], notifications : []});
+=======
+var createUser = function(name, id, url, email) {
+    var newUser = new User ({fullName : name, email: email, fbid : id, pictureURL : url, bids : [], review : [], notifications : []});
+>>>>>>> 86793f650027705803f6ac59d9ce94648940a319
     // call the built-in save method to save to the database
     newUser.save(function(err) {
         if (err) throw err;
