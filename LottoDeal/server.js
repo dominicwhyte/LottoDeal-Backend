@@ -117,6 +117,18 @@ app.get('/getListedItemsForUsers', function(request, response) {
 })
 
 
+app.get('/getSoldItemsForUsers', function(request, response) {
+
+    var userID = request.query["userID"];
+    console.log(userID);
+    console.log("fetching sold itemSchema")
+    getListedItemsForUsers(userID, function(items) {
+            console.log("fetching sold itemSchema")
+            console.log("sold items = " + JSON.stringify(items));
+            response.send(JSON.stringify(items));
+        });
+})
+
 
 
 
@@ -438,11 +450,17 @@ var getItemsForUsers = function(userID, callback) {
 }
 
 var getListedItemsForUsers = function(userID, callback) {
-    Item.find({sellerID:userID}, function(err, items) {
+    Item.find({sellerID:userID, sold:false}, function(err, items) {
         callback(items);
     });
 }
 
+
+var getSoldItemsForUsers = function(userID, callback) {
+    Item.find({sellerID:userID, sold:true}, function(err, items) {
+        callback(items);
+    });
+}
 
 var createReview = function(sellerID, reviewerID, stars, reviewDes) {
     User.find({fbid:sellerID}, function(err, user) {
