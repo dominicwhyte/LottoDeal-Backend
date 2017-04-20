@@ -81,8 +81,10 @@ app.post('/createReview', function(request, response) {
 // Send back the reviews on the passed in item parameter, in case user wants to
 // see the people that bid on his item
 app.get('/getReviews', function(request, response) {
-    var sellerID = request.body.sellerID;
+    var sellerID = request.query["sellerID"];
+    console.log("this is the request" + request.body);
     findUser(sellerID, function(user) {
+        console.log("this is the user's reviews" + user)
         response.send(JSON.stringify(user.reviews));
     });
 })
@@ -322,7 +324,7 @@ mongoose.connect(url, function(err, db) {
         console.log(users)
     });
 
-    User.find({fbid: 1355884977768129}, function(err, user) {
+    User.find({fbid: 1467343223328608}, function(err, user) {
         if (err) throw err;
         // object of all the users
 
@@ -476,8 +478,6 @@ var getItemsForUsers = function(userID, callback) {
         console.log("here are all your items" + items)
         callback(items);
     });
-
-
 
 });
 
@@ -679,7 +679,7 @@ var addBidForItem = function(itemID, userID, newAmount) {
                         user.bids.push(data);
                         user.save();
                     }
-                    sendEmailToAddress(user.email, "Congrats!", "You bid $" + newAmount + " on " + item.title)
+                    // sendEmailToAddress(user.email, "Congrats!", "You bid $" + newAmount + " on " + item.title)
                     console.log('bid successfully updated!');
                 }
                 break;
