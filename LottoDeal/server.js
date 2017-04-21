@@ -106,21 +106,16 @@ app.post('/performPayment', function(request, response) {
 
     // Charge the user's card:
     var charge = stripe.charges.create({
-        amount: 1000,
+        amount: request.body.amount,
         currency: "usd",
         description: "Example charge",
         source: token,
     }, function(err, charge) {
+        
+        console.log(err)
         response.send("charge is" + charge.amount)
-        console.log("charge is" + charge.amount)
-        if (err != null) {
-            console.log('payment success')
-            response.send('success with payment')
-        }
-        else {
-            console.log('payment failure')
-            response.send('error with payment')
-        }
+
+        
         // asynchronously called
     });
 })
@@ -286,6 +281,8 @@ app.post('/createPost', cpUpload, function (req, res, next) {
   var price = req.body.price;
   var offset = req.body.expirDate;
   var expirationDate = new Date()
+  var date = new Date();
+
     if (offset == 1) {
         expirationDate.setDate(date.getDate() + 1); 
     }
@@ -297,7 +294,7 @@ app.post('/createPost', cpUpload, function (req, res, next) {
     }
   var description = req.body.description;
   var sellerID = req.body.userID;
-  var date = new Date();
+  
 
   createItem(title, price, date, expirationDate, description, sellerID, image);
 
