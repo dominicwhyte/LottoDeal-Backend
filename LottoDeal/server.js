@@ -90,6 +90,41 @@ app.post('/createReview', function(request, response) {
     response.send("review added!")
 })
 
+// Stripe Code---------------------------------------------------------
+
+// A user has bid on an item, add this bid to database
+app.post('/performPayment', function(request, response) {
+    // get into database, access object, update it's bid field and add to user bids
+    console.log('Payment performing')
+    var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
+
+    // Token is created using Stripe.js or Checkout!
+    // Get the payment token submitted by the form:
+    var token = request.body.stripeToken; // Using Express
+
+    // Charge the user's card:
+    var charge = stripe.charges.create({
+        amount: 1000,
+        currency: "usd",
+        description: "Example charge",
+        source: token,
+    }, function(err, charge) {
+        response.send("charge is" + charge.amount)
+        console.log("charge is" + charge.amount)
+        if (err != null) {
+            console.log('payment success')
+            response.send('success with payment')
+        }
+        else {
+            console.log('payment failure')
+            response.send('error with payment')
+        }
+        // asynchronously called
+    });
+})
+
+
+//End Stripe Code ------------------------------------------------------
 
 // Send back the reviews on the passed in item parameter, in case user wants to
 // see the people that bid on his item
