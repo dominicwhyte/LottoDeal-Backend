@@ -270,7 +270,17 @@ app.post('/createPost', cpUpload, function (req, res, next) {
   console.log(image)
   var title = req.body.title;
   var price = req.body.price;
-  var expirationDate = req.body.expirDate;
+  var offset = req.body.expirDate;
+  var expirationDate = new Date()
+    if (offset == 1) {
+        expirationDate.setDate(date.getDate() + 1); 
+    }
+    else if (offset == 2) {
+        expirationDate.setDate(date.getDate() + 7); 
+    }
+    else {
+        expirationDate.setDate(date.getDate() + 30); 
+    }
   var description = req.body.description;
   var sellerID = req.body.userID;
   var date = new Date();
@@ -279,7 +289,6 @@ app.post('/createPost', cpUpload, function (req, res, next) {
 
   res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html');
 })
-
 
 
 // Will add a new user to our database
