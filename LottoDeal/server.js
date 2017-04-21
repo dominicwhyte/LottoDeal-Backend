@@ -139,6 +139,18 @@ app.get('/getReviews', function(request, response) {
     });
 })
 
+
+
+app.get('/getAccount', function(request, response) {
+    var userID = request.query["userID"];
+    findUser(userID, function(user) {
+        console.log("this is the user's reviews" + user)
+        response.send(JSON.stringify(user));
+    });
+})
+
+
+
 app.get('/getNotifications', function(request, response) {
     console.log('getting notifications');
     // var userID = '1641988472497790';
