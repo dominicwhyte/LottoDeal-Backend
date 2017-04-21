@@ -664,10 +664,11 @@ app.get('/getReviewerImagesandNames', function(request, response) {
 var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
     User.find({fbid:sellerID}, function(err, user) {
             if (err) throw err;
-             var data = {userID: reviewerID, stars: stars, reviewDes: reviewDes, date: date};
-
+             var data = {userID: reviewerID, stars: stars, reviewDes: reviewDes, datePosted: date};
+             console.log(data);
             user[0].reviews.push(data);
             user[0].save();
+            console.log(user[0].reviews)
         
     });
 }
