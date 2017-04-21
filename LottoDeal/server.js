@@ -83,8 +83,9 @@ app.post('/createReview', function(request, response) {
     var reviewerID = request.body.reviewerID;
     var stars = request.body.stars;
     var reviewDes = request.body.reviewDes;
+    var date = request.body.date;
 
-    createReview(sellerID, reviewerID, stars, reviewDes);
+    createReview(sellerID, reviewerID, stars, reviewDes, date);
 
     response.send("review added!")
 })
@@ -416,6 +417,7 @@ var userSchema = new Schema({
         userID: String,
         stars: Number,
         reviewDes: String,
+        datePosted: Date, //date the review was created (String - parse into Date object)
     }],
     notifications: [{ // notifications to show user
         read: Boolean,
@@ -583,50 +585,44 @@ var getSoldItemsForUsers = function(userID, callback) {
     });
 }
 
-var async = require('async');
-
 app.get('/getReviewerImagesandNames', function(request, response) {
     var userID = request.query["userID"];
 
     var reviewersID = []
-    var users = []
 
-    findUser(userID, function(user) {
+    findUser(userID, function (user) {
         var reviews = user.reviews;
         for (var i = 0; i < reviews.length; i++) {
             reviewersID.push(reviews[i].userID);
         }
 
         console.log("Here are all the reviewersID IDs" + reviewersID);
-
-        for (var j = 0; j < reviewersID.length; j++) {
-
-            User.find({fbid:reviewersID[j]}, function(err, curUser) {
-                users.push(curUser[0]);
-            });
-        }
-        console.log(users.length);
+        User.find({fbid:reviewersID}, function(err, reviewers) {
+            console.log('got reviewers')
+            var reviewersToSend = [];
+            for (var i = 0; i < reviewersID.length; i++) {
+                for (var j = 0; j < reviewers.length; j++) {
+                    if (reviewersID[i] == reviewers[j].fbid) {
+                        reviewersToSend.push(reviewers[j]);
+                        break;
+                    }
+                }
+            }
+            console.log('got reviewers')
+            response.send(reviewersToSend);
+        });
     });
-
-    async.parallel(Users, function(err, result) {
-        /* this code will run after all calls finished the job or
-         when any of the calls passes an error */
-        if (err)
-            return console.log(err);
-        response.send(JSON.stringify(Users));
-    });
+});
 
 
-})
-
-var createReview = function(sellerID, reviewerID, stars, reviewDes) {
+var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
     User.find({fbid:sellerID}, function(err, user) {
         if (user.length != 1) {
             console.log('ERROR: multiple users with FBID')
         }
         else {
             if (err) throw err;
-             var data = {userID: reviewerID, stars: stars, reviewDes: reviewDes};
+             var data = {userID: reviewerID, stars: stars, reviewDes: reviewDes, date: date};
 
             user[0].reviews.push(data);
             user[0].save();
