@@ -589,6 +589,7 @@ app.get('/getReviewerImagesandNames', function(request, response) {
     var userID = request.query["userID"];
 
     var reviewersID = []
+    var users = []
 
     findUser(userID, function(user) {
         var reviews = user.reviews;
@@ -598,17 +599,14 @@ app.get('/getReviewerImagesandNames', function(request, response) {
 
         console.log("Here are all the reviewersID IDs" + reviewersID);
 
-
-        var Users = []
-        for (var j = 0; j < reviewersID; j++) {
+        for (var j = 0; j < reviewersID.length; j++) {
 
             User.find({fbid:reviewersID[j]}, function(err, curUser) {
-                console.log('reviewerProfile' + curUser)
-                Users.push(curUser[0]);
+                users.push(curUser[0]);
             });
         }
+        console.log(users.length);
     });
-
 
     async.parallel(Users, function(err, result) {
         /* this code will run after all calls finished the job or
