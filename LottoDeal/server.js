@@ -83,7 +83,7 @@ app.post('/createReview', function(request, response) {
     var reviewerID = request.body.reviewerID;
     var stars = request.body.stars;
     var reviewDes = request.body.reviewDes;
-    var date = request.body.date;
+    var date = new Date();
 
     createReview(sellerID, reviewerID, stars, reviewDes, date);
 
