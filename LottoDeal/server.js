@@ -583,6 +583,44 @@ var getSoldItemsForUsers = function(userID, callback) {
     });
 }
 
+var async = require('async');
+
+app.get('/getReviewerImagesandNames', function(request, response) {
+    var userID = request.query["userID"];
+
+    var reviewersID = []
+
+    findUser(userID, function(user) {
+        var reviews = user.reviews;
+        for (var i = 0; i < reviews.length; i++) {
+            reviewersID.push(reviews[i].userID);
+        }
+
+        console.log("Here are all the reviewersID IDs" + reviewersID);
+
+
+        var Users = []
+        for (var j = 0; j < reviewersID; j++) {
+
+            User.find({fbid:reviewersID[j]}, function(err, curUser) {
+                console.log('reviewerProfile' + curUser)
+                Users.push(curUser[0]);
+            });
+        }
+    });
+
+
+    async.parallel(Users, function(err, result) {
+        /* this code will run after all calls finished the job or
+         when any of the calls passes an error */
+        if (err)
+            return console.log(err);
+        response.send(JSON.stringify(Users));
+    });
+
+
+})
+
 var createReview = function(sellerID, reviewerID, stars, reviewDes) {
     User.find({fbid:sellerID}, function(err, user) {
         if (user.length != 1) {
