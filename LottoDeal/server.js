@@ -320,6 +320,23 @@ app.post('/createUser', function(request, response) {
     });
 })
 
+
+// Will add a new user to our database
+app.post('/updateSettings', function(request, response) {
+    // Parse the response
+    console.log(request.body);
+    var email = request.body.email;
+    var userID = request.body.userID;
+
+    findUser(userID, function(user) {
+        user.email = email;
+        user.save();
+        console.log("here's your new email" + user.email)
+        response.send("updated settings");
+    });
+
+})
+
 // A user has bid on an item, add this bid to database
 app.post('/addBid', function(request, response) {
     // get into database, access object, update it's bid field and add to user bids
