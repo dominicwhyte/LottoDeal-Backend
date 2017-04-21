@@ -10,8 +10,20 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json())
 app.use(json())
 
+var multer = require('multer')
+var upload = multer({dest: 'uploads/'})
+
 
 var fs = require('fs'); // add for file system
+// app.get('/',function(req,res){
+// fs.readFile('index.html',function (err, data){
+//     res.writeHead(200, {'Content-Type': 'text/html','Content-Length':data.length});
+//     res.write(data);
+//     res.end();
+// });
+
+// });
+
 
 //Check if lotteries should be performed
 function checkIfServerShouldPerformLottery(){
@@ -160,34 +172,76 @@ app.get('/', function(request, response) {
 })
 
 // will create a new post, and associate it with a user in our database
-app.post('/createPost', function(request, response) {
-    // Parse the response
-    console.log(request.body);
+// app.post('/createPost', function(request, response) {
+//     // Parse the response
+//     console.log(request)
+//     console.log(request.body);
+//     console.log(request.files);
 
-    // create a new post in the database
-    var date = new Date();
-  //  var timecreated = date.getTime();
-  var expirationDate = request.body.expirationDate;
-  var title = request.body.title;
-  var price = request.body.price;
-    //var image = request.body.picture; 
-    var description = request.body.description;
-    var sellerID = request.body.sellerID;
+//     // create a new post in the database
+//     var date = new Date();
+//   //  var timecreated = date.getTime();
+//   var expirationDate = request.body.expirationDate;
+//   var title = request.body.title;
+//   var price = request.body.price;
+//     //var image = request.body.picture; 
+//     var description = request.body.description;
+//     var sellerID = request.body.sellerID;
 
-    // var post = {
-    //     timecreated: timecreated,
-    //     expirationDate: expirationDate,
-    //     title: title,
-    //     price: price,
-    //    // image: image,
-    //     description: description
-    // }
-//    console.log(post)
+//     // var post = {
+//     //     timecreated: timecreated,
+//     //     expirationDate: expirationDate,
+//     //     title: title,
+//     //     price: price,
+//     //    // image: image,
+//     //     description: description
+//     // }
+// //    console.log(post)
 
-// should be giving it a date instead of a time
-createItem(title, price, date, expirationDate, description, sellerID);
+// // should be giving it a date instead of a time
+// createItem(title, price, date, expirationDate, description, sellerID);
 
-response.send("You have created a new post.")
+// response.send("You have created a new post.")
+// })
+
+var cpUpload = upload.fields([{ name: 'title', maxCount: 1 }, 
+    { name: 'price', maxCount: 1 },
+    { name: 'picture', maxCount: 1},
+    { name: 'description', maxCount: 1},
+    { name: 'expirDate', maxCount: 1},
+    { name: 'userID', maxCount: 1}])
+app.post('/createPost', cpUpload, function (req, res, next) {
+  // req.files is an object (String -> Array) where fieldname is the key, and the value is array of files
+  //
+  // e.g.
+  //  req.files['avatar'][0] -> File
+  //  req.files['gallery'] -> Array
+  //
+  // req.body will contain the text fields, if there were any
+  // console.log(req)
+  console.log(req.files)
+  console.log(req.body)
+// img: {data: Buffer, // stores an image here
+//         contentType: String},
+  // image
+  var picture = req.files['picture'][0]
+  var imagePath = "./uploads/" + picture.filename;
+  var imageData = fs.readFileSync(imagePath);
+  var image = {}
+  image["data"] = imageData
+  image["contentType"] = 'image/png';
+
+  console.log(image)
+  var title = req.body.title;
+  var price = req.body.price;
+  var expirationDate = req.body.expirDate;
+  var description = req.body.description;
+  var sellerID = req.body.userID;
+  var date = new Date();
+
+  createItem(title, price, date, expirationDate, description, sellerID, image);
+
+  res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html');
 })
 
 
@@ -324,18 +378,18 @@ mongoose.connect(url, function(err, db) {
         console.log(users)
     });
 
-    User.find({fbid: 1467343223328608}, function(err, user) {
-        if (err) throw err;
-        // object of all the users
+    // User.find({fbid: 1467343223328608}, function(err, user) {
+    //     if (err) throw err;
+    //     // object of all the users
 
-        data = {
-            userID : "Dom",
-            stars : 100,
-            reviewDes : "supaa good",
-        };
-        user[0].reviews.push(data);
-        user[0].save();
-    });
+    //     data = {
+    //         userID : "Dom",
+    //         stars : 100,
+    //         reviewDes : "supaa good",
+    //     };
+    //     user[0].reviews.push(data);
+    //     user[0].save();
+    // });
 
     findAllItems(function (items) {
         console.log(items);
@@ -388,6 +442,7 @@ var itemSchema = new Schema({
     descrip: String, // text string of what exactly is being sold (String)
     img: {data: Buffer, // stores an image here
         contentType: String},
+    // picture: String,
     sold: Boolean, // has the item been sold
     sellerID: String, // who's selling the item
     winnerID: String, // who the winner of an item is
@@ -412,8 +467,9 @@ var createUser = function(name, id, url, email) {
     });
 }
 
-var createItem = function(title, price, datePosted, expirationDate, descrip, sellerID) {
-    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, amountRaised : 0, descrip: descrip, bids : [], sold: false, sellerID: sellerID});
+var createItem = function(title, price, datePosted, expirationDate, descrip, sellerID, picture) {
+    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, amountRaised : 0, descrip: descrip, bids : [], sold: false, sellerID: sellerID, img: picture});
+    console.log(newItem)
     // call the built-in save method to save to the database
     // newItem.img.data = fs.readFileSync(image);
     // newItem.img.contentType = 'image/png';
