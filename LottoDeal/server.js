@@ -85,6 +85,8 @@ app.post('/createReview', function(request, response) {
     var reviewDes = request.body.reviewDes;
     var date = new Date();
 
+    console.log(date)
+
     createReview(sellerID, reviewerID, stars, reviewDes, date);
 
     response.send("review added!")
@@ -661,16 +663,11 @@ app.get('/getReviewerImagesandNames', function(request, response) {
 
 var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
     User.find({fbid:sellerID}, function(err, user) {
-        if (user.length != 1) {
-            console.log('ERROR: multiple users with FBID')
-        }
-        else {
             if (err) throw err;
              var data = {userID: reviewerID, stars: stars, reviewDes: reviewDes, date: date};
 
             user[0].reviews.push(data);
             user[0].save();
-        }
         
     });
 }
