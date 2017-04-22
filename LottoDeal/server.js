@@ -95,7 +95,7 @@ app.post('/createReview', function(request, response) {
 // Stripe Code---------------------------------------------------------
 
 // A user has bid on an item, add this bid to database
-app.post('/performPayment', function(request, response) {
+app.post('/performPaymentAndAddBid', function(request, response) {
     // get into database, access object, update it's bid field and add to user bids
     console.log('Payment performing')
     var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
@@ -113,9 +113,13 @@ app.post('/performPayment', function(request, response) {
     }, function(err, charge) {
         
         console.log(err)
-        response.send("charge is" + charge.amount)
+        var itemID = request.body.itemID;
+        var userID = request.body.userID;
+        var newAmount = request.body.newAmount;
 
-        
+        addBidForItem(itemID, userID, newAmount);
+        addNotificationToUser(userID, "New Bid", "You just bid " + newAmount + " dollar(s)");
+        response.send("charge is" + charge.amount)
         // asynchronously called
     });
 })
@@ -347,18 +351,18 @@ app.post('/updateSettings', function(request, response) {
 })
 
 // A user has bid on an item, add this bid to database
-app.post('/addBid', function(request, response) {
-    // get into database, access object, update it's bid field and add to user bids
+// app.post('/addBid', function(request, response) {
+//     // get into database, access object, update it's bid field and add to user bids
 
-    var itemID = request.body.itemID;
-    var userID = request.body.userID;
-    var newAmount = request.body.newAmount;
+//     var itemID = request.body.itemID;
+//     var userID = request.body.userID;
+//     var newAmount = request.body.newAmount;
 
-    addBidForItem(itemID, userID, newAmount);
-    addNotificationToUser(userID, "New Bid", "You just bid " + newAmount + " dollar(s)");
+//     addBidForItem(itemID, userID, newAmount);
+//     addNotificationToUser(userID, "New Bid", "You just bid " + newAmount + " dollar(s)");
 
-    response.send("Bid added")
-})
+//     response.send("Bid added")
+// })
 
 // Send back all posts
 app.get('/getPosts', function(request, response) {
