@@ -298,7 +298,6 @@ app.post('/createPost', cpUpload, function (req, res, next) {
     }
   var description = req.body.description;
   var sellerID = req.body.userID;
-  
 
   createItem(title, price, date, expirationDate, description, sellerID, image);
 
@@ -533,6 +532,7 @@ var itemSchema = new Schema({
     // picture: String,
     sold: Boolean, // has the item been sold
     sellerID: String, // who's selling the item
+    sellerName: String, // name of the seller (for displaying on news feed)
     winnerID: String, // who the winner of an item is
     });
 
@@ -556,20 +556,22 @@ var createUser = function(name, id, url, email) {
 }
 
 var createItem = function(title, price, datePosted, expirationDate, descrip, sellerID, picture) {
-    var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, amountRaised : 0, descrip: descrip, bids : [], sold: false, sellerID: sellerID, img: picture});
-    console.log(newItem)
-    // call the built-in save method to save to the database
-    // newItem.img.data = fs.readFileSync(image);
-    // newItem.img.contentType = 'image/png';
 
-    newItem.save(function (err, newItem) {
-      if (err) throw err;});
+    findUser(sellerID, function(seller) {
+        var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, amountRaised : 0, descrip: descrip, bids : [], sold: false, sellerID: sellerID, sellerName: seller.fullName, img: picture});
+        newItem.save(function (err, newItem) {
+        if (err) throw err;});
 
-    newItem.save(function(err) {
+        newItem.save(function(err) {
         if (err) throw err;
 
         console.log('Item saved successfully!');
+        });
+
     });
+    // call the built-in save method to save to the database
+    // newItem.img.data = fs.readFileSync(image);
+    // newItem.img.contentType = 'image/png';    
 }
 
 
