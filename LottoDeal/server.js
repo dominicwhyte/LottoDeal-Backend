@@ -97,25 +97,23 @@ app.post('/createReview', function(request, response) {
 // A user has bid on an item, add this bid to database
 app.post('/performPaymentAndAddBid', function(request, response) {
     // get into database, access object, update it's bid field and add to user bids
-    console.log('Payment performing')
+    var amountToCharge = request.body.amountToCharge;
+    console.log('Payment performing for ' + amountToCharge + " USD")
     var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 
-    // Token is created using Stripe.js or Checkout!
-    // Get the payment token submitted by the form:
     var token = request.body.stripeToken; // Using Express
-
     // Charge the user's card:
     var charge = stripe.charges.create({
-        amount: request.body.amount,
+        amount: request.body.amountToCharge,
         currency: "usd",
-        description: "Example charge",
+        description: "Charge for LottoDeal " + request.body.itemTitle,
         source: token,
     }, function(err, charge) {
         
         console.log(err)
         var itemID = request.body.itemID;
         var userID = request.body.userID;
-        var newAmount = request.body.newAmount;
+        
 
         addBidForItem(itemID, userID, newAmount);
         addNotificationToUser(userID, "New Bid", "You just bid " + newAmount + " dollar(s)");
