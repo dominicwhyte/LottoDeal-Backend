@@ -110,7 +110,9 @@ app.post('/performPaymentAndAddBid', function(request, response) {
         source: token,
     }, function(err, charge) {
         
-        console.log('Error (should be null)=' + err)
+        if (err != null) {
+            console.log(err);
+        }
 
         var itemID = request.body.itemID;
         var userID = request.body.userID;
