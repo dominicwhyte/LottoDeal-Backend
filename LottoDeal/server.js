@@ -372,6 +372,16 @@ app.get('/getPosts', function(request, response) {
     
 })
 
+
+// Send back a specific item
+app.get('/getItem', function(request, response) {
+    var itemID = request.query.id;
+
+    var item = findItembyID(itemID, function(item) {
+        response.send(JSON.stringify(item));
+    });
+})
+
 // Send back either a serialized or full version of all users
 app.get('/getUsers', function(request, response) {
 
@@ -960,14 +970,15 @@ var findItem = function(title) {
 });
 }
 
-var findItembyID = function(id) {
+var findItembyID = function(id, callback) {
     // get all the Items
     Item.findById(id, function(err, item) {
         if (err) throw err;
-    // object of all the users
-    console.log(item);
-    return item;
-});
+        // object of all the users
+        console.log(item);
+        callback(item)
+        // return item;
+    });
 }
 
 var findAllItems = function(callback) {
