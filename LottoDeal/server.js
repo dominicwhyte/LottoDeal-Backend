@@ -97,26 +97,26 @@ app.post('/createReview', function(request, response) {
 // A user has bid on an item, add this bid to database
 app.post('/performPaymentAndAddBid', function(request, response) {
     // get into database, access object, update it's bid field and add to user bids
-    var amountToCharge = request.body.amountToCharge;
+    var amountToCharge = request.body.amount;
     console.log('Payment performing for ' + amountToCharge + " USD")
     var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 
     var token = request.body.stripeToken; // Using Express
     // Charge the user's card:
     var charge = stripe.charges.create({
-        amount: request.body.amountToCharge,
+        amount: amountToCharge * 100, //in cents
         currency: "usd",
         description: "Charge for LottoDeal " + request.body.itemTitle,
         source: token,
     }, function(err, charge) {
         
-        console.log(err)
+        console.log('Error (should be null)=' + err)
+
         var itemID = request.body.itemID;
         var userID = request.body.userID;
         
-
-        addBidForItem(itemID, userID, newAmount);
-        addNotificationToUser(userID, "New Bid", "You just bid " + newAmount + " dollar(s)");
+        addBidForItem(itemID, userID, amountToCharge);
+        addNotificationToUser(userID, "New Bid", "You just bid " + charge.amount + " dollar(s)");
         response.send("charge is" + charge.amount)
         // asynchronously called
     });
@@ -815,10 +815,7 @@ var addBidForItem = function(itemID, userID, newAmount) {
             item.save();
         }
 
-        console.log('bid successfully updated!');
-        
-
-
+        console.log('Bid successfully added to item');
     });
 
     var users = findAllUsers(function (users) {
@@ -848,7 +845,7 @@ var addBidForItem = function(itemID, userID, newAmount) {
                         user.save();
                     }
                     // sendEmailToAddress(user.email, "Congrats!", "You bid $" + newAmount + " on " + item.title)
-                    console.log('bid successfully updated!');
+                    console.log('Bid successfully added to user');
                 }
                 break;
             }
