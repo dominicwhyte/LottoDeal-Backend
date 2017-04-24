@@ -531,6 +531,7 @@ var itemSchema = new Schema({
         contentType: String},
     // picture: String,
     sold: Boolean, // has the item been sold
+    expired: Boolean, //is the item expired
     sellerID: String, // who's selling the item
     sellerName: String, // name of the seller (for displaying on news feed)
     winnerID: String, // who the winner of an item is
@@ -558,7 +559,7 @@ var createUser = function(name, id, url, email) {
 var createItem = function(title, price, datePosted, expirationDate, descrip, sellerID, picture) {
 
     findUser(sellerID, function(seller) {
-        var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, amountRaised : 0, descrip: descrip, bids : [], sold: false, sellerID: sellerID, sellerName: seller.fullName, img: picture});
+        var newItem = new Item ({title : title, price : price, datePosted : datePosted, expirationDate: expirationDate, amountRaised : 0, descrip: descrip, bids : [], sold: false, expired: false, sellerID: sellerID, sellerName: seller.fullName, img: picture});
         newItem.save(function (err, newItem) {
         if (err) throw err;});
 
@@ -729,7 +730,17 @@ var checkLotteries = function() {
                 console.log('Item sold to ' + winner)
             }
             else if (expirDate < Date.now()) {
-                console.log('Date has past')
+                console.log('Date has past - notifying users and marking item as expired');
+                for (var j = 0; j < item.bids.length; j++) {
+                    var bidderID = item.bids[j].ID;
+                    findUser(bidderID, function(user) {
+                        sendEmailToAddress(user.email, "LottoDeal:" + item.title + " expired", "You have been refunded your bid of $" + item.bids[j].amount);
+                    });
+                }
+                
+                
+                item.expired = true;
+                item.save();
             }
             else {
                 console.log('Item checked - no changes')
@@ -794,7 +805,8 @@ var addBidForItem = function(itemID, userID, newAmount) {
     // get a item with ID and update the userID array
     Item.findById(itemID, function(err, item) {
         if (err) throw err;
-        var array = item.bids;
+        if (item != null) {
+            var array = item.bids;
         var found = false;
 
         if (item.bids != null) {
@@ -820,6 +832,11 @@ var addBidForItem = function(itemID, userID, newAmount) {
         }
 
         console.log('Bid successfully added to item');
+        }
+        else {
+            console.log('Item was null in addbidforitem')
+        }
+        
     });
 
     var users = findAllUsers(function (users) {
@@ -901,13 +918,17 @@ var deleteUser = function(id) {
     // Remove User
     User.findById(id, function(err, user) {
         if (err) throw err;
-
-    // delete
-    user.remove(function(err) {
+    if (user != null) {
+        // delete
+        user.remove(function(err) {
         if (err) throw err;
-        console.log('User successfully deleted!');
+            console.log('User successfully deleted');
+        });
+    }
+    else {
+        console.log('User not successfully deleted')
+    }
     });
-});
 }
 
 
@@ -930,8 +951,14 @@ var findUser = function(fbid, callback) {
     // get all the users
     User.find({fbid: fbid}, function(err, user) {
         if (err) throw err;
-        console.log(user[0]);    
-        callback(user[0]);
+        if (user.length != 0) {
+            console.log(user[0]);    
+            callback(user[0]);
+        }
+        else {
+            callback(null);
+        }
+        
     });
 }
 
@@ -948,7 +975,7 @@ var deleteAllUsers = function() {
 
     User.remove({}, function(err) {
         if (err) throw err;
-        console.log('All User successfully deleted!');
+        console.log('All Uses successfully deleted!');
     });
 
 }
@@ -963,15 +990,6 @@ var deleteAllItems = function() {
 
 }
 
-var findItem = function(title) {
-    // get all the Items
-    Item.find({title: title}, function(err, item) {
-        if (err) throw err;
-    // object of all the users
-    console.log(items);
-    return item;
-});
-}
 
 var findItembyID = function(id, callback) {
     // get all the Items
