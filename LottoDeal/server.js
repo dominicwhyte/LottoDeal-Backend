@@ -32,7 +32,7 @@ var fs = require('fs'); // add for file system
 //Check if lotteries should be performed
 function checkIfServerShouldPerformLottery() {
     // do whatever you like here
-    console.log('Checking if lottery should be performed')
+    // console.log('Checking if lottery should be performed')
     checkLotteries();
     setTimeout(checkIfServerShouldPerformLottery, SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES * 1000);
 }
@@ -359,17 +359,18 @@ app.post('/createUser', function(request, response) {
 
             for (var i = 0; i < usersLength; i++) {
                 if (users[i].fbid === id) {
-                    //response.send("User already exists");
+                    response.send("User already exists");
                     found = 1;
                 }
             }
 
             if (!found) {
                 createUser(name, id, url, email);
-                //response.send("You have created a new user");
+                response.send("You have created a new user");
             }
         } else {
             console.log('Error: users is null in createUser');
+            respond.send(null);
         }
 
     });
@@ -848,7 +849,7 @@ var checkLotteries = function() {
                 item.expired = true;
                 item.save();
             } else {
-                console.log('Item checked - no changes')
+                // console.log('Item checked - no changes')
             }
         }
     });
