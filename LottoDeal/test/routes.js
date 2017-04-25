@@ -54,4 +54,28 @@ describe('Database connection', function() {
       });
     })
   });
+
+  describe('User deletion', function() {
+    it('should properly delete John Doe', function(done) {
+      var body = {
+        id: '12345',
+      }
+
+      // console.log(profile);
+      // console.log(url)
+
+      request(url)
+      .delete('/deleteUser')
+      .send(body)
+      .end(function(err, res) {
+        if (err) {
+          throw err;
+        }
+        res.status.should.be.equal(200);
+        res.text.should.be.equal("User already exists")
+        console.log(res);
+        done();
+      });
+    })
+  });
 });

@@ -458,6 +458,18 @@ app.get('/getUsers', function(request, response) {
 
 })
 
+// Delete a user account
+app.delete('/deleteUser', function(request, response) {
+	console.log(request.body);
+	console.log(request);
+	var id = request.body.id;
+
+	deleteUser(id, function(message) {
+		response.send(message);
+	})
+	// response.send('Deleted')
+})
+
 // Send back the bids on the passed in item parameter, in case user wants to
 // see the people that bid on his item
 // app.get('/getBids', function(request, response) {
@@ -998,20 +1010,46 @@ var addBidForItem = function(itemID, userID, newAmount) {
 
 
 
-var deleteUser = function(id) {
+var deleteUser = function(id, callback) {
     // Remove User
-    User.findById(id, function(err, user) {
-        if (err) throw err;
-        if (user != null) {
-            // delete
-            user.remove(function(err) {
-                if (err) throw err;
-                console.log('User successfully deleted');
-            });
-        } else {
-            console.log('User not successfully deleted')
-        }
-    });
+    // User.find({fbid: id}, function(err, user) {
+    //     // if (err) throw err;
+    //     if (err) console.log(err);
+    //     if (user != null) {
+    //         // delete
+    //         user.remove({}, function(err) {
+    //             // if (err) throw err;
+    //             if (err) console.log(err);
+    //             callback('User successfully deleted')
+    //             console.log('User successfully deleted');
+    //         });
+    //     } else {
+    //         callback('User not successfully deleted')
+    //         console.log('User not successfully deleted')
+    //     }
+    // });
+    User.find({fbid: id}).remove();
+
+    // User.remove({}, function(err) {
+    //     if (err) throw err;
+    //     console.log('All Uses successfully deleted!');
+    // });
+    // User.findById(id, function(err, user) {
+    //     // if (err) throw err;
+    //     if (err) console.log(err);
+    //     if (user != null) {
+    //         // delete
+    //         user.remove(function(err) {
+    //             // if (err) throw err;
+    //             if (err) console.log(err);
+    //             callback('User successfully deleted')
+    //             console.log('User successfully deleted');
+    //         });
+    //     } else {
+    //         callback('User not successfully deleted')
+    //         console.log('User not successfully deleted')
+    //     }
+    // });
 }
 
 
