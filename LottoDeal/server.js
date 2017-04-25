@@ -544,7 +544,7 @@ mongoose.connect(url, function(err, db) {
         console.log(items);
     });
 
-    //checkIfServerShouldPerformLottery();
+    checkIfServerShouldPerformLottery();
 });
 
 
@@ -832,20 +832,19 @@ var checkLotteries = function() {
 
         for (i = 0; i < items.length; i++) {
             var item = items[i]
+            if (item.expired) {
+                continue;
+            }
             var expirDate = new Date(item.expirationDate)
             if (item.amountRaised >= item.price) {
                 var winner = performLottery(item);
                 console.log('Item sold to ' + winner)
+                emailBiddersForItem(item, "LottoDeal: You lost!", "Sorry, you lost your bid for " + item.title + ". Bid again on LottoDeal!", winner)
             } else if (expirDate < Date.now()) {
+                //Refund and notify users
                 console.log('Date has past - notifying users and marking item as expired');
-                for (var j = 0; j < item.bids.length; j++) {
-                    var bidderID = item.bids[j].ID;
-                    findUser(bidderID, function(user) {
-                        sendEmailToAddress(user.email, "LottoDeal:" + item.title + " expired", "You have been refunded your bid of $" + item.bids[j].amount);
-                    });
-                }
 
-
+                emailBiddersForItem(item, "LottoDeal:" + item.title + " expired", "You have been fully refunded", "");
                 item.expired = true;
                 item.save();
             } else {
@@ -853,6 +852,19 @@ var checkLotteries = function() {
             }
         }
     });
+}
+
+//do not notify the winner
+function emailBiddersForItem(item, subject, message, winner) {
+    for (var j = 0; j < item.bids.length; j++) {
+        var bidderID = item.bids[j].ID;
+        if (bidderID == winner) {
+            continue;
+        }
+        findUser(bidderID, function(user) {
+            sendEmailToAddress(user.email, subject, message);
+        });
+    }
 }
 
 //Shuffle array - modified from http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
@@ -890,11 +902,9 @@ var performLottery = function(item) {
         }
     }
     item.sold = true;
-    var winnerID = "1234";
-    item.winner = winnerID;
+    item.winner = winner;
     item.save();
     return winner
-
 }
 
 
