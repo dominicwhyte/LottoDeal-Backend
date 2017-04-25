@@ -339,7 +339,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 
     createItem(title, price, date, expirationDate, description, sellerID, image);
 
-    res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html');
+    res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success');
 })
 
 
