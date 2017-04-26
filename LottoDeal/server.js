@@ -305,6 +305,10 @@ var cpUpload = upload.fields([{
     maxCount: 1
 }])
 app.post('/createPost', cpUpload, function(req, res, next) {
+
+    console.log('test');
+    console.log(req.body);
+    console.log('test');
     // req.files is an object (String -> Array) where fieldname is the key, and the value is array of files
     //
     // e.g.
