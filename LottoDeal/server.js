@@ -1030,6 +1030,13 @@ var deleteUser = function(id, callback) {
     // });
     User.find({fbid: id}).remove();
 
+    // removes all its corresponding items
+    Item.remove({sellerID: id}, function(err) {
+        if (err) throw err;
+        console.log('Items successfully deleted!');
+    });
+
+
     // User.remove({}, function(err) {
     //     if (err) throw err;
     //     console.log('All Uses successfully deleted!');
