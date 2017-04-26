@@ -17,7 +17,9 @@ var maxSize = 1.2 * Math.pow(10, 7); // 12MB
 var multer = require('multer')
 var upload = multer({
     dest: 'uploads/',
-    limits: {fileSize: maxSize}
+    limits: {
+        fileSize: maxSize
+    }
 })
 
 
@@ -313,15 +315,15 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     // console.log(req)
     // console.log(req.files)
     // console.log(req.body)
-        // img: {data: Buffer, // stores an image here
-        //         contentType: String},
-        // image
+    // img: {data: Buffer, // stores an image here
+    //         contentType: String},
+    // image
 
     // console.log(req.files['picture'][0])
     // CHECK FOR SIZE OF IMAGE
     var imgSize = req.files['picture'][0].size;
     if (imgSize > maxSize) {
-	    res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=sizeTooLarge');
+        res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=sizeTooLarge');
     }
 
     var picture = req.files['picture'][0]
@@ -345,10 +347,11 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     } else {
         expirationDate.setDate(date.getDate() + 30);
     }
-    var description = req.body.description;
+    var shortDescription = req.body.shortDescription;
+    var longDesciption = req.body.longDesciption;
     var sellerID = req.body.userID;
 
-    createItem(title, price, date, expirationDate, description, sellerID, image);
+    createItem(title, price, date, expirationDate, shortDescription, longDesciption, sellerID, image);
 
     res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success');
 })
@@ -471,14 +474,14 @@ app.get('/getUsers', function(request, response) {
 
 // Delete a user account
 app.delete('/deleteUser', function(request, response) {
-	// console.log(request.body);
-	// console.log(request);
-	var id = request.body.id;
+    // console.log(request.body);
+    // console.log(request);
+    var id = request.body.id;
 
-	deleteUser(id, function(message) {
-		response.send(message);
-	})
-	// response.send('Deleted')
+    deleteUser(id, function(message) {
+            response.send(message);
+        })
+        // response.send('Deleted')
 })
 
 // Send back the bids on the passed in item parameter, in case user wants to
@@ -613,7 +616,8 @@ var itemSchema = new Schema({
         ID: String,
         amount: Number,
     }], //Dictionary of fbid’s of users who have placed bids (Dictionary)
-    descrip: String, // text string of what exactly is being sold (String)
+    shortDescription: String, // text string of what exactly is being sold (String)
+    longDesciption: String,
     img: {
         data: Buffer, // stores an image here
         contentType: String
@@ -653,32 +657,39 @@ var createUser = function(name, id, url, email) {
     });
 }
 
-var createItem = function(title, price, datePosted, expirationDate, descrip, sellerID, picture) {
+var createItem = function(title, price, datePosted, expirationDate, shortDescription, longDesciption, sellerID, picture) {
 
     findUser(sellerID, function(seller) {
-        var newItem = new Item({
-            title: title,
-            price: price,
-            datePosted: datePosted,
-            expirationDate: expirationDate,
-            amountRaised: 0,
-            descrip: descrip,
-            bids: [],
-            sold: false,
-            expired: false,
-            sellerID: sellerID,
-            sellerName: seller.fullName,
-            img: picture
-        });
-        newItem.save(function(err, newItem) {
-            if (err) throw err;
-        });
+        if (seller != null) {
+            var newItem = new Item({
+                title: title,
+                price: price,
+                datePosted: datePosted,
+                expirationDate: expirationDate,
+                amountRaised: 0,
+                shortDescription: shortDescription,
+                longDesciption: longDesciption,
+                bids: [],
+                sold: false,
+                expired: false,
+                sellerID: sellerID,
+                sellerName: seller.fullName,
+                img: picture
+            });
+            newItem.save(function(err, newItem) {
+                if (err) throw err;
+            });
 
-        newItem.save(function(err) {
-            if (err) throw err;
+            newItem.save(function(err) {
+                if (err) throw err;
 
-            console.log('Item saved successfully!');
-        });
+                console.log('Item saved successfully');
+            });
+        }
+        else {
+            console.log('Item saved unsuccessfully');
+        }
+
 
     });
     // call the built-in save method to save to the database
@@ -1023,7 +1034,9 @@ var addBidForItem = function(itemID, userID, newAmount) {
 
 var deleteUser = function(id, callback) {
     // Remove User
-    User.find({fbid: id}, function(err, user) {
+    User.find({
+        fbid: id
+    }, function(err, user) {
         // if (err) throw err;
         console.log(user);
         if (err) console.log(err);
@@ -1033,11 +1046,13 @@ var deleteUser = function(id, callback) {
                 // if (err) throw err;
                 if (err) console.log(err);
                 // removes all its corresponding items
-			    Item.remove({sellerID: id}, function(err) {
-			        if (err) throw err;
-	                callback('User successfully deleted')
-			        console.log('Items successfully deleted!');
-			    });
+                Item.remove({
+                    sellerID: id
+                }, function(err) {
+                    if (err) throw err;
+                    callback('User successfully deleted')
+                    console.log('Items successfully deleted!');
+                });
 
                 // callback('User successfully deleted')
                 console.log('User successfully deleted');
