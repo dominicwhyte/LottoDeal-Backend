@@ -153,6 +153,23 @@ app.get('/getReviews', function(request, response) {
         } else {
             console.log('Error: user is null in getReviews');
         }
+    }, function() {
+    	response.status(404);
+
+		// respond with html page
+		if (request.accepts('html')) {
+			// CAN DO RESPONSE.RENDER HERE
+		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
+		  return;
+		}
+		// respond with json
+		if (request.accepts('json')) {
+		  response.send({ error: 'Not found' });
+		  return;
+		}
+
+		// default to plain-text. send()
+		response.type('txt').send('Not found');
     });
 })
 
@@ -167,6 +184,23 @@ app.get('/getAccount', function(request, response) {
         } else {
             console.log('Error: user is null in getAccount');
         }
+    }, function() {
+    	response.status(404);
+
+		// respond with html page
+		if (request.accepts('html')) {
+			// CAN DO RESPONSE.RENDER HERE
+		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
+		  return;
+		}
+		// respond with json
+		if (request.accepts('json')) {
+		  response.send({ error: 'Not found' });
+		  return;
+		}
+
+		// default to plain-text. send()
+		response.type('txt').send('Not found');
     });
 })
 
@@ -209,7 +243,7 @@ app.get('/getBiddedItemsofUsers', function(request, response) {
     var userID = request.query["userID"];
     getItemsForUsers(userID, function(items) {
         if (items != null) {
-            console.log("items your'e bidding on = " + JSON.stringify(items));
+            console.log("items you're bidding on = " + JSON.stringify(items));
             response.send(JSON.stringify(items));
         } else {
             console.log('Error: items is null in getBiddedItemsofUsers');
@@ -232,6 +266,23 @@ app.get('/getListedItemsForUsers', function(request, response) {
             console.log('Error: items is null in getListedItemsForUsers');
         }
 
+    }, function() {
+    	response.status(404);
+
+		// respond with html page
+		if (request.accepts('html')) {
+			// CAN DO RESPONSE.RENDER HERE
+		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
+		  return;
+		}
+		// respond with json
+		if (request.accepts('json')) {
+		  response.send({ error: 'Not found' });
+		  return;
+		}
+
+		// default to plain-text. send()
+		response.type('txt').send('Not found');
     });
 })
 
@@ -245,6 +296,23 @@ app.get('/getSoldItemsForUsers', function(request, response) {
         console.log("fetching sold itemSchema")
         console.log("sold items = " + JSON.stringify(items));
         response.send(JSON.stringify(items));
+    }, function() {
+    	response.status(404);
+
+		// respond with html page
+		if (request.accepts('html')) {
+			// CAN DO RESPONSE.RENDER HERE
+		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
+		  return;
+		}
+		// respond with json
+		if (request.accepts('json')) {
+		  response.send({ error: 'Not found' });
+		  return;
+		}
+
+		// default to plain-text. send()
+		response.type('txt').send('Not found');
     });
 })
 
@@ -416,6 +484,23 @@ app.post('/updateSettings', function(request, response) {
             response.send("Failed to update settings");
         }
 
+    }, function() {
+    	response.status(404);
+
+		// respond with html page
+		if (request.accepts('html')) {
+			// CAN DO RESPONSE.RENDER HERE
+		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
+		  return;
+		}
+		// respond with json
+		if (request.accepts('json')) {
+		  response.send({ error: 'Not found' });
+		  return;
+		}
+
+		// default to plain-text. send()
+		response.type('txt').send('Not found');
     });
 
 })
@@ -467,6 +552,7 @@ app.get('/getItem', function(request, response) {
 
 		// respond with html page
 		if (request.accepts('html')) {
+			// CAN DO RESPONSE.RENDER HERE
 		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
 		  return;
 		}
@@ -714,6 +800,23 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
         }
 
 
+    }, function() {
+    	response.status(404);
+
+		// respond with html page
+		if (request.accepts('html')) {
+			// CAN DO RESPONSE.RENDER HERE
+		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
+		  return;
+		}
+		// respond with json
+		if (request.accepts('json')) {
+		  response.send({ error: 'Not found' });
+		  return;
+		}
+
+		// default to plain-text. send()
+		response.type('txt').send('Not found');
     });
     // call the built-in save method to save to the database
     // newItem.img.data = fs.readFileSync(image);
@@ -802,21 +905,29 @@ var getItemsForUsers = function(userID, callback) {
 }
 
 
-var getListedItemsForUsers = function(userID, callback) {
+var getListedItemsForUsers = function(userID, callback, errorCallback) {
     Item.find({
         sellerID: userID,
         sold: false
     }, function(err, items) {
+    	if (err) {
+    		errorCallback();
+    		return;
+    	}
         callback(items);
     });
 }
 
 
-var getSoldItemsForUsers = function(userID, callback) {
+var getSoldItemsForUsers = function(userID, callback, errorCallback) {
     Item.find({
         sellerID: userID,
         sold: true
     }, function(err, items) {
+    	if (err) {
+    		errorCallback();
+    		return;
+    	}
         callback(items);
     });
 }
@@ -854,6 +965,23 @@ app.get('/getReviewerImagesandNames', function(request, response) {
             console.log('User is null in getReviewerImagesandNames');
         }
 
+    }, function() {
+    	response.status(404);
+
+		// respond with html page
+		if (request.accepts('html')) {
+			// CAN DO RESPONSE.RENDER HERE
+		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
+		  return;
+		}
+		// respond with json
+		if (request.accepts('json')) {
+		  response.send({ error: 'Not found' });
+		  return;
+		}
+
+		// default to plain-text. send()
+		response.type('txt').send('Not found');
     });
 });
 
@@ -921,7 +1049,24 @@ function emailBiddersForItem(item, subject, message, winner) {
         }
         findUser(bidderID, function(user) {
             sendEmailToAddress(user.email, subject, message);
-        });
+        }, function() {
+    	response.status(404);
+
+		// respond with html page
+		if (request.accepts('html')) {
+			// CAN DO RESPONSE.RENDER HERE
+		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
+		  return;
+		}
+		// respond with json
+		if (request.accepts('json')) {
+		  response.send({ error: 'Not found' });
+		  return;
+		}
+
+		// default to plain-text. send()
+		response.type('txt').send('Not found');
+    });
     }
 }
 
@@ -1130,12 +1275,16 @@ var deleteItem = function(id) {
 }
 
 
-var findUser = function(fbid, callback) {
+var findUser = function(fbid, callback, errorCallback) {
     // get all the users
     User.find({
         fbid: fbid
     }, function(err, user) {
-        if (err) throw err;
+    	if (err) {
+    		errorCallback();
+    		return;
+    	}
+        // if (err) throw err;
         if (user.length != 0) {
             console.log(user[0]);
             callback(user[0]);
