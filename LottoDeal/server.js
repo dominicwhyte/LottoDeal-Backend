@@ -11,6 +11,9 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json())
 app.use(json())
+app.use(express.static(__dirname + "/public"))
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
 
 var maxSize = 1.2 * Math.pow(10, 7); // 12MB
 
@@ -460,21 +463,21 @@ app.get('/getItem', function(request, response) {
         }
 
     }, function() {
-    	res.status(404);
+    	response.status(404);
 
 		// respond with html page
-		if (req.accepts('html')) {
-		  res.render('404', { url: req.url });
+		if (request.accepts('html')) {
+		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
 		  return;
 		}
 		// respond with json
-		if (req.accepts('json')) {
-		  res.send({ error: 'Not found' });
+		if (request.accepts('json')) {
+		  response.send({ error: 'Not found' });
 		  return;
 		}
 
 		// default to plain-text. send()
-		res.type('txt').send('Not found');
+		response.type('txt').send('Not found');
     });
 })
 
@@ -1172,11 +1175,12 @@ var deleteAllItems = function() {
 }
 
 
-var findItemByID = function(id, callback) {
+var findItemByID = function(id, callback, errorCallback) {
     // get all the Items
     Item.findById(id, function(err, item) {
         if (err) {
         	errorCallback()
+        	return;
         }
         // object of all the users
         console.log(item);
