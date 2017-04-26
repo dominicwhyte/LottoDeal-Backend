@@ -12,9 +12,12 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json())
 app.use(json())
 
+var maxSize = 1.2 * Math.pow(10, 7); // 12MB
+
 var multer = require('multer')
 var upload = multer({
-    dest: 'uploads/'
+    dest: 'uploads/',
+    limits: {fileSize: maxSize}
 })
 
 
@@ -308,11 +311,19 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     //
     // req.body will contain the text fields, if there were any
     // console.log(req)
-    console.log(req.files)
-    console.log(req.body)
+    // console.log(req.files)
+    // console.log(req.body)
         // img: {data: Buffer, // stores an image here
         //         contentType: String},
         // image
+
+    // console.log(req.files['picture'][0])
+    // CHECK FOR SIZE OF IMAGE
+    var imgSize = req.files['picture'][0].size;
+    if (imgSize > maxSize) {
+	    res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=sizeTooLarge');
+    }
+
     var picture = req.files['picture'][0]
     var imagePath = "./uploads/" + picture.filename;
     var imageData = fs.readFileSync(imagePath);
@@ -320,7 +331,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     image["data"] = imageData
     image["contentType"] = 'image/png';
 
-    console.log(image)
+    // console.log(image)
     var title = req.body.title;
     var price = req.body.price;
     var offset = req.body.expirDate;
@@ -460,8 +471,8 @@ app.get('/getUsers', function(request, response) {
 
 // Delete a user account
 app.delete('/deleteUser', function(request, response) {
-	console.log(request.body);
-	console.log(request);
+	// console.log(request.body);
+	// console.log(request);
 	var id = request.body.id;
 
 	deleteUser(id, function(message) {
@@ -1012,28 +1023,29 @@ var addBidForItem = function(itemID, userID, newAmount) {
 
 var deleteUser = function(id, callback) {
     // Remove User
-    // User.find({fbid: id}, function(err, user) {
-    //     // if (err) throw err;
-    //     if (err) console.log(err);
-    //     if (user != null) {
-    //         // delete
-    //         user.remove({}, function(err) {
-    //             // if (err) throw err;
-    //             if (err) console.log(err);
-    //             callback('User successfully deleted')
-    //             console.log('User successfully deleted');
-    //         });
-    //     } else {
-    //         callback('User not successfully deleted')
-    //         console.log('User not successfully deleted')
-    //     }
-    // });
-    User.find({fbid: id}).remove();
+    User.find({fbid: id}, function(err, user) {
+        // if (err) throw err;
+        console.log(user);
+        if (err) console.log(err);
+        if (user != null) {
+            // delete
+            user[0].remove({}, function(err) {
+                // if (err) throw err;
+                if (err) console.log(err);
+                // removes all its corresponding items
+			    Item.remove({sellerID: id}, function(err) {
+			        if (err) throw err;
+	                callback('User successfully deleted')
+			        console.log('Items successfully deleted!');
+			    });
 
-    // removes all its corresponding items
-    Item.remove({sellerID: id}, function(err) {
-        if (err) throw err;
-        console.log('Items successfully deleted!');
+                // callback('User successfully deleted')
+                console.log('User successfully deleted');
+            });
+        } else {
+            callback('User not successfully deleted')
+            console.log('User not successfully deleted')
+        }
     });
 
 
