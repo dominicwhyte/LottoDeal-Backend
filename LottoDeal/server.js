@@ -352,7 +352,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
         expirationDate.setDate(date.getDate() + 30);
     }
     var shortDescription = req.body.shortDescription;
-    var longDesciption = req.body.longDesciption;
+    var longDesciption = req.body.longDescription;
     var sellerID = req.body.userID;
 
     createItem(title, price, date, expirationDate, shortDescription, longDesciption, sellerID, image);
@@ -452,7 +452,7 @@ app.get('/getPosts', function(request, response) {
 app.get('/getItem', function(request, response) {
     var itemID = request.query.id;
 
-    var item = findItembyID(itemID, function(item) {
+    var item = findItemByID(itemID, function(item) {
         if (item != null) {
             response.send(JSON.stringify(item));
         } else {
@@ -1156,10 +1156,12 @@ var deleteAllItems = function() {
 }
 
 
-var findItembyID = function(id, callback) {
+var findItemByID = function(id, callback) {
     // get all the Items
     Item.findById(id, function(err, item) {
-        if (err) throw err;
+        if (err) {
+
+        }
         // object of all the users
         console.log(item);
         callback(item)
