@@ -352,10 +352,10 @@ app.post('/createPost', cpUpload, function(req, res, next) {
         expirationDate.setDate(date.getDate() + 30);
     }
     var shortDescription = req.body.shortDescription;
-    var longDesciption = req.body.longDescription;
+    var longDescription = req.body.longDescription;
     var sellerID = req.body.userID;
 
-    createItem(title, price, date, expirationDate, shortDescription, longDesciption, sellerID, image);
+    createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image);
 
     res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success');
 })
@@ -459,6 +459,22 @@ app.get('/getItem', function(request, response) {
             console.log("Error: item is null in getItem");
         }
 
+    }, function() {
+    	res.status(404);
+
+		// respond with html page
+		if (req.accepts('html')) {
+		  res.render('404', { url: req.url });
+		  return;
+		}
+		// respond with json
+		if (req.accepts('json')) {
+		  res.send({ error: 'Not found' });
+		  return;
+		}
+
+		// default to plain-text. send()
+		res.type('txt').send('Not found');
     });
 })
 
@@ -621,7 +637,7 @@ var itemSchema = new Schema({
         amount: Number,
     }], //Dictionary of fbid’s of users who have placed bids (Dictionary)
     shortDescription: String, // text string of what exactly is being sold (String)
-    longDesciption: String,
+    longDescription: String,
     img: {
         data: Buffer, // stores an image here
         contentType: String
@@ -661,7 +677,7 @@ var createUser = function(name, id, url, email) {
     });
 }
 
-var createItem = function(title, price, datePosted, expirationDate, shortDescription, longDesciption, sellerID, picture) {
+var createItem = function(title, price, datePosted, expirationDate, shortDescription, longDescription, sellerID, picture) {
 
     findUser(sellerID, function(seller) {
         if (seller != null) {
@@ -672,7 +688,7 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
                 expirationDate: expirationDate,
                 amountRaised: 0,
                 shortDescription: shortDescription,
-                longDesciption: longDesciption,
+                longDescription: longDescription,
                 bids: [],
                 sold: false,
                 expired: false,
@@ -1160,7 +1176,7 @@ var findItemByID = function(id, callback) {
     // get all the Items
     Item.findById(id, function(err, item) {
         if (err) {
-
+        	errorCallback()
         }
         // object of all the users
         console.log(item);
