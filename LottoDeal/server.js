@@ -592,7 +592,12 @@ app.get('/getAccountsForPosts', function(request, response) {
                                         averageRating : averageRounded,
                                     }
                                     accounts.push(account);
-
+                                }
+                                else {
+                                    var account = {
+                                        averageRating : "No Ratings Yet",
+                                    }
+                                    accounts.push(account);
                                 }
                             }
                         }
@@ -675,6 +680,20 @@ app.delete('/deleteUser', function(request, response) {
         })
         // response.send('Deleted')
 })
+
+
+// Delete an Item
+app.delete('/deleteItem', function(request, response) {
+    // console.log(request.body);
+    // console.log(request);
+    var id = request.body.id;
+
+    deleteItem(id, function(message) {
+            response.send(message);
+        })
+        // response.send('Deleted')
+})
+
 
 // Send back the bids on the passed in item parameter, in case user wants to
 // see the people that bid on his item
@@ -1382,20 +1401,26 @@ var deleteUser = function(id, callback) {
 }
 
 
-var deleteItem = function(id) {
+var deleteItem = function(id, callback) {
     // Remove Item
     Item.findById(id, function(err, item) {
         if (err) throw err;
 
-        // delete
-        if (item != null) {
-            item.remove(function(err) {
-                if (err) throw err;
-
-                console.log('Item successfully deleted!');
-            });
-        } else {
-            console.log('Error: item is null in delete item');
+        // if no one has bidded on the item
+        if (item.bids.length == 0) {
+            // delete
+            if (item != null) {
+                item.remove(function(err) {
+                    if (err) throw err;
+                    callback(1);
+                    console.log('Item successfully deleted!');
+                });
+            } else {
+                console.log('Error: item is null in delete item');
+            }
+        }
+        else {
+            callback(0);
         }
 
     });
