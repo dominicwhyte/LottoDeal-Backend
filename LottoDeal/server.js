@@ -157,6 +157,7 @@ app.get('/getReviews', function(request, response) {
     }, function() {
         response.status(404);
 
+
         // respond with html page
         if (request.accepts('html')) {
             // CAN DO RESPONSE.RENDER HERE
@@ -1443,6 +1444,10 @@ var findUser = function(fbid, callback, errorCallback) {
             callback(user[0]);
         } else {
             console.log('returning null');
+            // SHOULD REALLY TRY AND FIX THIS! - make sure this doesn't crash anything else
+            // MAYBE NOT THE BEST IMPLEMENTATION? should it always return null?
+            errorCallback();
+            return;
             callback(null);
         }
 
