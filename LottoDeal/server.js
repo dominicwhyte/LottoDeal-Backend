@@ -129,7 +129,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
             var itemID = request.body.itemID;
             var userID = request.body.userID;
 
-            addBidForItem(itemID, userID, amountToCharge);
+            addBidForItem(itemID, userID, amountToCharge, charge.id);
             addNotificationToUser(userID, "New Bid", "You just bid " + charge.amount + " dollar(s)");
             response.send("charge is" + charge.amount)
         } else {
@@ -144,6 +144,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
 // Send back the reviews on the passed in item parameter, in case user wants to
 // see the people that bid on his item
 app.get('/getReviews', function(request, response) {
+
     var sellerID = request.query["sellerID"];
     console.log("this is the request" + request.body);
     findUser(sellerID, function(user) {
@@ -154,22 +155,26 @@ app.get('/getReviews', function(request, response) {
             console.log('Error: user is null in getReviews');
         }
     }, function() {
-    	response.status(404);
+        response.status(404);
 
-		// respond with html page
-		if (request.accepts('html')) {
-			// CAN DO RESPONSE.RENDER HERE
-		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
-		  return;
-		}
-		// respond with json
-		if (request.accepts('json')) {
-		  response.send({ error: 'Not found' });
-		  return;
-		}
+        // respond with html page
+        if (request.accepts('html')) {
+            // CAN DO RESPONSE.RENDER HERE
+            response.sendFile(__dirname + "/views/404.html", {
+                url: request.url
+            });
+            return;
+        }
+        // respond with json
+        if (request.accepts('json')) {
+            response.send({
+                error: 'Not found'
+            });
+            return;
+        }
 
-		// default to plain-text. send()
-		response.type('txt').send('Not found');
+        // default to plain-text. send()
+        response.type('txt').send('Not found');
     });
 })
 
@@ -185,22 +190,26 @@ app.get('/getAccount', function(request, response) {
             console.log('Error: user is null in getAccount');
         }
     }, function() {
-    	response.status(404);
+        response.status(404);
 
-		// respond with html page
-		if (request.accepts('html')) {
-			// CAN DO RESPONSE.RENDER HERE
-		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
-		  return;
-		}
-		// respond with json
-		if (request.accepts('json')) {
-		  response.send({ error: 'Not found' });
-		  return;
-		}
+        // respond with html page
+        if (request.accepts('html')) {
+            // CAN DO RESPONSE.RENDER HERE
+            response.sendFile(__dirname + "/views/404.html", {
+                url: request.url
+            });
+            return;
+        }
+        // respond with json
+        if (request.accepts('json')) {
+            response.send({
+                error: 'Not found'
+            });
+            return;
+        }
 
-		// default to plain-text. send()
-		response.type('txt').send('Not found');
+        // default to plain-text. send()
+        response.type('txt').send('Not found');
     });
 })
 
@@ -267,22 +276,26 @@ app.get('/getListedItemsForUsers', function(request, response) {
         }
 
     }, function() {
-    	response.status(404);
+        response.status(404);
 
-		// respond with html page
-		if (request.accepts('html')) {
-			// CAN DO RESPONSE.RENDER HERE
-		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
-		  return;
-		}
-		// respond with json
-		if (request.accepts('json')) {
-		  response.send({ error: 'Not found' });
-		  return;
-		}
+        // respond with html page
+        if (request.accepts('html')) {
+            // CAN DO RESPONSE.RENDER HERE
+            response.sendFile(__dirname + "/views/404.html", {
+                url: request.url
+            });
+            return;
+        }
+        // respond with json
+        if (request.accepts('json')) {
+            response.send({
+                error: 'Not found'
+            });
+            return;
+        }
 
-		// default to plain-text. send()
-		response.type('txt').send('Not found');
+        // default to plain-text. send()
+        response.type('txt').send('Not found');
     });
 })
 
@@ -297,22 +310,26 @@ app.get('/getSoldItemsForUsers', function(request, response) {
         console.log("sold items = " + JSON.stringify(items));
         response.send(JSON.stringify(items));
     }, function() {
-    	response.status(404);
+        response.status(404);
 
-		// respond with html page
-		if (request.accepts('html')) {
-			// CAN DO RESPONSE.RENDER HERE
-		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
-		  return;
-		}
-		// respond with json
-		if (request.accepts('json')) {
-		  response.send({ error: 'Not found' });
-		  return;
-		}
+        // respond with html page
+        if (request.accepts('html')) {
+            // CAN DO RESPONSE.RENDER HERE
+            response.sendFile(__dirname + "/views/404.html", {
+                url: request.url
+            });
+            return;
+        }
+        // respond with json
+        if (request.accepts('json')) {
+            response.send({
+                error: 'Not found'
+            });
+            return;
+        }
 
-		// default to plain-text. send()
-		response.type('txt').send('Not found');
+        // default to plain-text. send()
+        response.type('txt').send('Not found');
     });
 })
 
@@ -437,7 +454,7 @@ app.post('/editItem', function(request, response) {
     // get into database, access object, update it's bid field and add to user bids
 
     var itemID = request.body.itemID;
-    var title = request.body.title;    
+    var title = request.body.title;
     var price = request.body.price;
     var expirationDate = request.body.expirationDate;
     var shortDescription = request.body.shortDescription;
@@ -517,22 +534,26 @@ app.post('/updateSettings', function(request, response) {
         }
 
     }, function() {
-    	response.status(404);
+        response.status(404);
 
-		// respond with html page
-		if (request.accepts('html')) {
-			// CAN DO RESPONSE.RENDER HERE
-		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
-		  return;
-		}
-		// respond with json
-		if (request.accepts('json')) {
-		  response.send({ error: 'Not found' });
-		  return;
-		}
+        // respond with html page
+        if (request.accepts('html')) {
+            // CAN DO RESPONSE.RENDER HERE
+            response.sendFile(__dirname + "/views/404.html", {
+                url: request.url
+            });
+            return;
+        }
+        // respond with json
+        if (request.accepts('json')) {
+            response.send({
+                error: 'Not found'
+            });
+            return;
+        }
 
-		// default to plain-text. send()
-		response.type('txt').send('Not found');
+        // default to plain-text. send()
+        response.type('txt').send('Not found');
     });
 
 })
@@ -580,22 +601,26 @@ app.get('/getItem', function(request, response) {
         }
 
     }, function() {
-    	response.status(404);
+        response.status(404);
 
-		// respond with html page
-		if (request.accepts('html')) {
-			// CAN DO RESPONSE.RENDER HERE
-		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
-		  return;
-		}
-		// respond with json
-		if (request.accepts('json')) {
-		  response.send({ error: 'Not found' });
-		  return;
-		}
+        // respond with html page
+        if (request.accepts('html')) {
+            // CAN DO RESPONSE.RENDER HERE
+            response.sendFile(__dirname + "/views/404.html", {
+                url: request.url
+            });
+            return;
+        }
+        // respond with json
+        if (request.accepts('json')) {
+            response.send({
+                error: 'Not found'
+            });
+            return;
+        }
 
-		// default to plain-text. send()
-		response.type('txt').send('Not found');
+        // default to plain-text. send()
+        response.type('txt').send('Not found');
     });
 })
 
@@ -710,6 +735,10 @@ mongoose.connect(url, function(err, db) {
 
     findAllItems(function(items) {
         console.log(items);
+        console.log('initiating refunds');
+        for (var i = 0; i < items.length; i++) {
+            refundUsers(items[i]);
+        }
     });
 
     checkIfServerShouldPerformLottery();
@@ -756,6 +785,7 @@ var itemSchema = new Schema({
     bids: [{
         ID: String,
         amount: Number,
+        chargeIDs: [String] ////charge ID, in case refund should be issued
     }], //Dictionary of fbid’s of users who have placed bids (Dictionary)
     shortDescription: String, // text string of what exactly is being sold (String)
     longDescription: String,
@@ -820,7 +850,6 @@ var editItem = function(title, price, expirationDate, shortDescription, longDesc
 
 
 var createItem = function(title, price, datePosted, expirationDate, shortDescription, longDescription, sellerID, picture) {
-
     findUser(sellerID, function(seller) {
         if (seller != null) {
             var newItem = new Item({
@@ -847,29 +876,32 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
 
                 console.log('Item saved successfully');
             });
-        }
-        else {
+        } else {
             console.log('Item saved unsuccessfully');
         }
 
 
     }, function() {
-    	response.status(404);
+        response.status(404);
 
-		// respond with html page
-		if (request.accepts('html')) {
-			// CAN DO RESPONSE.RENDER HERE
-		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
-		  return;
-		}
-		// respond with json
-		if (request.accepts('json')) {
-		  response.send({ error: 'Not found' });
-		  return;
-		}
+        // respond with html page
+        if (request.accepts('html')) {
+            // CAN DO RESPONSE.RENDER HERE
+            response.sendFile(__dirname + "/views/404.html", {
+                url: request.url
+            });
+            return;
+        }
+        // respond with json
+        if (request.accepts('json')) {
+            response.send({
+                error: 'Not found'
+            });
+            return;
+        }
 
-		// default to plain-text. send()
-		response.type('txt').send('Not found');
+        // default to plain-text. send()
+        response.type('txt').send('Not found');
     });
     // call the built-in save method to save to the database
     // newItem.img.data = fs.readFileSync(image);
@@ -963,10 +995,10 @@ var getListedItemsForUsers = function(userID, callback, errorCallback) {
         sellerID: userID,
         sold: false
     }, function(err, items) {
-    	if (err) {
-    		errorCallback();
-    		return;
-    	}
+        if (err) {
+            errorCallback();
+            return;
+        }
         callback(items);
     });
 }
@@ -977,10 +1009,10 @@ var getSoldItemsForUsers = function(userID, callback, errorCallback) {
         sellerID: userID,
         sold: true
     }, function(err, items) {
-    	if (err) {
-    		errorCallback();
-    		return;
-    	}
+        if (err) {
+            errorCallback();
+            return;
+        }
         callback(items);
     });
 }
@@ -1019,22 +1051,26 @@ app.get('/getReviewerImagesandNames', function(request, response) {
         }
 
     }, function() {
-    	response.status(404);
+        response.status(404);
 
-		// respond with html page
-		if (request.accepts('html')) {
-			// CAN DO RESPONSE.RENDER HERE
-		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
-		  return;
-		}
-		// respond with json
-		if (request.accepts('json')) {
-		  response.send({ error: 'Not found' });
-		  return;
-		}
+        // respond with html page
+        if (request.accepts('html')) {
+            // CAN DO RESPONSE.RENDER HERE
+            response.sendFile(__dirname + "/views/404.html", {
+                url: request.url
+            });
+            return;
+        }
+        // respond with json
+        if (request.accepts('json')) {
+            response.send({
+                error: 'Not found'
+            });
+            return;
+        }
 
-		// default to plain-text. send()
-		response.type('txt').send('Not found');
+        // default to plain-text. send()
+        response.type('txt').send('Not found');
     });
 });
 
@@ -1093,6 +1129,29 @@ var checkLotteries = function() {
     });
 }
 
+function refundUsers(item) {
+    for (var j = 0; j < item.bids.length; j++) {
+        console.log('attempting to refund user');
+        var bid = item.bids[j];
+        for (var i = 0; i < bid.chargeIDs.length; i++) {
+            console.log('attempt refund for charge ID');
+            var chargeID = bid.chargeIDs[i];
+            var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
+
+            stripe.refunds.create({
+                charge: chargeID,
+            }, function(err, refund) {
+                if (refund != null) {
+                    console.log(refund.amount + " cents refunded successfully");
+                }
+                else {
+                    console.log('Refund failed')
+                }
+            });
+        }
+    }
+}
+
 //do not notify the winner
 function emailBiddersForItem(item, subject, message, winner) {
     for (var j = 0; j < item.bids.length; j++) {
@@ -1103,23 +1162,27 @@ function emailBiddersForItem(item, subject, message, winner) {
         findUser(bidderID, function(user) {
             sendEmailToAddress(user.email, subject, message);
         }, function() {
-    	response.status(404);
+            response.status(404);
 
-		// respond with html page
-		if (request.accepts('html')) {
-			// CAN DO RESPONSE.RENDER HERE
-		  response.sendFile(__dirname + "/views/404.html", { url: request.url });
-		  return;
-		}
-		// respond with json
-		if (request.accepts('json')) {
-		  response.send({ error: 'Not found' });
-		  return;
-		}
+            // respond with html page
+            if (request.accepts('html')) {
+                // CAN DO RESPONSE.RENDER HERE
+                response.sendFile(__dirname + "/views/404.html", {
+                    url: request.url
+                });
+                return;
+            }
+            // respond with json
+            if (request.accepts('json')) {
+                response.send({
+                    error: 'Not found'
+                });
+                return;
+            }
 
-		// default to plain-text. send()
-		response.type('txt').send('Not found');
-    });
+            // default to plain-text. send()
+            response.type('txt').send('Not found');
+        });
     }
 }
 
@@ -1172,7 +1235,7 @@ var performLottery = function(item) {
 //   res.send(doc.img.data);
 //   // how to send it back to the sever from my computer
 
-var addBidForItem = function(itemID, userID, newAmount) {
+var addBidForItem = function(itemID, userID, newAmount, chargeID) {
     // get a item with ID and update the userID array
     Item.findById(itemID, function(err, item) {
         if (err) throw err;
@@ -1186,6 +1249,8 @@ var addBidForItem = function(itemID, userID, newAmount) {
                         var curAmount = Number(item.bids[i].amount);
                         curAmount += Number(newAmount);
                         item.bids[i].amount = Number(curAmount);
+                        item.bids[i].chargeIDs.push(chargeID);
+                        console.log('pushing chargeID ' + chargeID);
                         item.amountRaised += Number(newAmount);
                         item.save();
                         found = true;
@@ -1195,12 +1260,15 @@ var addBidForItem = function(itemID, userID, newAmount) {
             }
 
             if (!found) {
+                console.log('pushing chargeID ' + chargeID);
                 var data = {
                     ID: userID,
-                    amount: newAmount
+                    amount: newAmount,
+                    chargeIDs: [chargeID]
                 };
                 console.log(data);
                 item.bids.push(data);
+
                 item.amountRaised += newAmount;
                 item.save();
             }
@@ -1333,15 +1401,17 @@ var findUser = function(fbid, callback, errorCallback) {
     User.find({
         fbid: fbid
     }, function(err, user) {
-    	if (err) {
-    		errorCallback();
-    		return;
-    	}
+        if (err) {
+            console.log('Error finding user');
+            errorCallback();
+            return;
+        }
         // if (err) throw err;
         if (user.length != 0) {
             console.log(user[0]);
             callback(user[0]);
         } else {
+            console.log('returning null');
             callback(null);
         }
 
@@ -1381,8 +1451,8 @@ var findItemByID = function(id, callback, errorCallback) {
     // get all the Items
     Item.findById(id, function(err, item) {
         if (err) {
-        	errorCallback()
-        	return;
+            errorCallback()
+            return;
         }
         // object of all the users
         console.log(item);
