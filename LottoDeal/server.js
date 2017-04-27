@@ -26,6 +26,9 @@ var upload = multer({
 })
 
 
+var helmet = require("helmet")
+app.use(helmet())
+
 var fs = require('fs'); // add for file system
 // app.get('/',function(req,res){
 // fs.readFile('index.html',function (err, data){
@@ -77,14 +80,23 @@ var options = {
 app.use(function(req, res, next) {
     var allowedOrigins = ['https://dominicwhyte.github.io'];
     var origin = req.headers.origin;
+    console.log("printing origin");
+    console.log(origin);
     if (allowedOrigins.indexOf(origin) > -1) {
         res.setHeader('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
+	    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+	    res.header('Access-Control-Allow-Credentials', true);
+	    return next();
+    }
+    else {
+    	res.send("Oops! You can't access our API")
     }
     //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
-    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.header('Access-Control-Allow-Credentials', true);
-    return next();
+    // res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
+    // res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    // res.header('Access-Control-Allow-Credentials', true);
+    // return next();
 });
 
 // A user has bid on an item, add this bid to database
@@ -568,6 +580,7 @@ app.post('/updateSettings', function(request, response) {
 app.get('/getPosts', function(request, response) {
     // get all of the posts and return them to frontend to load on feed
     // might not need to include bids
+    console.log(request);
 
     var items = findAllItems(function(items) {
         if (items != null) {
