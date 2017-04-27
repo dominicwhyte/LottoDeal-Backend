@@ -432,6 +432,38 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 })
 
 
+// Edit an item that the seller has posted
+app.post('/editItem', function(request, response) {
+    // get into database, access object, update it's bid field and add to user bids
+
+    var itemID = request.body.itemID;
+    var title = request.body.title;    
+    var price = request.body.price;
+    var expirationDate = request.body.expirationDate;
+    var shortDescription = request.body.shortDescription;
+    var longDescription = request.body.longDescription;
+
+    var imgSize = request.files['picture'][0].size;
+    if (imgSize > maxSize) {
+        res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=sizeTooLarge');
+    }
+
+    var picture = request.files['picture'][0]
+    var imagePath = "./uploads/" + picture.filename;
+    var imageData = fs.readFileSync(imagePath);
+    var image = {}
+    image["data"] = imageData
+    image["contentType"] = 'image/png';
+
+
+    editItem(title, price, expirationDate, shortDescription, longDescription, itemID, image);
+
+    response.send("Edited Item successfully")
+})
+
+
+
+
 // Will add a new user to our database
 app.post('/createUser', function(request, response) {
     // Parse the response
@@ -765,6 +797,27 @@ var createUser = function(name, id, url, email) {
         console.log('User saved successfully!');
     });
 }
+
+
+var editItem = function(title, price, expirationDate, shortDescription, longDescription, itemID, image) {
+
+    Item.findById(itemID, function(err, item) {
+        item.title = title;
+        item.price = price;
+        item.expirationDate = expirationDate;
+        item.shortDescription = shortDescription;
+        item.longDescription = longDescription;
+        item.image = image;
+        item.save(function(err) {
+            if (err) throw err;
+            console.log('Item updated successfully');
+        });
+    });
+    // call the built-in save method to save to the database
+    // newItem.img.data = fs.readFileSync(image);
+    // newItem.img.contentType = 'image/png';    
+}
+
 
 var createItem = function(title, price, datePosted, expirationDate, shortDescription, longDescription, sellerID, picture) {
 
