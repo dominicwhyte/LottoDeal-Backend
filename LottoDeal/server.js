@@ -81,7 +81,7 @@ app.use(function(req, res, next) {
         res.setHeader('Access-Control-Allow-Origin', origin);
     }
     //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
-    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.header('Access-Control-Allow-Credentials', true);
     return next();
@@ -712,9 +712,14 @@ app.delete('/deleteItem', function(request, response) {
     // console.log(request);
     var id = request.body.id;
 
+    console.log("here");
+
+    response.header('Access-Control-Allow-Methods', 'DELETE');
+
+
     deleteItem(id, function(message) {
-            response.send(message);
-        })
+        response.send(message);
+    })
         // response.send('Deleted')
 })
 
@@ -1464,13 +1469,16 @@ var deleteItem = function(id, callback) {
     Item.findById(id, function(err, item) {
         if (err) throw err;
 
-        // if no one has bidded on the item
+        console.log(item)
+
+
+        // if no one has bid on the item
         if (item.bids.length == 0) {
             // delete
             if (item != null) {
                 item.remove(function(err) {
                     if (err) throw err;
-                    callback(1);
+                    callback("1");
                     console.log('Item successfully deleted!');
                 });
             } else {
@@ -1478,7 +1486,9 @@ var deleteItem = function(id, callback) {
             }
         }
         else {
-            callback(0);
+        	// DELETE THE ITEM, PERFORM ALL REFUNDS, AND REMOVE FROM BID LIST OF USERS THAT BID ON IT
+
+            callback("0");
         }
 
     });
