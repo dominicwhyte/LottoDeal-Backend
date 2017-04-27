@@ -85,12 +85,11 @@ app.use(function(req, res, next) {
     if (allowedOrigins.indexOf(origin) > -1) {
         res.setHeader('Access-Control-Allow-Origin', origin);
         res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
-	    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-	    res.header('Access-Control-Allow-Credentials', true);
-	    return next();
-    }
-    else {
-    	res.send("Oops! You can't access our API")
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.header('Access-Control-Allow-Credentials', true);
+        return next();
+    } else {
+        res.send("Oops! You can't access our API")
     }
     //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
     // res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
@@ -348,7 +347,6 @@ app.get('/getSoldItemsForUsers', function(request, response) {
 
 
 
-
 app.get('/', function(request, response) {
     response.send("API is working!")
 })
@@ -457,7 +455,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var sellerID = req.body.userID;
 
     createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
-	    res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
+        res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
     }, function() {
         response.status(404);
 
@@ -614,25 +612,24 @@ app.get('/getAccountsForPosts', function(request, response) {
 
                                     var reviews = user.reviews;
                                     var length = reviews.length;
-                                    var total = 0; 
+                                    var total = 0;
                                     var average = 0;
                                     var averageRounded = 0;
                                     if (length != 0) {
-                                        var total = 0; 
+                                        var total = 0;
                                         for (var k = 0; k < length; k++) {
                                             total += parseInt(reviews[k].stars);
                                         }
-                                        var average = total/length;
-                                        var averageRounded = Math.round(average*10)/10
+                                        var average = total / length;
+                                        var averageRounded = Math.round(average * 10) / 10
                                     }
                                     var account = {
-                                        averageRating : averageRounded,
+                                        averageRating: averageRounded,
                                     }
                                     accounts.push(account);
-                                }
-                                else {
+                                } else {
                                     var account = {
-                                        averageRating : "No Ratings Yet",
+                                        averageRating: "No Ratings Yet",
                                     }
                                     accounts.push(account);
                                 }
@@ -641,13 +638,11 @@ app.get('/getAccountsForPosts', function(request, response) {
                     }
 
                     response.send(JSON.stringify(accounts))
-                } 
-                else {
+                } else {
                     console.log("Error: Users null");
                 }
             });
-        } 
-        else {
+        } else {
             console.log('Error: Items null');
         }
 
@@ -731,38 +726,38 @@ app.delete('/deleteItem', function(request, response) {
 
 
     deleteItem(id, function(message) {
-        response.send(message);
-    })
+            response.send(message);
+        })
         // response.send('Deleted')
 })
 
 app.post('/editItem', function(request, response) {
-     // get into database, access object, update it's bid field and add to user bids
- 
-     var itemID = request.body.itemID;
-     var title = request.body.title;    
-     var price = request.body.price;
-     var expirationDate = request.body.expirationDate;
-     var shortDescription = request.body.shortDescription;
-     var longDescription = request.body.longDescription;
- 
-     var imgSize = request.files['picture'][0].size;
-     if (imgSize > maxSize) {
-         res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=sizeTooLarge');
-     }
- 
-     var picture = request.files['picture'][0]
-     var imagePath = "./uploads/" + picture.filename;
-     var imageData = fs.readFileSync(imagePath);
-     var image = {}
-     image["data"] = imageData
-     image["contentType"] = 'image/png';
- 
- 
-     editItem(title, price, expirationDate, shortDescription, longDescription, itemID, image);
- 
-     response.send("Edited Item successfully")
- })
+    // get into database, access object, update it's bid field and add to user bids
+
+    var itemID = request.body.itemID;
+    var title = request.body.title;
+    var price = request.body.price;
+    var expirationDate = request.body.expirationDate;
+    var shortDescription = request.body.shortDescription;
+    var longDescription = request.body.longDescription;
+
+    var imgSize = request.files['picture'][0].size;
+    if (imgSize > maxSize) {
+        res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=sizeTooLarge');
+    }
+
+    var picture = request.files['picture'][0]
+    var imagePath = "./uploads/" + picture.filename;
+    var imageData = fs.readFileSync(imagePath);
+    var image = {}
+    image["data"] = imageData
+    image["contentType"] = 'image/png';
+
+
+    editItem(title, price, expirationDate, shortDescription, longDescription, itemID, image);
+
+    response.send("Edited Item successfully")
+})
 
 
 // Send back the bids on the passed in item parameter, in case user wants to
@@ -828,6 +823,11 @@ mongoose.connect(url, function(err, db) {
     //findAllUsers();
     console.log("Connected successfully to server");
 
+    deleteItem('590267c9be88c312ba3d5d8a', function(result) {
+        console.log(result);
+        console.log('deleted');
+    });
+
     //addBidForItem("58efe4435363382e3d61137a", "58e8054642a9960421d3a566", 3);
     var date = new Date();
 
@@ -850,10 +850,10 @@ mongoose.connect(url, function(err, db) {
 
     findAllItems(function(items) {
         console.log(items);
-        console.log('initiating refunds');
-        for (var i = 0; i < items.length; i++) {
-            refundUsers(items[i]);
-        }
+        //console.log('initiating refunds');
+        // for (var i = 0; i < items.length; i++) {
+        //     refundUsers(items[i]);
+        // }
     });
 
     checkIfServerShouldPerformLottery();
@@ -923,8 +923,6 @@ module.exports = Item;
 
 
 
-
-
 var createUser = function(name, id, url, email) {
     var newUser = new User({
         fullName: name,
@@ -965,11 +963,11 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
             newItem.save(function(err, newItem) {
                 // if (err) throw err; // THERE SHOULD BE AN ERROR CALLBACK HERE
                 if (err) {
-                	errorCallback();
+                    errorCallback();
                 }
                 console.log("Here is the new item");
                 callback(newItem["_id"])
-                // console.log(newItem);
+                    // console.log(newItem);
             });
 
             newItem.save(function(err) {
@@ -1245,8 +1243,7 @@ function refundUsers(item) {
             }, function(err, refund) {
                 if (refund != null) {
                     console.log(refund.amount + " cents refunded successfully");
-                }
-                else {
+                } else {
                     console.log('Refund failed')
                 }
             });
@@ -1327,7 +1324,6 @@ var performLottery = function(item) {
     item.save();
     return winner
 }
-
 
 
 
@@ -1422,7 +1418,6 @@ var addBidForItem = function(itemID, userID, newAmount, chargeID) {
 
 
 
-
 var deleteUser = function(id, callback) {
     // Remove User
     User.find({
@@ -1481,28 +1476,49 @@ var deleteUser = function(id, callback) {
 var deleteItem = function(id, callback) {
     // Remove Item
     Item.findById(id, function(err, item) {
+        //TODO: Need to replace this error by an error callback
         if (err) throw err;
 
-        console.log(item)
-
-
-        // if no one has bid on the item
-        if (item.bids.length == 0) {
-            // delete
-            if (item != null) {
+        if (item != null) {
+            //delete the bid from the users bids
+            findAllUsers(function(users) {
+                // if no one has bid on the item
+                if (item.bids.length == 0) {
+                    console.log('Deleting item with no bids');
+                } else {
+                    console.log('Deleting item with bids');
+                    //iterate through users (one time) to delete the necessary bids
+                    for (var j = 0; j < users.length; j++) {
+                        var user = users[j];
+                        console.log('checking user');
+                        //check if user bid on item
+                        for (var i = 0; i < item.bids.length; i++) {
+                            var userID = item.bids[i].ID
+                            console.log('UserID of a bidder is ' + userID);
+                            //if user bid on the item, remove the bid
+                            if (user.fbid == userID) {
+                                for (var k = 0; k < user.bids.length; k++) {
+                                    var bid = user.bids[k];
+                                    if (bid.itemID == id) {
+                                        user.bids.splice(k, 1);
+                                        user.save();
+                                        console.log('Removing bid from user');
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                //Delete the item
+                callback("1");
                 item.remove(function(err) {
                     if (err) throw err;
-                    callback("1");
                     console.log('Item successfully deleted!');
                 });
-            } else {
-                console.log('Error: item is null in delete item');
-            }
-        }
-        else {
-        	// DELETE THE ITEM, PERFORM ALL REFUNDS, AND REMOVE FROM BID LIST OF USERS THAT BID ON IT
-
-            callback("0");
+            });
+        } else {
+            console.log('Trying to remove null item');
         }
 
     });
