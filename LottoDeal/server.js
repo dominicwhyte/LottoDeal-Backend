@@ -491,7 +491,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     Jimp.read(imagePath, function(err, img) {
     	console.log(err);
     	console.log(img);
-    	img.resize(220, 220) // crop(100, 100, 300, 200)
+    	img.scaleToFit(500, 500) // crop(100, 100, 300, 200)
     	.write(imagePath + picture.filename +  "compressed").getBase64(Jimp.AUTO, function(err, src) {
     		console.log("here");
     		console.log(err);
