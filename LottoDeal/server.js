@@ -502,7 +502,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 
 		        // default to plain-text. send()
 		        response.type('txt').send('Not found');
-		    });
+		    }, imageData);
     	})
     })
 
@@ -735,9 +735,35 @@ app.get('/getAccountsForPosts', function(request, response) {
 app.get('/getItem', function(request, response) {
     var itemID = request.query.id;
 
-    var item = findItemByID(itemID, function(item) {
+    findItemByID(itemID, function(item) {
         if (item != null) {
-            response.send(JSON.stringify(item));
+        	findImageByID(item["_id"], function(buffer) {
+        		item.img.data = buffer;
+        		response.send(JSON.stringify(item))
+        	}, function() {
+        		response.status(404);
+
+		        // respond with html page
+		        if (request.accepts('html')) {
+		            // CAN DO RESPONSE.RENDER HERE
+		            response.sendFile(__dirname + "/views/404.html", {
+		                url: request.url
+		            });
+		            return;
+		        }
+		        // respond with json
+		        if (request.accepts('json')) {
+		            response.send({
+		                error: 'Not found'
+		            });
+		            return;
+		        }
+
+		        // default to plain-text. send()
+		        response.type('txt').send('Not found');
+        	})
+
+            // response.send(JSON.stringify(item));
         } else {
             console.log("Error: item is null in getItem");
         }
@@ -896,8 +922,8 @@ mongoose.connect(url, function(err, db) {
     //     });
 
 
-    deleteAllUsers();
-    deleteAllItems();
+    // deleteAllUsers();
+    // deleteAllItems();
 
     //findAllUsers();
     console.log("Connected successfully to server");
@@ -934,6 +960,10 @@ mongoose.connect(url, function(err, db) {
         //     refundUsers(items[i]);
         // }
     });
+
+    findAllImages(function(images) {
+    	console.log(images)
+    })
 
     checkIfServerShouldPerformLottery();
 });
@@ -998,9 +1028,21 @@ var itemSchema = new Schema({
 
 var Item = mongoose.model('Item', itemSchema);
 
+
+var imageSchema = new Schema({
+	itemID: String,
+	img: {
+		data: Buffer,
+	}
+})
+
+var Image = mongoose.model('Image', imageSchema);
+
+
+
 module.exports = User;
 module.exports = Item;
-
+module.exports = Image;
 
 
 var createUser = function(name, id, url, email) {
@@ -1022,7 +1064,7 @@ var createUser = function(name, id, url, email) {
 }
 
 
-var createItem = function(title, price, datePosted, expirationDate, shortDescription, longDescription, sellerID, picture, callback, errorCallback) {
+var createItem = function(title, price, datePosted, expirationDate, shortDescription, longDescription, sellerID, picture, callback, errorCallback, buffer) {
     findUser(sellerID, function(seller) {
         if (seller != null) {
             var newItem = new Item({
@@ -1046,6 +1088,11 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
                     errorCallback();
                 }
                 console.log("Here is the new item");
+
+                console.log(newItem["_id"])
+
+                createImage(newItem["_id"], buffer);
+
                 callback(newItem["_id"])
                     // console.log(newItem);
             });
@@ -1673,6 +1720,10 @@ var findItemByID = function(id, callback, errorCallback) {
         }
         // object of all the users
         console.log(item);
+
+
+
+
         callback(item)
             // return item;
     });
@@ -1705,4 +1756,53 @@ var editItem = function(title, price, expirationDate, shortDescription, longDesc
     // call the built-in save method to save to the database
     // newItem.img.data = fs.readFileSync(image);
     // newItem.img.contentType = 'image/png';    
+}
+
+
+var createImage = function(id, buffer) {
+    var newImage = new Image({
+        itemID: id,
+        img: {
+        	data: buffer
+        }
+    });
+
+    // call the built-in save method to save to the database
+    newImage.save(function(err) {
+        if (err) throw err;
+        console.log('Image saved successfully!');
+    });
+}
+
+var findImageByID = function(id, callback, errorCallback) {
+	console.log(id);
+	Image.find({
+		itemID: id
+	}, function(err, images) {
+		console.log(images);
+		if (err) {
+			errorCallback();
+			return;
+		}
+		if (images == null || images.length == 0) {
+			console.log("here")
+			errorCallback();
+			return;
+		}
+		if (images != null) {
+			image = images[0]
+			callback(image.img.data);
+			return;
+		}
+
+	})
+
+}
+
+var findAllImages = function(callback) {
+	Image.find({}, function(err, items) {
+        if (err) throw err;
+        //console.log(items);
+        callback(items)
+    });
 }
