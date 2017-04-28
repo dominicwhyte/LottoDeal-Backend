@@ -148,7 +148,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
             var userID = request.body.userID;
 
             addBidForItem(itemID, userID, amountToCharge, charge.id);
-            addNotificationToUser(userID, "New Bid", "You just bid " + charge.amount + " dollar(s)");
+            addNotificationToUser(itemID, userID, "New Bid", "You just bid " + charge.amount + " dollar(s)");
             response.send("charge is" + charge.amount)
         } else {
             console.log('Error: charge is null in performPaymentAndAddBid');
@@ -968,21 +968,21 @@ mongoose.connect(url, function(err, db) {
     //     });
 
 
-    deleteAllUsers();
-    deleteAllItems();
-    deleteAllImages();
+    // deleteAllUsers();
+    // deleteAllItems();
+    // deleteAllImages();
 
 
     //findAllUsers();
     console.log("Connected successfully to server");
 
-    deleteItem('590267c9be88c312ba3d5d8a', function(result) {
-        console.log(result);
-        console.log('deleted');
-    });
+    // deleteItem('590267c9be88c312ba3d5d8a', function(result) {
+    //     console.log(result);
+    //     console.log('deleted');
+    // });
 
     //addBidForItem("58efe4435363382e3d61137a", "58e8054642a9960421d3a566", 3);
-    var date = new Date();
+    // var date = new Date();
 
     findAllUsers(function(users) {
         console.log(users)
@@ -1040,6 +1040,12 @@ var userSchema = new Schema({
         read: Boolean,
         title: String,
         description: String,
+
+
+        itemID: String, // item associated with the notification
+
+
+
     }],
 });
 
@@ -1183,7 +1189,7 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
 }
 
 
-var addNotificationToUser = function(userID, titleText, descriptionText) {
+var addNotificationToUser = function(itemID, userID, titleText, descriptionText) {
     User.find({
         fbid: userID
     }, function(err, user) {
@@ -1192,6 +1198,14 @@ var addNotificationToUser = function(userID, titleText, descriptionText) {
         } else {
             if (err) throw err;
             var data = {
+
+
+                itemID: itemID,
+
+
+
+
+
                 read: false,
                 title: titleText,
                 description: descriptionText
