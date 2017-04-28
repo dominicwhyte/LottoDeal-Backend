@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({
 // SHOULD GET THIS TO WORK
 // var sharp = require("sharp");
 
-
+var Jimp = require("jimp");
 
 app.use(bodyParser.json())
 app.use(json())
@@ -412,9 +412,9 @@ var cpUpload = upload.fields([{
 }])
 app.post('/createPost', cpUpload, function(req, res, next) {
 
-    console.log('test');
-    console.log(req.body);
-    console.log('test');
+    // console.log('test');
+    // console.log(req.body);
+    // console.log('test');
     // req.files is an object (String -> Array) where fieldname is the key, and the value is array of files
     //
     // e.g.
@@ -440,62 +440,123 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var imagePath = "./uploads/" + picture.filename;
     var imageData = fs.readFileSync(imagePath);
     var image = {}
-    image["data"] = imageData
+    // image["data"] = imageData
     image["contentType"] = 'image/png';
 
 
 
     // create compressed version
+    Jimp.read(imagePath, function(err, img) {
+    	console.log(err);
+    	console.log(img);
+    	img.resize(220, 220) // crop(100, 100, 300, 200)
+    	.write(imagePath + picture.filename +  "compressed").getBase64(Jimp.AUTO, function(err, src) {
+    		console.log("here");
+    		console.log(err);
+    		// console.log(response);
+    		// console.log(src);
+    		// if (err != null) {
+			console.log("working");
+			image["compressed"] = src;
+    		// }
 
 
+    		var title = req.body.title;
+		    var price = req.body.price;
+		    var offset = req.body.expirDate;
+		    var expirationDate = new Date()
+		    var date = new Date();
 
+		    if (offset == 1) {
+		        expirationDate.setDate(date.getDate() + 1);
+		    } else if (offset == 2) {
+		        expirationDate.setDate(date.getDate() + 7);
+		    } else {
+		        expirationDate.setDate(date.getDate() + 30);
+		    }
+		    var shortDescription = req.body.shortDescription;
+		    var longDescription = req.body.longDescription;
+		    var sellerID = req.body.userID;
+		    console.log(image);
 
+		    createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
+		        res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
+		    }, function() {
+		        response.status(404);
 
+		        // respond with html page
+		        if (request.accepts('html')) {
+		            // CAN DO RESPONSE.RENDER HERE
+		            response.sendFile(__dirname + "/views/404.html", {
+		                url: request.url
+		            });
+		            return;
+		        }
+		        // respond with json
+		        if (request.accepts('json')) {
+		            response.send({
+		                error: 'Not found'
+		            });
+		            return;
+		        }
 
+		        // default to plain-text. send()
+		        response.type('txt').send('Not found');
+		    });
+    	})
+    })
+
+    // Jimp.read(imagePath + "compressed", function(err, image) {
+    // 	console.log(err);
+    // 	console.log(image);
+    // 	image.getBuffer(Jimp.AUTO, function(response) {
+    // 		console.log(response);
+    // 	})
+    // })
 
 
     // console.log(image)
-    var title = req.body.title;
-    var price = req.body.price;
-    var offset = req.body.expirDate;
-    var expirationDate = new Date()
-    var date = new Date();
+    // var title = req.body.title;
+    // var price = req.body.price;
+    // var offset = req.body.expirDate;
+    // var expirationDate = new Date()
+    // var date = new Date();
 
-    if (offset == 1) {
-        expirationDate.setDate(date.getDate() + 1);
-    } else if (offset == 2) {
-        expirationDate.setDate(date.getDate() + 7);
-    } else {
-        expirationDate.setDate(date.getDate() + 30);
-    }
-    var shortDescription = req.body.shortDescription;
-    var longDescription = req.body.longDescription;
-    var sellerID = req.body.userID;
+    // if (offset == 1) {
+    //     expirationDate.setDate(date.getDate() + 1);
+    // } else if (offset == 2) {
+    //     expirationDate.setDate(date.getDate() + 7);
+    // } else {
+    //     expirationDate.setDate(date.getDate() + 30);
+    // }
+    // var shortDescription = req.body.shortDescription;
+    // var longDescription = req.body.longDescription;
+    // var sellerID = req.body.userID;
 
-    createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
-        res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
-    }, function() {
-        response.status(404);
+    // createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
+    //     res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
+    // }, function() {
+    //     response.status(404);
 
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
-            });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
-        }
+    //     // respond with html page
+    //     if (request.accepts('html')) {
+    //         // CAN DO RESPONSE.RENDER HERE
+    //         response.sendFile(__dirname + "/views/404.html", {
+    //             url: request.url
+    //         });
+    //         return;
+    //     }
+    //     // respond with json
+    //     if (request.accepts('json')) {
+    //         response.send({
+    //             error: 'Not found'
+    //         });
+    //         return;
+    //     }
 
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
-    });
+    //     // default to plain-text. send()
+    //     response.type('txt').send('Not found');
+    // });
 
     // res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=');
 })
@@ -596,7 +657,7 @@ app.post('/updateSettings', function(request, response) {
 app.get('/getPosts', function(request, response) {
     // get all of the posts and return them to frontend to load on feed
     // might not need to include bids
-    console.log(request);
+    // console.log(request);
 
     var items = findAllItems(function(items) {
         if (items != null) {
@@ -835,8 +896,8 @@ mongoose.connect(url, function(err, db) {
     //     });
 
 
-    // deleteAllUsers();
-    // deleteAllItems();
+    deleteAllUsers();
+    deleteAllItems();
 
     //findAllUsers();
     console.log("Connected successfully to server");
@@ -924,6 +985,7 @@ var itemSchema = new Schema({
     longDescription: String,
     img: {
         data: Buffer, // stores an image here
+        compressed: String,
         contentType: String
     },
     // picture: String,
