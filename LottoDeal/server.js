@@ -9,6 +9,13 @@ var bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({
     extended: false
 }));
+
+
+// SHOULD GET THIS TO WORK
+// var sharp = require("sharp");
+
+
+
 app.use(bodyParser.json())
 app.use(json())
 app.use(express.static(__dirname + "/public"))
@@ -435,6 +442,17 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var image = {}
     image["data"] = imageData
     image["contentType"] = 'image/png';
+
+
+
+    // create compressed version
+
+
+
+
+
+
+
 
     // console.log(image)
     var title = req.body.title;
@@ -1586,6 +1604,10 @@ var findItemByID = function(id, callback, errorCallback) {
         if (err) {
             errorCallback()
             return;
+        }
+        else if (item == null)  {
+        	errorCallback();
+        	return;
         }
         // object of all the users
         console.log(item);
