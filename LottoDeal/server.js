@@ -491,7 +491,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     Jimp.read(imagePath, function(err, img) {
     	console.log(err);
     	console.log(img);
-    	img.scaleToFit(500, 500) // crop(100, 100, 300, 200)
+    	img.scaleToFit(500, 500) // crop(100, 100, 300, 200) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
     	.write(imagePath + picture.filename +  "compressed").getBase64(Jimp.AUTO, function(err, src) {
     		console.log("here");
     		console.log(err);
@@ -780,7 +780,11 @@ app.get('/getItem', function(request, response) {
     findItemByID(itemID, function(item) {
         if (item != null) {
         	findImageByID(item["_id"], function(buffer) {
-        		item.img.data = buffer;
+        		// console.log(item);
+        		item.img.compressed = buffer;
+        		console.log("printing item");
+        		// console.log(item);
+        		console.log(buffer);
         		response.send(JSON.stringify(item))
         	}, function() {
         		response.status(404);
@@ -964,8 +968,10 @@ mongoose.connect(url, function(err, db) {
     //     });
 
 
-    // deleteAllUsers();
-    // deleteAllItems();
+    deleteAllUsers();
+    deleteAllItems();
+    deleteAllImages();
+
 
     //findAllUsers();
     console.log("Connected successfully to server");
@@ -1074,7 +1080,7 @@ var Item = mongoose.model('Item', itemSchema);
 var imageSchema = new Schema({
 	itemID: String,
 	img: {
-		data: Buffer,
+		data: String,
 	}
 })
 
@@ -1802,18 +1808,38 @@ var editItem = function(title, price, expirationDate, shortDescription, longDesc
 
 
 var createImage = function(id, buffer) {
-    var newImage = new Image({
-        itemID: id,
-        img: {
-        	data: buffer
-        }
-    });
+	Jimp.read(buffer, function(err, img) {
+    	// console.log(err);
+    	// console.log(img);
+    	img.scaleToFit(1000, 1000).getBase64(Jimp.AUTO, function(err, src) {
+    		// console.log(src);
+    		var newImage = new Image({
+		        itemID: id,
+		        img: {
+		        	data: src
+		        }
+		    });
+		    // console.log(newImage);
 
-    // call the built-in save method to save to the database
-    newImage.save(function(err) {
-        if (err) throw err;
-        console.log('Image saved successfully!');
-    });
+		    // call the built-in save method to save to the database
+		    newImage.save(function(err) {
+		        if (err) throw err;
+		        console.log('Image saved successfully!');
+		    });
+    	});
+    });	
+    // var newImage = new Image({
+    //     itemID: id,
+    //     img: {
+    //     	data: buffer
+    //     }
+    // });
+
+    // // call the built-in save method to save to the database
+    // newImage.save(function(err) {
+    //     if (err) throw err;
+    //     console.log('Image saved successfully!');
+    // });
 }
 
 var findImageByID = function(id, callback, errorCallback) {
@@ -1821,7 +1847,7 @@ var findImageByID = function(id, callback, errorCallback) {
 	Image.find({
 		itemID: id
 	}, function(err, images) {
-		console.log(images);
+		// console.log(images);
 		if (err) {
 			errorCallback();
 			return;
@@ -1847,4 +1873,14 @@ var findAllImages = function(callback) {
         //console.log(items);
         callback(items)
     });
+}
+
+var deleteAllImages = function() {
+    // get all the users
+
+    Image.remove({}, function(err) {
+        if (err) throw err;
+        console.log('All Images successfully deleted!');
+    });
+
 }
