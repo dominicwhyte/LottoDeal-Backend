@@ -146,9 +146,9 @@ app.post('/performPaymentAndAddBid', function(request, response) {
         if (charge != null) {
             var itemID = request.body.itemID;
             var userID = request.body.userID;
-
+            var date = new Date();
             addBidForItem(itemID, userID, amountToCharge, charge.id);
-            addNotificationToUser(itemID, userID, "New Bid", "You just bid " + charge.amount + " dollar(s)");
+            addNotificationToUser(itemID, userID, "New Bid", "You just bid " + charge.amount + " dollar(s)", date);
             response.send("charge is" + charge.amount)
         } else {
             console.log('Error: charge is null in performPaymentAndAddBid');
@@ -1070,12 +1070,8 @@ var userSchema = new Schema({
         read: Boolean,
         title: String,
         description: String,
-
-
+        datePosted: Date, //date the notification was created (String - parse into Date object)
         itemID: String, // item associated with the notification
-
-
-
     }],
 });
 
@@ -1224,7 +1220,7 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
 }
 
 
-var addNotificationToUser = function(itemID, userID, titleText, descriptionText) {
+var addNotificationToUser = function(itemID, userID, titleText, descriptionText, date) {
     User.find({
         fbid: userID
     }, function(err, user) {
@@ -1234,11 +1230,8 @@ var addNotificationToUser = function(itemID, userID, titleText, descriptionText)
             if (err) throw err;
             var data = {
 
-
                 itemID: itemID,
-
-
-
+                datePosted: date,
                 read: false,
                 title: titleText,
                 description: descriptionText
