@@ -400,38 +400,63 @@ app.get('/', function(request, response) {
     response.send("API is working!")
 })
 
-// will create a new post, and associate it with a user in our database
-// app.post('/createPost', function(request, response) {
-//     // Parse the response
-//     console.log(request)
-//     console.log(request.body);
-//     console.log(request.files);
 
-//     // create a new post in the database
-//     var date = new Date();
-//   //  var timecreated = date.getTime();
-//   var expirationDate = request.body.expirationDate;
-//   var title = request.body.title;
-//   var price = request.body.price;
-//     //var image = request.body.picture; 
-//     var description = request.body.description;
-//     var sellerID = request.body.sellerID;
+app.post('/debugPost', function (request, response) {
+	var imagePath = './uploads/debug.png';
+	var imageData = fs.readFileSync(imagePath);
 
-//     // var post = {
-//     //     timecreated: timecreated,
-//     //     expirationDate: expirationDate,
-//     //     title: title,
-//     //     price: price,
-//     //    // image: image,
-//     //     description: description
-//     // }
-// //    console.log(post)
+	var image = {}
+    image["contentType"] = 'image/png';
 
-// // should be giving it a date instead of a time
-// createItem(title, price, date, expirationDate, description, sellerID);
+	Jimp.read(imagePath, function(err, img) {
+    	img.scaleToFit(500, 500) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
+    	.getBase64(Jimp.AUTO, function(err, src) {
+    		console.log(err);
+			console.log("Creating your debug item!");
+			image["compressed"] = src;
+    		var title = request.body.title;
+		    var price = request.body.price;
+		    var offset = request.body.expirDate;
+		    var expirationDate = new Date()
+		    var date = new Date();
 
-// response.send("You have created a new post.")
-// })
+		    if (offset == 1) {
+		        expirationDate.setDate(date.getDate() + 1);
+		    } else if (offset == 2) {
+		        expirationDate.setDate(date.getDate() + 7);
+		    } else {
+		        expirationDate.setDate(date.getDate() + 30);
+		    }
+		    var shortDescription = request.body.shortDescription;
+		    var longDescription = request.body.longDescription;
+		    var sellerID = request.body.userID;
+		    createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
+		        response.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
+		    }, function() {
+		        response.status(404);
+
+		        // respond with html page
+		        if (request.accepts('html')) {
+		            // CAN DO RESPONSE.RENDER HERE
+		            response.sendFile(__dirname + "/views/404.html", {
+		                url: request.url
+		            });
+		            return;
+		        }
+		        // respond with json
+		        if (request.accepts('json')) {
+		            response.send({
+		                error: 'Not found'
+		            });
+		            return;
+		        }
+
+		        // default to plain-text. send()
+		        response.type('txt').send('Not found');
+		    }, imageData);
+    	})
+    })	
+});
 
 var cpUpload = upload.fields([{
     name: 'title',
@@ -451,7 +476,7 @@ var cpUpload = upload.fields([{
 }, {
     name: 'userID',
     maxCount: 1
-}])
+}]) // SHOULDNT LONG DESCRIPTION AND SHORT DESCRIPTION BE ADDED INTO THIS
 app.post('/createPost', cpUpload, function(req, res, next) {
 
     // console.log('test');
@@ -502,7 +527,6 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 			image["compressed"] = src;
     		// }
 
-
     		var title = req.body.title;
 		    var price = req.body.price;
 		    var offset = req.body.expirDate;
@@ -524,26 +548,26 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 		    createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
 		        res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
 		    }, function() {
-		        response.status(404);
+		        res.status(404);
 
 		        // respond with html page
-		        if (request.accepts('html')) {
+		        if (req.accepts('html')) {
 		            // CAN DO RESPONSE.RENDER HERE
-		            response.sendFile(__dirname + "/views/404.html", {
-		                url: request.url
+		            res.sendFile(__dirname + "/views/404.html", {
+		                url: req.url
 		            });
 		            return;
 		        }
 		        // respond with json
-		        if (request.accepts('json')) {
-		            response.send({
+		        if (req.accepts('json')) {
+		            res.send({
 		                error: 'Not found'
 		            });
 		            return;
 		        }
 
 		        // default to plain-text. send()
-		        response.type('txt').send('Not found');
+		        res.type('txt').send('Not found');
 		    }, imageData);
     	})
     })
@@ -1010,7 +1034,7 @@ mongoose.connect(url, function(err, db) {
     });
 
     findAllImages(function(images) {
-    	console.log(images)
+    	// console.log(images)
     })
 
     checkIfServerShouldPerformLottery();
