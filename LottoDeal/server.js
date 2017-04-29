@@ -1102,6 +1102,7 @@ var itemSchema = new Schema({
     sellerID: String, // who's selling the item
     sellerName: String, // name of the seller (for displaying on news feed)
     winnerID: String, // who the winner of an item is
+    winnerName: String, // the name of the winner
 });
 
 var Item = mongoose.model('Item', itemSchema);
@@ -1419,7 +1420,7 @@ var checkLotteries = function() {
 
         for (i = 0; i < items.length; i++) {
             var item = items[i]
-            if (item.expired) {
+            if (item.expired || item.sold) {
                 continue;
             }
             var expirDate = new Date(item.expirationDate)
@@ -1472,7 +1473,8 @@ function emailBiddersForItem(item, subject, message, winner) {
             continue;
         }
         findUser(bidderID, function(user) {
-            sendEmailToAddress(user.email, subject, message);
+        	// SHOULD COMMENT THIS BACK IN
+            // sendEmailToAddress(user.email, subject, message);
         }, function() {
             response.status(404);
 
@@ -1533,9 +1535,26 @@ var performLottery = function(item) {
         }
     }
     item.sold = true;
-    item.winner = winner;
-    item.save();
-    return winner
+    item.winnerID = winner;
+    User.find({
+        fbid: winner
+    }, function(err, user) {
+        // if (err) throw err;
+        console.log(user);
+        if (err) console.log(err);
+        if (user != null) {
+            // get the user name
+            item.winnerName = user[0].fullName;
+            item.save();
+            return winner;
+        } else {
+            console.log('User not successfully found')
+            return null;
+        }
+    });
+
+    // item.save();
+    // return winner;
 }
 
 
