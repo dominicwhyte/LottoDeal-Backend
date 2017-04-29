@@ -637,6 +637,7 @@ app.post('/createUser', function(request, response) {
     var email = request.body.email;
     var age = request.body.age;
     var gender = request.body.gender;
+    console.log("Age and gender: " + age + " " + gender);
 
     var users = findAllUsers(function(users) {
         if (users != null) {
@@ -1129,7 +1130,7 @@ module.exports = Item;
 module.exports = Image;
 
 
-var createUser = function(name, id, url, email, gender, age) {
+var createUser = function(name, id, url, email, age, gender) {
     var newUser = new User({
         fullName: name,
         email: email,
