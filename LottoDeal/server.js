@@ -211,8 +211,7 @@ app.get('/markRead', function(request, response) {
             user.save();
             notifications = user.notifications;
             response.send(JSON.stringify(notifications));
-        } 
-        else {
+        } else {
             console.log('Error: user is null in getAccount');
         }
     }, function() {
@@ -401,82 +400,82 @@ app.get('/', function(request, response) {
 })
 
 
-app.post('/debugPost', function (request, response) {
-	var imagePath = './uploads/debug.png';
-	var imageData = fs.readFileSync(imagePath);
+app.post('/debugPost', function(request, response) {
+    var imagePath = './uploads/debug.png';
+    var imageData = fs.readFileSync(imagePath);
 
-	var image = {}
+    var image = {}
     image["contentType"] = 'image/png';
 
-	Jimp.read(imagePath, function(err, img) {
-    	img.scaleToFit(500, 500) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
-    	.getBase64(Jimp.AUTO, function(err, src) {
-    		console.log(err);
-			console.log("Creating your debug item!");
-			image["compressed"] = src;
-    		var title = request.body.title;
-		    var price = request.body.price;
-		    var offset = request.body.expirDate;
-		    var expirationDate = new Date()
-		    var date = new Date();
+    Jimp.read(imagePath, function(err, img) {
+        img.scaleToFit(500, 500) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
+            .getBase64(Jimp.AUTO, function(err, src) {
+                console.log(err);
+                console.log("Creating your debug item!");
+                image["compressed"] = src;
+                var title = request.body.title;
+                var price = request.body.price;
+                var offset = request.body.expirDate;
+                var expirationDate = new Date()
+                var date = new Date();
 
-		    if (offset == 1) {
-		        expirationDate.setDate(date.getDate() + 1);
-		    } else if (offset == 2) {
-		        expirationDate.setDate(date.getDate() + 7);
-		    } else {
-		        expirationDate.setDate(date.getDate() + 30);
-		    }
-		    var shortDescription = request.body.shortDescription;
-		    var longDescription = request.body.longDescription;
-		    var sellerID = request.body.userID;
-		    createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
-		        response.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
-		    }, function() {
-		        response.status(404);
+                if (offset == 1) {
+                    expirationDate.setDate(date.getDate() + 1);
+                } else if (offset == 2) {
+                    expirationDate.setDate(date.getDate() + 7);
+                } else {
+                    expirationDate.setDate(date.getDate() + 30);
+                }
+                var shortDescription = request.body.shortDescription;
+                var longDescription = request.body.longDescription;
+                var sellerID = request.body.userID;
+                createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
+                    response.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
+                }, function() {
+                    response.status(404);
 
-		        // respond with html page
-		        if (request.accepts('html')) {
-		            // CAN DO RESPONSE.RENDER HERE
-		            response.sendFile(__dirname + "/views/404.html", {
-		                url: request.url
-		            });
-		            return;
-		        }
-		        // respond with json
-		        if (request.accepts('json')) {
-		            response.send({
-		                error: 'Not found'
-		            });
-		            return;
-		        }
+                    // respond with html page
+                    if (request.accepts('html')) {
+                        // CAN DO RESPONSE.RENDER HERE
+                        response.sendFile(__dirname + "/views/404.html", {
+                            url: request.url
+                        });
+                        return;
+                    }
+                    // respond with json
+                    if (request.accepts('json')) {
+                        response.send({
+                            error: 'Not found'
+                        });
+                        return;
+                    }
 
-		        // default to plain-text. send()
-		        response.type('txt').send('Not found');
-		    }, imageData);
-    	})
-    })	
+                    // default to plain-text. send()
+                    response.type('txt').send('Not found');
+                }, imageData);
+            })
+    })
 });
 
 var cpUpload = upload.fields([{
-    name: 'title',
-    maxCount: 1
-}, {
-    name: 'price',
-    maxCount: 1
-}, {
-    name: 'picture',
-    maxCount: 1
-}, {
-    name: 'description',
-    maxCount: 1
-}, {
-    name: 'expirDate',
-    maxCount: 1
-}, {
-    name: 'userID',
-    maxCount: 1
-}]) // SHOULDNT LONG DESCRIPTION AND SHORT DESCRIPTION BE ADDED INTO THIS
+        name: 'title',
+        maxCount: 1
+    }, {
+        name: 'price',
+        maxCount: 1
+    }, {
+        name: 'picture',
+        maxCount: 1
+    }, {
+        name: 'description',
+        maxCount: 1
+    }, {
+        name: 'expirDate',
+        maxCount: 1
+    }, {
+        name: 'userID',
+        maxCount: 1
+    }]) // SHOULDNT LONG DESCRIPTION AND SHORT DESCRIPTION BE ADDED INTO THIS
 app.post('/createPost', cpUpload, function(req, res, next) {
 
     // console.log('test');
@@ -507,69 +506,69 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var imagePath = "./uploads/" + picture.filename;
     var imageData = fs.readFileSync(imagePath);
     var image = {}
-    // image["data"] = imageData
+        // image["data"] = imageData
     image["contentType"] = 'image/png';
 
 
 
     // create compressed version
     Jimp.read(imagePath, function(err, img) {
-    	console.log(err);
-    	console.log(img);
-    	img.scaleToFit(500, 500) // crop(100, 100, 300, 200) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
-    	.write(imagePath + picture.filename +  "compressed").getBase64(Jimp.AUTO, function(err, src) {
-    		console.log("here");
-    		console.log(err);
-    		// console.log(response);
-    		// console.log(src);
-    		// if (err != null) {
-			console.log("working");
-			image["compressed"] = src;
-    		// }
+        console.log(err);
+        console.log(img);
+        img.scaleToFit(500, 500) // crop(100, 100, 300, 200) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
+            .write(imagePath + picture.filename + "compressed").getBase64(Jimp.AUTO, function(err, src) {
+                console.log("here");
+                console.log(err);
+                // console.log(response);
+                // console.log(src);
+                // if (err != null) {
+                console.log("working");
+                image["compressed"] = src;
+                // }
 
-    		var title = req.body.title;
-		    var price = req.body.price;
-		    var offset = req.body.expirDate;
-		    var expirationDate = new Date()
-		    var date = new Date();
+                var title = req.body.title;
+                var price = req.body.price;
+                var offset = req.body.expirDate;
+                var expirationDate = new Date()
+                var date = new Date();
 
-		    if (offset == 1) {
-		        expirationDate.setDate(date.getDate() + 1);
-		    } else if (offset == 2) {
-		        expirationDate.setDate(date.getDate() + 7);
-		    } else {
-		        expirationDate.setDate(date.getDate() + 30);
-		    }
-		    var shortDescription = req.body.shortDescription;
-		    var longDescription = req.body.longDescription;
-		    var sellerID = req.body.userID;
-		    console.log(image);
+                if (offset == 1) {
+                    expirationDate.setDate(date.getDate() + 1);
+                } else if (offset == 2) {
+                    expirationDate.setDate(date.getDate() + 7);
+                } else {
+                    expirationDate.setDate(date.getDate() + 30);
+                }
+                var shortDescription = req.body.shortDescription;
+                var longDescription = req.body.longDescription;
+                var sellerID = req.body.userID;
+                console.log(image);
 
-		    createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
-		        res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
-		    }, function() {
-		        res.status(404);
+                createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
+                    res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
+                }, function() {
+                    res.status(404);
 
-		        // respond with html page
-		        if (req.accepts('html')) {
-		            // CAN DO RESPONSE.RENDER HERE
-		            res.sendFile(__dirname + "/views/404.html", {
-		                url: req.url
-		            });
-		            return;
-		        }
-		        // respond with json
-		        if (req.accepts('json')) {
-		            res.send({
-		                error: 'Not found'
-		            });
-		            return;
-		        }
+                    // respond with html page
+                    if (req.accepts('html')) {
+                        // CAN DO RESPONSE.RENDER HERE
+                        res.sendFile(__dirname + "/views/404.html", {
+                            url: req.url
+                        });
+                        return;
+                    }
+                    // respond with json
+                    if (req.accepts('json')) {
+                        res.send({
+                            error: 'Not found'
+                        });
+                        return;
+                    }
 
-		        // default to plain-text. send()
-		        res.type('txt').send('Not found');
-		    }, imageData);
-    	})
+                    // default to plain-text. send()
+                    res.type('txt').send('Not found');
+                }, imageData);
+            })
     })
 
     // Jimp.read(imagePath + "compressed", function(err, image) {
@@ -636,6 +635,8 @@ app.post('/createUser', function(request, response) {
     var id = request.body.fbid;
     var url = request.body.url;
     var email = request.body.email;
+    var age = request.body.age;
+    var gender = request.body.gender;
 
     var users = findAllUsers(function(users) {
         if (users != null) {
@@ -650,7 +651,7 @@ app.post('/createUser', function(request, response) {
             }
 
             if (!found) {
-                createUser(name, id, url, email);
+                createUser(name, id, url, email, age, gender);
                 response.send("You have created a new user");
             }
         } else {
@@ -803,35 +804,35 @@ app.get('/getItem', function(request, response) {
 
     findItemByID(itemID, function(item) {
         if (item != null) {
-        	findImageByID(item["_id"], function(buffer) {
-        		// console.log(item);
-        		item.img.compressed = buffer;
-        		console.log("printing item");
-        		// console.log(item);
-        		console.log(buffer);
-        		response.send(JSON.stringify(item))
-        	}, function() {
-        		response.status(404);
+            findImageByID(item["_id"], function(buffer) {
+                // console.log(item);
+                item.img.compressed = buffer;
+                console.log("printing item");
+                // console.log(item);
+                console.log(buffer);
+                response.send(JSON.stringify(item))
+            }, function() {
+                response.status(404);
 
-		        // respond with html page
-		        if (request.accepts('html')) {
-		            // CAN DO RESPONSE.RENDER HERE
-		            response.sendFile(__dirname + "/views/404.html", {
-		                url: request.url
-		            });
-		            return;
-		        }
-		        // respond with json
-		        if (request.accepts('json')) {
-		            response.send({
-		                error: 'Not found'
-		            });
-		            return;
-		        }
+                // respond with html page
+                if (request.accepts('html')) {
+                    // CAN DO RESPONSE.RENDER HERE
+                    response.sendFile(__dirname + "/views/404.html", {
+                        url: request.url
+                    });
+                    return;
+                }
+                // respond with json
+                if (request.accepts('json')) {
+                    response.send({
+                        error: 'Not found'
+                    });
+                    return;
+                }
 
-		        // default to plain-text. send()
-		        response.type('txt').send('Not found');
-        	})
+                // default to plain-text. send()
+                response.type('txt').send('Not found');
+            })
 
             // response.send(JSON.stringify(item));
         } else {
@@ -1034,7 +1035,7 @@ mongoose.connect(url, function(err, db) {
     });
 
     findAllImages(function(images) {
-    	// console.log(images)
+        // console.log(images)
     })
 
     checkIfServerShouldPerformLottery();
@@ -1060,6 +1061,10 @@ var userSchema = new Schema({
         reviewDes: String,
         datePosted: Date, //date the review was created (String - parse into Date object)
     }],
+    userInfo: {
+        age: Number,
+        gender: String
+    },
     notifications: [{ // notifications to show user
         read: Boolean,
         title: String,
@@ -1109,10 +1114,10 @@ var Item = mongoose.model('Item', itemSchema);
 
 
 var imageSchema = new Schema({
-	itemID: String,
-	img: {
-		data: String,
-	}
+    itemID: String,
+    img: {
+        data: String,
+    }
 })
 
 var Image = mongoose.model('Image', imageSchema);
@@ -1124,7 +1129,7 @@ module.exports = Item;
 module.exports = Image;
 
 
-var createUser = function(name, id, url, email) {
+var createUser = function(name, id, url, email, gender, age) {
     var newUser = new User({
         fullName: name,
         email: email,
@@ -1132,6 +1137,10 @@ var createUser = function(name, id, url, email) {
         pictureURL: url,
         bids: [],
         reviews: [],
+        userInfo: {
+            age: age,
+            gender: gender
+        },
         notifications: []
     });
 
@@ -1226,8 +1235,6 @@ var addNotificationToUser = function(itemID, userID, titleText, descriptionText)
 
 
                 itemID: itemID,
-
-
 
 
 
@@ -1473,7 +1480,7 @@ function emailBiddersForItem(item, subject, message, winner) {
             continue;
         }
         findUser(bidderID, function(user) {
-        	// SHOULD COMMENT THIS BACK IN
+            // SHOULD COMMENT THIS BACK IN
             // sendEmailToAddress(user.email, subject, message);
         }, function() {
             response.status(404);
@@ -1818,14 +1825,12 @@ var findItemByID = function(id, callback, errorCallback) {
         if (err) {
             errorCallback()
             return;
-        }
-        else if (item == null)  {
-        	errorCallback();
-        	return;
+        } else if (item == null) {
+            errorCallback();
+            return;
         }
         // object of all the users
         console.log(item);
-
 
 
 
@@ -1865,26 +1870,26 @@ var editItem = function(title, price, expirationDate, shortDescription, longDesc
 
 
 var createImage = function(id, buffer) {
-	Jimp.read(buffer, function(err, img) {
-    	// console.log(err);
-    	// console.log(img);
-    	img.scaleToFit(1000, 1000).getBase64(Jimp.AUTO, function(err, src) {
-    		// console.log(src);
-    		var newImage = new Image({
-		        itemID: id,
-		        img: {
-		        	data: src
-		        }
-		    });
-		    // console.log(newImage);
+    Jimp.read(buffer, function(err, img) {
+        // console.log(err);
+        // console.log(img);
+        img.scaleToFit(1000, 1000).getBase64(Jimp.AUTO, function(err, src) {
+            // console.log(src);
+            var newImage = new Image({
+                itemID: id,
+                img: {
+                    data: src
+                }
+            });
+            // console.log(newImage);
 
-		    // call the built-in save method to save to the database
-		    newImage.save(function(err) {
-		        if (err) throw err;
-		        console.log('Image saved successfully!');
-		    });
-    	});
-    });	
+            // call the built-in save method to save to the database
+            newImage.save(function(err) {
+                if (err) throw err;
+                console.log('Image saved successfully!');
+            });
+        });
+    });
     // var newImage = new Image({
     //     itemID: id,
     //     img: {
@@ -1900,32 +1905,32 @@ var createImage = function(id, buffer) {
 }
 
 var findImageByID = function(id, callback, errorCallback) {
-	console.log(id);
-	Image.find({
-		itemID: id
-	}, function(err, images) {
-		// console.log(images);
-		if (err) {
-			errorCallback();
-			return;
-		}
-		if (images == null || images.length == 0) {
-			console.log("here")
-			errorCallback();
-			return;
-		}
-		if (images != null) {
-			image = images[0]
-			callback(image.img.data);
-			return;
-		}
+    console.log(id);
+    Image.find({
+        itemID: id
+    }, function(err, images) {
+        // console.log(images);
+        if (err) {
+            errorCallback();
+            return;
+        }
+        if (images == null || images.length == 0) {
+            console.log("here")
+            errorCallback();
+            return;
+        }
+        if (images != null) {
+            image = images[0]
+            callback(image.img.data);
+            return;
+        }
 
-	})
+    })
 
 }
 
 var findAllImages = function(callback) {
-	Image.find({}, function(err, items) {
+    Image.find({}, function(err, items) {
         if (err) throw err;
         //console.log(items);
         callback(items)
