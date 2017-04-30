@@ -114,10 +114,15 @@ app.post('/createReview', function(request, response) {
     var date = new Date();
 
     console.log(date)
+    if (sellerID != reviewerID) {
 
-    createReview(sellerID, reviewerID, stars, reviewDes, date);
+        createReview(sellerID, reviewerID, stars, reviewDes, date);
 
-    response.send("review added!")
+        response.send("review added!")
+    }
+    else{
+        response.send("You can't review yourself!")
+    }
 })
 
 // Stripe Code---------------------------------------------------------
