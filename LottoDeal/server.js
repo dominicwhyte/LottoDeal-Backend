@@ -1012,6 +1012,10 @@ mongoose.connect(url, function(err, db) {
 
     findAllUsers(function(users) {
         console.log(users)
+        if (users.length != 0) {
+            computeSimilarities(users[0].fbid);
+
+        }
     });
 
     // User.find({fbid: 1467343223328608}, function(err, user) {
