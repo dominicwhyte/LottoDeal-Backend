@@ -508,9 +508,16 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     image["contentType"] = 'image/png';
 
 
+    // backend is done with the image now, so it can be deleted from uploads folder (since readfile was sync)
+    fs.unlink(imagePath, function(error) {
+    	console.log("Removing created image from /uploads")
+    	if (error != null) {
+    		console.log(error);
+    	}
+    })
 
     // create compressed version
-    Jimp.read(imagePath, function(err, img) {
+    Jimp.read(imageData, function(err, img) {
         console.log(err);
         console.log(img);
         img.scaleToFit(500, 500) // crop(100, 100, 300, 200) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
