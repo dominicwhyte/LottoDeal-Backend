@@ -87,8 +87,6 @@ var options = {
 app.use(function(req, res, next) {
     var allowedOrigins = ['https://dominicwhyte.github.io'];
     var origin = req.headers.origin;
-    console.log("printing origin");
-    console.log(origin);
     if (allowedOrigins.indexOf(origin) > -1) {
         res.setHeader('Access-Control-Allow-Origin', origin);
         res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
@@ -1013,6 +1011,7 @@ mongoose.connect(url, function(err, db) {
     findAllUsers(function(users) {
         console.log(users)
         if (users.length != 0) {
+            console.log('Computing similarity for: ' + users[0].fullName);
             computeSimilarities(users[0].fbid);
 
         }
@@ -1032,7 +1031,7 @@ mongoose.connect(url, function(err, db) {
     // });
 
     findAllItems(function(items) {
-        console.log(items);
+        //console.log(items);
         //console.log('initiating refunds');
         // for (var i = 0; i < items.length; i++) {
         //     refundUsers(items[i]);
@@ -1131,6 +1130,18 @@ module.exports = Image;
 
 
 var createUser = function(name, id, url, email, age, gender) {
+    if (age == null || isNaN(age)) {
+        age = 25
+    }
+    if (gender == null) {
+        gender = ""
+    }
+    console.log(name)
+    console.log(id)
+    console.log(url)
+    console.log(email)
+    console.log(age)
+
     var newUser = new User({
         fullName: name,
         email: email,
@@ -2072,7 +2083,8 @@ function addConnectingEdges(users) {
                     target: "i" + users[i].bids[j].itemID
                 }
             });
-            edgeWeights["c" + users[i].fbid + "," + users[i].bids[j].itemID] = users[i].bids[j].amount;
+            //slightly favor bigger bids
+            edgeWeights["c" + users[i].fbid + "," + users[i].bids[j].itemID] = (1 / users[i].bids[j].amount);
         }
     }
 }
