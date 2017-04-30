@@ -1471,6 +1471,27 @@ var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
         }
 
 
+    }, function() {
+        response.status(404);
+
+        // respond with html page
+        if (request.accepts('html')) {
+            // CAN DO RESPONSE.RENDER HERE
+            response.sendFile(__dirname + "/views/404.html", {
+                url: request.url
+            });
+            return;
+        }
+        // respond with json
+        if (request.accepts('json')) {
+            response.send({
+                error: 'Not found'
+            });
+            return;
+        }
+
+        // default to plain-text. send()
+        response.type('txt').send('Not found');
     });
 }
 
