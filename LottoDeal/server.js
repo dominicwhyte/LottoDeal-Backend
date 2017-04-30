@@ -498,9 +498,43 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var imgSize = req.files['picture'][0].size;
     if (imgSize > maxSize) {
         res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=sizeTooLarge');
+    	return;
+    }
+
+    // Check to make sure that the elements in the form were properly formatted:
+    var title = req.body.title;
+   	var price = req.body.price;
+    var offset = req.body.expirDate;
+    var shortDescription = req.body.shortDescription;
+    var longDescription = req.body.longDescription;
+
+    if (title == null || price == null || offset == null || shortDescription == null || longDescription == null) {
+    	res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
+    	return;
+    }
+
+    if (title.length > 100 || price > 1000000000 || (offset < 0 || offset > 3) 
+    	|| shortDescription.length > 200 || longDescription.length > 2000) {
+    	res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
+    	return;
+    }
+    if (title.length < 0 || price < 1 || shortDescription.length < 0 || longDescription.length < 0) {
+    	res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
+    	return;
     }
 
     var picture = req.files['picture'][0]
+
+    // console.log("printing picture");
+    // console.log(picture);
+
+    if (picture.mimetype != "image/jpeg" && picture.mimetype != "image/png") {
+    	res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
+    	return;
+    }
+
+
+
     var imagePath = "./uploads/" + picture.filename;
     var imageData = fs.readFileSync(imagePath);
     var image = {}
