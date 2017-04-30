@@ -1,4 +1,3 @@
-
 //TEST CODE TEMPORARILY IN SERVER.JS
 // CYTOSCAPE CODE
 
@@ -24,7 +23,7 @@ var cy = cytoscape({
 var stringSimilarity = require('string-similarity');
 var edgeWeights = {};
 
-function computeSimilarities(userID) {
+exports.computeSimilarities = function(userID, User, Item) {
     //Retrieve users and items
     User.find({}, function(err, users) {
         if (err) {
@@ -120,7 +119,8 @@ function addConnectingEdges(users) {
                     target: "i" + users[i].bids[j].itemID
                 }
             });
-            edgeWeights["c" + users[i].fbid + "," + users[i].bids[j].itemID] = users[i].bids[j].amount;
+            //slightly favor bigger bids
+            edgeWeights["c" + users[i].fbid + "," + users[i].bids[j].itemID] = (1 / users[i].bids[j].amount);
         }
     }
 }
