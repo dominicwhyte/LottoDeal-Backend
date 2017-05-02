@@ -224,42 +224,42 @@ app.get('/getReviews', function(request, response) {
 // mark all notifications read
 app.get('/markRead', function(request, response) {
     var userID = request.query["userID"];
-
-    findUser(userID, function(user) {
-        if (user != null) {
-            var notifications = user.notifications;
-            for (var i = 0; i < notifications.length; i++) {
-                notifications[i].read = true;
+    if (userID != undefined) {
+        findUser(userID, function(user) {
+            if (user != null) {
+                var notifications = user.notifications;
+                for (var i = 0; i < notifications.length; i++) {
+                    notifications[i].read = true;
+                }
+                user.save();
+                notifications = user.notifications;
+                response.send(JSON.stringify(notifications));
+            } else {
+                console.log('Error: user is null in getAccount');
             }
-            user.save();
-            notifications = user.notifications;
-            response.send(JSON.stringify(notifications));
-        } else {
-            console.log('Error: user is null in getAccount');
-        }
-    }, function() {
-        response.status(404);
+        }, function() {
+            response.status(404);
 
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
-            });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
-        }
+            // respond with html page
+            if (request.accepts('html')) {
+                // CAN DO RESPONSE.RENDER HERE
+                response.sendFile(__dirname + "/views/404.html", {
+                    url: request.url
+                });
+                return;
+            }
+            // respond with json
+            if (request.accepts('json')) {
+                response.send({
+                    error: 'Not found'
+                });
+                return;
+            }
 
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
-    });
-
+            // default to plain-text. send()
+            response.type('txt').send('Not found');
+        });
+    }
 })
 
 
