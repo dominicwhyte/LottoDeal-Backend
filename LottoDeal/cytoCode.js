@@ -120,13 +120,14 @@ function addConnectingEdges(users) {
                 }
             });
             //slightly favor bigger bids to have lower weights
-            edgeWeights["c" + users[i].fbid + "," + users[i].bids[j].itemID] = (1 / users[i].bids[j].amount);
+            edgeWeights["c" + users[i].fbid + "," + users[i].bids[j].itemID] = (1 / users[i].bids[j].amount) * BID_MUTLIPLIER;
         }
     }
 }
 
 var ITEM_SIMILARITY_MULTIPLIER = 2;
 var USER_GENDER_DISPARITY_MULTIPLIER = 2;
+var BID_MUTLIPLIER = 3;
 var TITLE_MULTIPLIER = 3;
 
 // COMPUTE THE EDGE WEIGHTS
@@ -252,6 +253,9 @@ function printPathToItem(itemID, dijkstra, users, items) {
         //skip over the edges in the path, just look at nodes
         if (!(path[i].id().indexOf(',') > -1)) {
             console.log(getNameOfID(path[i].id(), users, items));
+        }
+        else {
+            console.log('Edge with weight: ' + edgeWeights[path[i].id()]);
         }
     }
     console.log('END PATH');
