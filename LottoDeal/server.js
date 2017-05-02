@@ -90,13 +90,13 @@ app.use(function(req, res, next) {
     var allowedOrigins = ['https://dominicwhyte.github.io'];
     var origin = req.headers.origin;
     if (allowedOrigins.indexOf(origin) > -1) {
-    //     res.setHeader('Access-Control-Allow-Origin', origin);
-    //     res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
-    //     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    //     res.header('Access-Control-Allow-Credentials', true);
-    //     return next();
-    // } else {
-    //     res.send("Oops! You can't access our API")
+        //     res.setHeader('Access-Control-Allow-Origin', origin);
+        //     res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
+        //     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        //     res.header('Access-Control-Allow-Credentials', true);
+        //     return next();
+        // } else {
+        //     res.send("Oops! You can't access our API")
     }
     // res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
     res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
@@ -121,8 +121,7 @@ app.post('/createReview', function(request, response) {
         createReview(sellerID, reviewerID, stars, reviewDes, date);
 
         response.send("review added!")
-    }
-    else{
+    } else {
         response.send("You can't review yourself!")
     }
 })
@@ -135,7 +134,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
     // get into database, access object, update it's bid field and add to user bids
     var amountToCharge = request.body.amount;
     console.log('Payment performing for ' + amountToCharge + " USD")
-    // var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
+        // var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 
     var token = request.body.stripeToken; // Using Express
     // Charge the user's card:
@@ -249,12 +248,50 @@ app.get('/markRead', function(request, response) {
 app.get('/getAccount', function(request, response) {
     var userID = request.query["userID"];
 
-    suggestionsModule.computeSimilarities(userID, User, Item); 
+    suggestionsModule.computeSimilarities(userID, User, Item);
 
     findUser(userID, function(user) {
         if (user != null) {
             console.log("this is the user's reviews" + user)
             response.send(JSON.stringify(user));
+        } else {
+            console.log('Error: user is null in getAccount');
+        }
+    }, function() {
+        response.status(404);
+
+        // respond with html page
+        if (request.accepts('html')) {
+            // CAN DO RESPONSE.RENDER HERE
+            response.sendFile(__dirname + "/views/404.html", {
+                url: request.url
+            });
+            return;
+        }
+        // respond with json
+        if (request.accepts('json')) {
+            response.send({
+                error: 'Not found'
+            });
+            return;
+        }
+
+        // default to plain-text. send()
+        response.type('txt').send('Not found');
+    });
+})
+
+app.get('/getSuggestions', function(request, response) {
+    var userID = request.query["userID"];
+
+
+
+    findUser(userID, function(user) {
+        if (user != null) {
+            console.log("Returning suggestions for user");
+            suggestionsModule.computeSimilarities(userID, User, Item, function(suggestions) {
+                response.send(JSON.stringify(suggestions));
+            });
         } else {
             console.log('Error: user is null in getAccount');
         }
@@ -509,12 +546,12 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var imgSize = req.files['picture'][0].size;
     if (imgSize > maxSize) {
         res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=sizeTooLarge');
-    	return;
+        return;
     }
 
     // Check to make sure that the elements in the form were properly formatted:
     var title = req.body.title;
-   	var price = req.body.price;
+    var price = req.body.price;
     var offset = req.body.expirDate;
     var shortDescription = req.body.shortDescription;
     var longDescription = req.body.longDescription;
@@ -522,18 +559,17 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 
 
     if (title == null || price == null || offset == null || shortDescription == null || longDescription == null || sellerID == null) {
-    	res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
-    	return;
+        res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
+        return;
     }
 
-    if (title.length > 100 || price > 1000000000 || (offset < 0 || offset > 3) 
-    	|| shortDescription.length > 200 || longDescription.length > 2000) {
-    	res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
-    	return;
+    if (title.length > 100 || price > 1000000000 || (offset < 0 || offset > 3) || shortDescription.length > 200 || longDescription.length > 2000) {
+        res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
+        return;
     }
     if (title.length < 0 || price < 1 || shortDescription.length < 0 || longDescription.length < 0) {
-    	res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
-    	return;
+        res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
+        return;
     }
 
     var picture = req.files['picture'][0]
@@ -542,8 +578,8 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     // console.log(picture);
 
     if (picture.mimetype != "image/jpeg" && picture.mimetype != "image/png") {
-    	res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
-    	return;
+        res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
+        return;
     }
 
 
@@ -557,10 +593,10 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 
     // backend is done with the image now, so it can be deleted from uploads folder (since readfile was sync)
     fs.unlink(imagePath, function(error) {
-    	console.log("Removing created image from /uploads")
-    	if (error != null) {
-    		console.log(error);
-    	}
+        console.log("Removing created image from /uploads")
+        if (error != null) {
+            console.log(error);
+        }
     })
 
     // create compressed version
@@ -939,32 +975,31 @@ app.get('/getImage', function(request, response) {
 
     findImageByID(itemID, function(buffer) {
         if (buffer != null) {
-        	response.send(buffer);
-        }
-        else {
-        	response.send("Error");
+            response.send(buffer);
+        } else {
+            response.send("Error");
         }
     }, function() {
-    	response.status(404);
+        response.status(404);
 
-            // respond with html page
-            if (request.accepts('html')) {
-                // CAN DO RESPONSE.RENDER HERE
-                response.sendFile(__dirname + "/views/404.html", {
-                    url: request.url
-                });
-                return;
-            }
-            // respond with json
-            if (request.accepts('json')) {
-                response.send({
-                    error: 'Not found'
-                });
-                return;
-            }
+        // respond with html page
+        if (request.accepts('html')) {
+            // CAN DO RESPONSE.RENDER HERE
+            response.sendFile(__dirname + "/views/404.html", {
+                url: request.url
+            });
+            return;
+        }
+        // respond with json
+        if (request.accepts('json')) {
+            response.send({
+                error: 'Not found'
+            });
+            return;
+        }
 
-            // default to plain-text. send()
-            response.type('txt').send('Not found');
+        // default to plain-text. send()
+        response.type('txt').send('Not found');
     });
 })
 
@@ -1025,8 +1060,7 @@ mongoose.connect(url, function(err, db) {
     //         "TextBody": "Hello from Postmark!"
     //     });
 
-    
-    
+
 
     // deleteAllUsers();
     // deleteAllItems();
@@ -1046,10 +1080,10 @@ mongoose.connect(url, function(err, db) {
 
     findAllUsers(function(users) {
         console.log(users)
-        // if (users.length != 0) {
-        //     console.log('Computing similarity for: ' + users[0].fullName);
-        //     suggestionsModule.computeSimilarities(users[0].fbid, User, Item); 
-        // }
+            // if (users.length != 0) {
+            //     console.log('Computing similarity for: ' + users[0].fullName);
+            //     suggestionsModule.computeSimilarities(users[0].fbid, User, Item); 
+            // }
     });
 
     // User.find({fbid: 1467343223328608}, function(err, user) {

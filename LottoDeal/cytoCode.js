@@ -22,8 +22,9 @@ var cy = cytoscape({
 
 var stringSimilarity = require('string-similarity');
 var edgeWeights = {};
+var MAX_NUMBER_OF_SIMILARITIES_TO_RETURN = 5
 
-exports.computeSimilarities = function(userID, User, Item) {
+exports.computeSimilarities = function(userID, User, Item, callback) {
     //Retrieve users and items
     User.find({}, function(err, users) {
         if (err) {
@@ -39,8 +40,9 @@ exports.computeSimilarities = function(userID, User, Item) {
                         addConnectingEdges(users);
                         computeEdgeWeights(users, items);
                         console.log('Graph set up');
-                        var suggestions = getSuggestedItems(userID, users);
+                        var suggestions = getSuggestedItems(userID, users);                        
                         printSuggestions(users, items, suggestions);
+                        callback(suggestions.sortedItemsslice(0, MAX_NUMBER_OF_SIMILARITIES_TO_RETURN));
                     } else {
                         console.log("Oops, there are no users and/or items!");
                     }
