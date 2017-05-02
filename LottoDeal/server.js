@@ -247,6 +247,9 @@ app.get('/markRead', function(request, response) {
 
 app.get('/getAccount', function(request, response) {
     var userID = request.query["userID"];
+
+    suggestionsModule.computeSimilarities(userID, User, Item); 
+
     findUser(userID, function(user) {
         if (user != null) {
             console.log("this is the user's reviews" + user)
@@ -1060,10 +1063,10 @@ mongoose.connect(url, function(err, db) {
 
     findAllUsers(function(users) {
         console.log(users)
-        if (users.length != 0) {
-            console.log('Computing similarity for: ' + users[0].fullName);
-            suggestionsModule.computeSimilarities(users[0].fbid, User, Item); 
-        }
+        // if (users.length != 0) {
+        //     console.log('Computing similarity for: ' + users[0].fullName);
+        //     suggestionsModule.computeSimilarities(users[0].fbid, User, Item); 
+        // }
     });
 
     // User.find({fbid: 1467343223328608}, function(err, user) {
