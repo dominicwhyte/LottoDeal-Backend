@@ -426,26 +426,53 @@ describe('Database connection', function() {
       });
     })
 
-    it('should not create a post with an incorrect user id', function(done) {
+    // it('should not create a post with an incorrect user id', function(done) {
+    //   request(url)
+    //   .post('/createPost')
+    //   .field('title', 'title')
+    //   .field('price', 123)
+    //   .field('expirDate', 1)
+    //   .field('description', 'description')
+    //   .field('userID', 123)
+    //   .attach('picture', './uploads/x.jpg')
+    //   // .send()
+    //   .end(function(err, res) {
+    //     if (err) {
+    //       throw err;
+    //     }
+    //     console.log("here");
+    //     console.log(res)
+    //     // res.status.should.be.equal(302); // redirection
+
+    //     // NEED TO FIGURE OUT BETTER WAY TO DO THIS (expect, and not)
+    //     // res.header.location.should.be.equal("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success");
+    //     done();
+    //   });
+    // })
+    it('should properly delete John Doe and all items associated', function(done) {
+      var body = {
+        id: '12345',
+      }
+      // console.log(profile);
+      // console.log(url)
+
       request(url)
-      .post('/createPost')
-      .field('title', 'title')
-      .field('price', 123)
-      .field('expirDate', 1)
-      .field('description', 'description')
-      .field('userID', 123)
-      .attach('picture', './uploads/x.jpg')
-      // .send()
+      .delete('/deleteUser')
+      .send(body)
       .end(function(err, res) {
         if (err) {
           throw err;
         }
-        console.log("here");
-        console.log(res)
-        // res.status.should.be.equal(302); // redirection
+        res.status.should.be.equal(200);
+        res.text.should.be.equal("User successfully deleted")
 
-        // NEED TO FIGURE OUT BETTER WAY TO DO THIS (expect, and not)
-        // res.header.location.should.be.equal("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success");
+        // check if really all deleted:
+
+        // ADD A CALL TO SOME /getPostsForId, and check for id = 12345, should be empty, no items
+
+
+
+        // console.log(res);
         done();
       });
     })
