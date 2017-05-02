@@ -40,9 +40,10 @@ exports.computeSimilarities = function(userID, User, Item, callback) {
                         addConnectingEdges(users);
                         computeEdgeWeights(users, items);
                         console.log('Graph set up');
-                        var suggestions = getSuggestedItems(userID, users);                        
+                        var suggestions = getSuggestedItems(userID, users);  
                         printSuggestions(users, items, suggestions);
-                        callback(suggestions.sortedItemsslice(0, MAX_NUMBER_OF_SIMILARITIES_TO_RETURN));
+                        var suggestionItems = getItemsFromStructs(suggestions.suggestions.slice(0, MAX_NUMBER_OF_SIMILARITIES_TO_RETURN), items);
+                        callback(suggestionItems);
                     } else {
                         console.log("Oops, there are no users and/or items!");
                     }
@@ -223,6 +224,18 @@ function getSuggestedItems(user_fbid, users) {
         dijkstra: dijkstra
     }
     return struct;
+}
+
+//Gets the items for the given struct from getSuggestedItems. Ok since constant
+//number of items in struct
+function getItemsFromStructs(struct, items) {
+    var itemsToReturn = []
+    for (var i = 0; i < struct.length; i++) {
+        var itemID = struct[i].itemID
+        var item = getItem(itemID, items);
+        itemsToReturn.push(item);
+    }
+    return itemsToReturn;
 }
 
 //Prints the cy graph. Innefficient - just for testing
