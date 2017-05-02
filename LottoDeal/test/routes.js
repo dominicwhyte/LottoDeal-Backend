@@ -4,10 +4,16 @@ var request = require('supertest');
 var mongoose = require('mongoose');
 var winston = require('winston');
 var config = require('./config-debug');
+// var serv = require('../server.js').goToDebugMode;
 
 var db = 'mongodb://localhost:27017/LottoDeal';
 var url = "https://localhost:8000"
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+
+// console.log(serv);
+
+
 
 describe('Database connection', function() {
     // within before() you can run all the operations that are needed to setup your tests. In this case

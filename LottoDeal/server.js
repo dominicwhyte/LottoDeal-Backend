@@ -34,6 +34,23 @@ var upload = multer({
     }
 })
 
+var debug = false;
+
+module.exports = {
+	goToDebugMode: function() {
+		debug = true;
+		console.log(debug);
+	},
+	goToProductionMode: function() {
+		debug = false;
+		console.log(debug);
+	}
+}
+// exports.goToDebugMode = function() {
+// 	debug = true;
+// 	console.log(debug);
+// }
+
 
 var helmet = require("helmet")
 app.use(helmet())
@@ -249,7 +266,7 @@ app.get('/markRead', function(request, response) {
 app.get('/getAccount', function(request, response) {
     var userID = request.query["userID"];
 
-    suggestionsModule.computeSimilarities(userID, User, Item);
+    // suggestionsModule.computeSimilarities(userID, User, Item);
 
     findUser(userID, function(user) {
         if (user != null) {
