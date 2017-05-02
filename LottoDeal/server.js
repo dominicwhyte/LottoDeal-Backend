@@ -90,19 +90,20 @@ app.use(function(req, res, next) {
     var allowedOrigins = ['https://dominicwhyte.github.io'];
     var origin = req.headers.origin;
     if (allowedOrigins.indexOf(origin) > -1) {
-        //     res.setHeader('Access-Control-Allow-Origin', origin);
-        //     res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
-        //     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        //     res.header('Access-Control-Allow-Credentials', true);
-        //     return next();
-        // } else {
-        //     res.send("Oops! You can't access our API")
+            res.setHeader('Access-Control-Allow-Origin', origin);
+            res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
+            res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+            res.header('Access-Control-Allow-Credentials', true);
+            return next();
+        } else {
+            res.send("Oops! You can't access our API")
     }
     // res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
-    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.header('Access-Control-Allow-Credentials', true);
-    return next();
+    // res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
+    // res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    // res.header('Access-Control-Allow-Credentials', true);
+    // return next();
+    
 });
 
 // A user has bid on an item, add this bid to database
