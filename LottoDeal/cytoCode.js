@@ -42,7 +42,7 @@ exports.computeSimilarities = function(userID, User, Item, callback) {
                         console.log('Graph set up');
                         var suggestions = getSuggestedItems(userID, users);                        
                         printSuggestions(users, items, suggestions);
-                        callback(suggestions.sortedItemsslice(0, MAX_NUMBER_OF_SIMILARITIES_TO_RETURN));
+                        callback(suggestions.sortedItems.slice(0, MAX_NUMBER_OF_SIMILARITIES_TO_RETURN));
                     } else {
                         console.log("Oops, there are no users and/or items!");
                     }
