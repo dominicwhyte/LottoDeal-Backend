@@ -264,6 +264,8 @@ app.get('/markRead', function(request, response) {
 
 
 app.get('/getAccount', function(request, response) {
+
+
     var userID = request.query["userID"];
 
     // suggestionsModule.computeSimilarities(userID, User, Item);
