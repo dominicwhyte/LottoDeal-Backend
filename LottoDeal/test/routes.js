@@ -440,6 +440,7 @@ describe('Database connection', function() {
         if (err) {
           throw err;
         }
+        console.log("here");
         console.log(res)
         // res.status.should.be.equal(302); // redirection
 
