@@ -128,13 +128,14 @@ app.post('/createReview', function(request, response) {
 })
 
 // Stripe Code---------------------------------------------------------
+var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 
 // A user has bid on an item, add this bid to database
 app.post('/performPaymentAndAddBid', function(request, response) {
     // get into database, access object, update it's bid field and add to user bids
     var amountToCharge = request.body.amount;
     console.log('Payment performing for ' + amountToCharge + " USD")
-    var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
+    // var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 
     var token = request.body.stripeToken; // Using Express
     // Charge the user's card:
@@ -517,8 +518,10 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var offset = req.body.expirDate;
     var shortDescription = req.body.shortDescription;
     var longDescription = req.body.longDescription;
+    var sellerID = req.body.userID;
 
-    if (title == null || price == null || offset == null || shortDescription == null || longDescription == null) {
+
+    if (title == null || price == null || offset == null || shortDescription == null || longDescription == null || sellerID == null) {
     	res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
     	return;
     }
@@ -619,60 +622,6 @@ app.post('/createPost', cpUpload, function(req, res, next) {
                 }, imageData);
             })
     })
-
-    // Jimp.read(imagePath + "compressed", function(err, image) {
-    // 	console.log(err);
-    // 	console.log(image);
-    // 	image.getBuffer(Jimp.AUTO, function(response) {
-    // 		console.log(response);
-    // 	})
-    // })
-
-
-    // console.log(image)
-    // var title = req.body.title;
-    // var price = req.body.price;
-    // var offset = req.body.expirDate;
-    // var expirationDate = new Date()
-    // var date = new Date();
-
-    // if (offset == 1) {
-    //     expirationDate.setDate(date.getDate() + 1);
-    // } else if (offset == 2) {
-    //     expirationDate.setDate(date.getDate() + 7);
-    // } else {
-    //     expirationDate.setDate(date.getDate() + 30);
-    // }
-    // var shortDescription = req.body.shortDescription;
-    // var longDescription = req.body.longDescription;
-    // var sellerID = req.body.userID;
-
-    // createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
-    //     res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
-    // }, function() {
-    //     response.status(404);
-
-    //     // respond with html page
-    //     if (request.accepts('html')) {
-    //         // CAN DO RESPONSE.RENDER HERE
-    //         response.sendFile(__dirname + "/views/404.html", {
-    //             url: request.url
-    //         });
-    //         return;
-    //     }
-    //     // respond with json
-    //     if (request.accepts('json')) {
-    //         response.send({
-    //             error: 'Not found'
-    //         });
-    //         return;
-    //     }
-
-    //     // default to plain-text. send()
-    //     response.type('txt').send('Not found');
-    // });
-
-    // res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=');
 })
 
 

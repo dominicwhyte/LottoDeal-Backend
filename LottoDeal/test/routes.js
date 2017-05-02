@@ -243,8 +243,102 @@ describe('Database connection', function() {
       });
     })
 
-    
+    it('should properly create an item', function(done) {
+      var profile = {
+        name: 'jane doe',
+        fbid: '01234',
+        url: 'www.someurl.com',
+        email: 'example@example.com'
+      }
+
+      // console.log(profile);
+      // console.log(url)
+
+      request(url)
+      .post('/createUser')
+      .send(profile)
+      .end(function(err, res) {
+        if (err) {
+          throw err;
+        }
+        res.status.should.be.equal(200);
+        res.text.should.be.equal("You have created a new user")
+        // console.log(res);
+        done();
+      });
+    })
+
+    it('should properly create a post for john doe', function(done) {
+      request(url)
+      .post('/createPost')
+      .field('title', 'title')
+      .field('price', 123)
+      .field('expirDate', 1)
+      .field('description', 'description')
+      .field('userID', 12345)
+      .attach('picture', './uploads/x.jpg')
+      // .send()
+      .end(function(err, res) {
+        if (err) {
+          throw err;
+        }
+        // console.log(res)
+        res.status.should.be.equal(302); // redirection
+
+        // NEED TO FIGURE OUT BETTER WAY TO DO THIS (expect, and not)
+        res.header.location.should.be.equal("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success");
+        done();
+      });
+    })
+
+    // it('should properly bid on an item for john doe', function(done) {
+    //   request(url)
+    //   .post('/createPost')
+    //   .field('title', 'title')
+    //   .field('price', 123)
+    //   .field('expirDate', 1)
+    //   .field('description', 'description')
+    //   .field('userID', 12345)
+    //   .attach('picture', './uploads/x.jpg')
+    //   // .send()
+    //   .end(function(err, res) {
+    //     if (err) {
+    //       throw err;
+    //     }
+    //     // console.log(res)
+    //     res.status.should.be.equal(302); // redirection
+
+    //     // NEED TO FIGURE OUT BETTER WAY TO DO THIS (expect, and not)
+    //     res.header.location.should.be.equal("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success");
+    //     done();
+    //   });
+    // })
+
+    // it('should properly bid on an item for jane doe', function(done) {
+    //   request(url)
+    //   .post('/createPost')
+    //   .field('title', 'title')
+    //   .field('price', 123)
+    //   .field('expirDate', 1)
+    //   .field('description', 'description')
+    //   .field('userID', 12345)
+    //   .attach('picture', './uploads/x.jpg')
+    //   // .send()
+    //   .end(function(err, res) {
+    //     if (err) {
+    //       throw err;
+    //     }
+    //     // console.log(res)
+    //     res.status.should.be.equal(302); // redirection
+
+    //     // NEED TO FIGURE OUT BETTER WAY TO DO THIS (expect, and not)
+    //     res.header.location.should.be.equal("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success");
+    //     done();
+    //   });
+    // })
   });
+
+
 
 
 });
