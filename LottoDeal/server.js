@@ -134,7 +134,7 @@ app.post('/createReview', function(request, response) {
     var date = new Date();
 
     console.log(date)
-    if (sellerID != reviewerID) {
+    if (sellerID != reviewerID && reviewerID != undefined) {
 
         createReview(sellerID, reviewerID, stars, reviewDes, date);
 
@@ -187,10 +187,12 @@ app.post('/performPaymentAndAddBid', function(request, response) {
 app.get('/getReviews', function(request, response) {
 
     var sellerID = request.query["sellerID"];
-    console.log("this is the request" + request.body);
+
+
+
     findUser(sellerID, function(user) {
         if (user != null) {
-            console.log("this is the user's reviews" + user)
+            console.log("this is the user's reviews from User" + user.reviews)
             response.send(JSON.stringify(user.reviews));
         } else {
             console.log('Error: user is null in getReviews');
@@ -1500,7 +1502,7 @@ var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
         if (user != null) {
             if (err) throw err;
             var data = {
-                userID: reviewerID,
+                reviewerID: reviewerID,
                 stars: stars,
                 reviewDes: reviewDes,
                 datePosted: date
