@@ -39,7 +39,7 @@ exports.computeSimilarities = function(userID, User, Item) {
                         addConnectingEdges(users);
                         computeEdgeWeights(users, items);
                         console.log('Graph set up');
-                        var suggestions = getSuggestedItems(userID);
+                        var suggestions = getSuggestedItems(userID, users);
                         printSuggestions(users, items, suggestions);
                     } else {
                         console.log("Oops, there are no users and/or items!");
@@ -119,14 +119,15 @@ function addConnectingEdges(users) {
                     target: "i" + users[i].bids[j].itemID
                 }
             });
-            //slightly favor bigger bids
+            //slightly favor bigger bids to have lower weights
             edgeWeights["c" + users[i].fbid + "," + users[i].bids[j].itemID] = (1 / users[i].bids[j].amount);
         }
     }
 }
 
-var ITEM_SIMILARITY_MULTIPLIER = 3
-var USER_GENDER_DISPARITY_MULTIPLIER = 2
+var ITEM_SIMILARITY_MULTIPLIER = 2;
+var USER_GENDER_DISPARITY_MULTIPLIER = 2;
+var TITLE_MULTIPLIER = 3;
 
 // COMPUTE THE EDGE WEIGHTS
 function computeEdgeWeights(users, items) {
@@ -134,9 +135,9 @@ function computeEdgeWeights(users, items) {
     // ADD EDGE WEIGHTS FOR USERS
     for (var i = 0; i < users.length; i++) {
         for (var j = i + 1; j < users.length; j++) {
-            var similarity = Math.abs(users[i].userInfo.age - users[j].userInfo.age); //  COMPARE THE USERS HERE
+            var similarity = Math.abs(users[i].userInfo.age - users[j].userInfo.age); 
             if (users[i].userInfo.gender == users[j].userInfo.gender) {
-                similarity = similarity; // keep it the same?
+                similarity /= USER_GENDER_DISPARITY_MULTIPLIER;
                 edge = "u" + users[i].fbid + "," + users[j].fbid;
                 edgeWeights[edge] = similarity;
             } else {
@@ -150,7 +151,7 @@ function computeEdgeWeights(users, items) {
     // ADD EDGE WEIGHTS FOR ITEMS
     for (var i = 0; i < items.length; i++) {
         for (var j = i + 1; j < items.length; j++) {
-            var similarity = 1 - stringSimilarity.compareTwoStrings(items[i].title, items[j].title);
+            var similarity = (1 - stringSimilarity.compareTwoStrings(items[i].title, items[j].title)) * TITLE_MULTIPLIER; 
             similarity += 1 - stringSimilarity.compareTwoStrings(items[i].shortDescription, items[j].shortDescription);
             similarity += 1 - stringSimilarity.compareTwoStrings(items[i].longDescription, items[j].longDescription);
             similarity *= ITEM_SIMILARITY_MULTIPLIER // mult
@@ -161,16 +162,22 @@ function computeEdgeWeights(users, items) {
     }
 }
 
-//Compute the shortest paths for user_fbid
-function getSuggestedItems(user_fbid) {
-    // console.log("Edges: ");
-    // console.log(cy.edges());
+// console.log('test: ' + stringSimilarity.compareTwoStrings("HP 15-ay018nr 15.6-Inch Laptop (Intel Core i7, 8GB RAM, 256GB SSD)", " Razor 62042 High Roller BMX/Freestyle Bike"));
+
+// console.log('test2: ' + stringSimilarity.compareTwoStrings("bike", "Used bike"));
+
+
+//Compute the shortest paths for user_fbid. Only include items that have not already
+//been bid on
+function getSuggestedItems(user_fbid, users) {
+    // bids that have already been made by the user
+    var bids = getUser(user_fbid, users).bids;
 
     var query = "u" + user_fbid;
 
-    var root = cy.getElementById(query);
+    var rootNode = cy.getElementById(query);
 
-    var dijkstra = cy.elements().dijkstra(root, function(edge) {
+    var dijkstra = cy.elements().dijkstra(rootNode, function(edge) {
         var weight = edgeWeights[edge.id()];
         return weight;
     }, false);
@@ -182,13 +189,24 @@ function getSuggestedItems(user_fbid) {
         var indicator = ele.id().charAt(0);
         var id = ele.id().substring(1, ele.id().length);
         if (indicator == 'i') {
-            var itemNode = cy.getElementById(ele.id());
-            var length = dijkstra.distanceTo(itemNode)
-            var struct = {
-                weight: length,
-                itemID: id
+            //only add item if the item hasn't been bid on by the user
+            var alreadyBidOn = false;
+            for (var i = 0; i < bids.length; i++) {
+                var previousItem = bids[i].itemID;
+                if (previousItem == id) {
+                    alreadyBidOn = true;
+                    break;
+                }
             }
-            sortedItems.push(struct);
+            if (!alreadyBidOn) {
+                var itemNode = cy.getElementById(ele.id());
+                var length = dijkstra.distanceTo(itemNode)
+                var struct = {
+                    weight: length,
+                    itemID: id
+                }
+                sortedItems.push(struct);
+            }
         }
 
     });
