@@ -141,7 +141,8 @@ describe('Database connection', function() {
       .field('title', 'title')
       .field('price', 123)
       .field('expirDate', 1)
-      .field('description', 'description')
+      .field('shortDescription', 'short description')
+      .field('longDescription', 'long description')
       .field('userID', 12345)
       .attach('picture', './uploads/x.jpg')
       // .send()
@@ -153,11 +154,16 @@ describe('Database connection', function() {
         res.status.should.be.equal(302); // redirection
 
         // NEED TO FIGURE OUT BETTER WAY TO DO THIS (expect, and not)
-        res.header.location.should.be.equal("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success");
+        // res.header.location.should.be.equal("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success");
         // res.header['location'].should.include('/sell.html')
         // res.header['location'].should.include('value=success')
         // expect(res.header.location).to.have.
-        // console.log(res.header);
+        // console.log('printing thing');
+        // console.log(res.header['location']);
+        // console.log(res.header['location'].includes('value=success'))
+        res.header['location'].includes('value=success').should.be.equal(true);
+        // res.header.location.should.be.equal
+
         // res.text.should.be.equal("You have created a new user")
         // console.log(res);
         done();
@@ -243,38 +249,17 @@ describe('Database connection', function() {
       });
     })
 
-    it('should properly create an item', function(done) {
-      var profile = {
-        name: 'jane doe',
-        fbid: '01234',
-        url: 'www.someurl.com',
-        email: 'example@example.com'
-      }
-
+    it('should properly create a post for john doe', function(done) {
       // console.log(profile);
       // console.log(url)
 
-      request(url)
-      .post('/createUser')
-      .send(profile)
-      .end(function(err, res) {
-        if (err) {
-          throw err;
-        }
-        res.status.should.be.equal(200);
-        res.text.should.be.equal("You have created a new user")
-        // console.log(res);
-        done();
-      });
-    })
-
-    it('should properly create a post for john doe', function(done) {
       request(url)
       .post('/createPost')
       .field('title', 'title')
       .field('price', 123)
       .field('expirDate', 1)
-      .field('description', 'description')
+      .field('shortDescription', 'short description')
+      .field('longDescription', 'long description')
       .field('userID', 12345)
       .attach('picture', './uploads/x.jpg')
       // .send()
@@ -286,10 +271,11 @@ describe('Database connection', function() {
         res.status.should.be.equal(302); // redirection
 
         // NEED TO FIGURE OUT BETTER WAY TO DO THIS (expect, and not)
-        res.header.location.should.be.equal("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success");
+        res.header['location'].includes('value=success').should.be.equal(true);
         done();
       });
     })
+
 
     // it('should properly bid on an item for john doe', function(done) {
     //   request(url)
@@ -404,12 +390,16 @@ describe('Database connection', function() {
       });
     })
     it('should properly create a post for john doe', function(done) {
+      // console.log(profile);
+      // console.log(url)
+
       request(url)
       .post('/createPost')
       .field('title', 'title')
       .field('price', 123)
       .field('expirDate', 1)
-      .field('description', 'description')
+      .field('shortDescription', 'short description')
+      .field('longDescription', 'long description')
       .field('userID', 12345)
       .attach('picture', './uploads/x.jpg')
       // .send()
@@ -421,34 +411,35 @@ describe('Database connection', function() {
         res.status.should.be.equal(302); // redirection
 
         // NEED TO FIGURE OUT BETTER WAY TO DO THIS (expect, and not)
-        res.header.location.should.be.equal("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success");
+        res.header['location'].includes('value=success').should.be.equal(true);
         done();
       });
     })
 
-    // it('should not create a post with an incorrect user id', function(done) {
-    //   request(url)
-    //   .post('/createPost')
-    //   .field('title', 'title')
-    //   .field('price', 123)
-    //   .field('expirDate', 1)
-    //   .field('description', 'description')
-    //   .field('userID', 123)
-    //   .attach('picture', './uploads/x.jpg')
-    //   // .send()
-    //   .end(function(err, res) {
-    //     if (err) {
-    //       throw err;
-    //     }
-    //     console.log("here");
-    //     console.log(res)
-    //     // res.status.should.be.equal(302); // redirection
 
-    //     // NEED TO FIGURE OUT BETTER WAY TO DO THIS (expect, and not)
-    //     // res.header.location.should.be.equal("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success");
-    //     done();
-    //   });
-    // })
+    it('should not create a post with an incorrect user id', function(done) {
+      request(url)
+      .post('/createPost')
+      .field('title', 'title')
+      .field('price', 123)
+      .field('expirDate', 1)
+      .field('description', 'description')
+      .field('userID', 123)
+      .attach('picture', './uploads/x.jpg')
+      // .send()
+      .end(function(err, res) {
+        if (err) {
+          throw err;
+        }
+        // console.log("here");
+        // console.log(res)
+        res.status.should.be.equal(302); // redirection
+
+        // NEED TO FIGURE OUT BETTER WAY TO DO THIS (expect, and not)
+        res.header['location'].includes('value=improperFormat').should.be.equal(true);
+        done();
+      });
+    })
     it('should properly delete John Doe and all items associated', function(done) {
       var body = {
         id: '12345',
