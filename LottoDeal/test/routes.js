@@ -193,5 +193,58 @@ describe('Database connection', function() {
     })
   });
 
+  describe('Bidding on an item (testing multiple users at the same time)', function() {
+    it('should properly create john doe', function(done) {
+      var profile = {
+        name: 'john doe',
+        fbid: '12345',
+        url: 'www.someurl.com',
+        email: 'example@example.com'
+      }
+
+      // console.log(profile);
+      // console.log(url)
+
+      request(url)
+      .post('/createUser')
+      .send(profile)
+      .end(function(err, res) {
+        if (err) {
+          throw err;
+        }
+        res.status.should.be.equal(200);
+        res.text.should.be.equal("You have created a new user")
+        // console.log(res);
+        done();
+      });
+    })
+    it('should properly create jane doe', function(done) {
+      var profile = {
+        name: 'jane doe',
+        fbid: '01234',
+        url: 'www.someurl.com',
+        email: 'example@example.com'
+      }
+
+      // console.log(profile);
+      // console.log(url)
+
+      request(url)
+      .post('/createUser')
+      .send(profile)
+      .end(function(err, res) {
+        if (err) {
+          throw err;
+        }
+        res.status.should.be.equal(200);
+        res.text.should.be.equal("You have created a new user")
+        // console.log(res);
+        done();
+      });
+    })
+
+    
+  });
+
 
 });
