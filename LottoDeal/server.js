@@ -999,50 +999,49 @@ app.post('/editItem', function(request, response) {
 
 app.get('/getImagesForNotifications', function(request, response) {
       var itemIDs = request.query["itemIDs"];
-      var length;
       if (itemIDs != undefined) {
 
- 
-     Item.find({}, function(err, items) {
-         console.log("here are all your images" + items)
-         var imagesCompressed = [];
-         for (var i = 0; i < itemIDs.length; i++) {
-             var id = itemIDs[i];
-             for (var j = 0; j < itemIDs.length; j++) {
-                 if (items[j]._id == itemIDs[i]) {
-                     imagesCompressed.push(items[j].img.compressed)
-                 }
-             }
-         }
+          Item.find({}, function (err, items) {
+              console.log("here are all your images" + items)
+              var imagesCompressed = [];
+              for (var i = 0; i < itemIDs.length; i++) {
+                  var id = itemIDs[i];
+                  for (var j = 0; j < items.length; j++) {
+                      if (items[j]._id == itemIDs[i]) {
+                          imagesCompressed.push(items[j].img.compressed)
+                      }
+                  }
+              }
 
 
-         response.send(JSON.stringify(imagesCompressed));
-     }
-     else {
-         response.send();
-          }
-             }, function() {
-         response.status(404);
- 
-         // respond with html page
-         if (request.accepts('html')) {
-             // CAN DO RESPONSE.RENDER HERE
-             response.sendFile(__dirname + "/views/404.html", {
-                 url: request.url
-             });
-             return;
-         }
-         // respond with json
-         if (request.accepts('json')) {
-             response.send({
-                 error: 'Not found'
-             });
-             return;
-         }
- 
-         // default to plain-text. send()
-         response.type('txt').send('Not found');
-     });
+              response.send(JSON.stringify(imagesCompressed));
+
+          }, function () {
+              response.status(404);
+
+              // respond with html page
+              if (request.accepts('html')) {
+                  // CAN DO RESPONSE.RENDER HERE
+                  response.sendFile(__dirname + "/views/404.html", {
+                      url: request.url
+                  });
+                  return;
+              }
+              // respond with json
+              if (request.accepts('json')) {
+                  response.send({
+                      error: 'Not found'
+                  });
+                  return;
+              }
+
+              // default to plain-text. send()
+              response.type('txt').send('Not found');
+          });
+      }
+      else {
+          response.send();
+      }
  })
 
 
