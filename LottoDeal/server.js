@@ -997,43 +997,34 @@ app.post('/editItem', function(request, response) {
 
 app.get('/getImagesForNotifications', function(request, response) {
     var itemIDs = request.query["itemIDs"];
+    var imagesCompressed = [];
+    for (var j = 0; j < itemIDs.length; j++) {
+        Item.findById(itemIDs[j], function (err,item) {
+            imagesCompressed.push(item.img.compressed);
+            if (err) throw err;
+        }, function() {
+            response.status(404);
 
-    Item.find({
-                '_id': itemIDs
-            }, function(err, items) {
-                console.log("here are all your images" + items)
-                var imagesCompressed = [];
-                for (var i = 0; i < items.length; i++) {
-                    imagesCompressed.push(items[i].img.compressed)
-                }
+            // respond with html page
+            if (request.accepts('html')) {
+                // CAN DO RESPONSE.RENDER HERE
+                response.sendFile(__dirname + "/views/404.html", {
+                    url: request.url
+                });
+                return;
+            }
+            // respond with json
+            if (request.accepts('json')) {
+                response.send({
+                    error: 'Not found'
+                });
+                return;
+            }
 
-
-
-
-
-                response.send(JSON.stringify(imagesCompressed));
-            }, function() {
-        response.status(404);
-
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
-            });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
-        }
-
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
-    });
+            // default to plain-text. send()
+            response.type('txt').send('Not found');
+        });
+    }
 })
 
 
