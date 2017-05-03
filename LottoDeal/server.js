@@ -992,16 +992,23 @@ app.post('/editItem', function(request, response) {
     response.send("Edited Item successfully")
 })
 
-app.get('/getImage', function(request, response) {
-    var itemID = request.query["itemID"];
 
-    findImageByID(itemID, function(buffer) {
-        if (buffer != null) {
-            response.send(buffer);
-        } else {
-            response.send("Error");
-        }
-    }, function() {
+
+
+
+
+
+
+
+app.get('/getImagesForNotifications', function(request, response) {
+    var itemIDs = request.query["itemIDs"];
+
+    Image.find({
+                '_id': itemIDs
+            }, function(err, images) {
+                console.log("here are all your images" + images)
+                callback(images);
+            }, function() {
         response.status(404);
 
         // respond with html page
@@ -1024,6 +1031,50 @@ app.get('/getImage', function(request, response) {
         response.type('txt').send('Not found');
     });
 })
+
+
+
+
+
+
+
+
+
+
+
+
+// app.get('/getImage', function(request, response) {
+//     var itemID = request.query["itemID"];
+
+//     findImageByID(itemID, function(buffer) {
+//         if (buffer != null) {
+//             response.send(buffer);
+//         } else {
+//             response.send("Error");
+//         }
+//     }, function() {
+//         response.status(404);
+
+//         // respond with html page
+//         if (request.accepts('html')) {
+//             // CAN DO RESPONSE.RENDER HERE
+//             response.sendFile(__dirname + "/views/404.html", {
+//                 url: request.url
+//             });
+//             return;
+//         }
+//         // respond with json
+//         if (request.accepts('json')) {
+//             response.send({
+//                 error: 'Not found'
+//             });
+//             return;
+//         }
+
+//         // default to plain-text. send()
+//         response.type('txt').send('Not found');
+//     });
+// })
 
 
 // Send back the bids on the passed in item parameter, in case user wants to
