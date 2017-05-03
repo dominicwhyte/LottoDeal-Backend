@@ -1000,29 +1000,27 @@ app.post('/editItem', function(request, response) {
 app.get('/getImagesForNotifications', function(request, response) {
       var itemIDs = request.query["itemIDs"];
       var length;
-      if (itemIDs == undefined) {
-          length = 0;
-      }
-      else {
-          length = itemIDs.length;
-      }
- 
-     Item.find({}, function(err, items) {
-                 console.log("here are all your images" + items)
-                 var imagesCompressed = [];
-                 for (var i = 0; i < length; i++) {
-                    var id = itemIDs[i];
-                    for (var j = 0; j < length; j++) {
-                        if (items[j]._id == itemIDs[i]) {
-                            imagesCompressed.push(items[j].img.compressed)
-                        }
-                    }
-                 }
+      if (itemIDs != undefined) {
 
  
- 
- 
-                 response.send(JSON.stringify(imagesCompressed));
+     Item.find({}, function(err, items) {
+         console.log("here are all your images" + items)
+         var imagesCompressed = [];
+         for (var i = 0; i < itemIDs.length; i++) {
+             var id = itemIDs[i];
+             for (var j = 0; j < itemIDs.length; j++) {
+                 if (items[j]._id == itemIDs[i]) {
+                     imagesCompressed.push(items[j].img.compressed)
+                 }
+             }
+         }
+
+
+         response.send(JSON.stringify(imagesCompressed));
+     }
+     else {
+         response.send();
+          }
              }, function() {
          response.status(404);
  
