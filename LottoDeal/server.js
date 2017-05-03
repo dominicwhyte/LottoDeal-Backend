@@ -994,7 +994,12 @@ app.post('/editItem', function(request, response) {
 
 
 
-
+longDescription: String,
+    img: {
+        data: Buffer, // stores an image here
+        compressed: String,
+        contentType: String
+    },
 
 
 
@@ -1003,11 +1008,20 @@ app.post('/editItem', function(request, response) {
 app.get('/getImagesForNotifications', function(request, response) {
     var itemIDs = request.query["itemIDs"];
 
-    Image.find({
+    Item.find({
                 '_id': itemIDs
-            }, function(err, images) {
-                console.log("here are all your images" + images)
-                response.send(JSON.stringify(images));
+            }, function(err, items) {
+                console.log("here are all your images" + items)
+                var imagesCompressed = [];
+                for (var i = 0; i < items.length; i++) {
+                    imagesCompressed.push(items[i].img.compressed)
+                }
+
+
+
+
+
+                response.send(JSON.stringify(imagesCompressed));
             }, function() {
         response.status(404);
 
@@ -1173,7 +1187,7 @@ mongoose.connect(url, function(err, db) {
     // });
 
     findAllItems(function(items) {
-        //console.log(items);
+        // console.log(items);
         //console.log('initiating refunds');
         // for (var i = 0; i < items.length; i++) {
         //     refundUsers(items[i]);
