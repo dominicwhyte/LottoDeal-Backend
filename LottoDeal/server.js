@@ -1004,7 +1004,7 @@ app.get('/getImagesForNotifications', function(request, response) {
                  for (var i = 0; i < itemIDs.length; i++) {
                     var id = itemIDs[i];
                     for (var j = 0; j < items.length; j++) {
-                        if (items[j].id == itemIDs[i]) {
+                        if (items[j]._id == itemIDs[i]) {
                             imagesCompressed.push(items[j].img.compressed)
                         }
                     }
