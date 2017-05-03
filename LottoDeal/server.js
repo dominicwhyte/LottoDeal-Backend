@@ -994,16 +994,6 @@ app.post('/editItem', function(request, response) {
 
 
 
-longDescription: String,
-    img: {
-        data: Buffer, // stores an image here
-        compressed: String,
-        contentType: String
-    },
-
-
-
-
 
 app.get('/getImagesForNotifications', function(request, response) {
     var itemIDs = request.query["itemIDs"];
