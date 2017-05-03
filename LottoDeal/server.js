@@ -163,7 +163,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
         source: token,
     }, function(err, charge) {
 
-        dollarAmount = (charge.amount \ 100);
+        dollarAmount = (charge.amount / 100);
 
         if (err != null) {
             console.log(err);
