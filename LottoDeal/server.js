@@ -998,16 +998,18 @@ app.post('/editItem', function(request, response) {
 app.get('/getImagesForNotifications', function(request, response) {
       var itemIDs = request.query["itemIDs"];
  
-     Item.find({
-                 '_id': itemIDs
-             }, function(err, items) {
+     Item.find({}, function(err, items) {
                  console.log("here are all your images" + items)
                  var imagesCompressed = [];
-                 for (var i = 0; i < items.length; i++) {
-                     imagesCompressed.push(items[i].img.compressed)
+                 for (var i = 0; i < itemIDs.length; i++) {
+                    var id = itemIDs[i];
+                    for (var j = 0; j < items.length; j++) {
+                        if (items[j].id == itemIDs[i]) {
+                            imagesCompressed.push(items[j].img.compressed)
+                        }
+                    }
                  }
- 
- 
+
  
  
  
