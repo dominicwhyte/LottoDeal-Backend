@@ -1754,48 +1754,53 @@ var performLottery = function(item) {
 
 var addBidForItem = function(itemID, userID, newAmount, chargeID) {
     // get a item with ID and update the userID array
-    Item.findById(itemID, function(err, item) {
-        if (err) throw err;
-        if (item != null) {
-            var array = item.bids;
-            var found = false;
+    if (userID != undefined) {
+        Item.findById(itemID, function(err, item) {
+            if (err) throw err;
+            if (item != null) {
+                var array = item.bids;
+                var found = false;
 
-            if (item.bids != null) {
-                for (i = 0; i < item.bids.length; i++) {
-                    if (item.bids[i].ID == userID) {
-                        var curAmount = Number(item.bids[i].amount);
-                        curAmount += Number(newAmount);
-                        item.bids[i].amount = Number(curAmount);
-                        item.bids[i].chargeIDs.push(chargeID);
-                        console.log('pushing chargeID ' + chargeID);
-                        item.amountRaised += Number(newAmount);
-                        item.save();
-                        found = true;
-                        break;
+                if (item.bids != null) {
+                    for (i = 0; i < item.bids.length; i++) {
+                        if (item.bids[i].ID == userID) {
+                            var curAmount = Number(item.bids[i].amount);
+                            curAmount += Number(newAmount);
+                            item.bids[i].amount = Number(curAmount);
+                            item.bids[i].chargeIDs.push(chargeID);
+                            console.log('pushing chargeID ' + chargeID);
+                            item.amountRaised += Number(newAmount);
+                            item.save();
+                            found = true;
+                            break;
+                        }
                     }
                 }
+
+                if (!found) {
+                    console.log('pushing chargeID ' + chargeID);
+                    var data = {
+                        ID: userID,
+                        amount: newAmount,
+                        chargeIDs: [chargeID]
+                    };
+                    console.log(data);
+                    item.bids.push(data);
+
+                    item.amountRaised += newAmount;
+                    item.save();
+                }
+
+                console.log('Bid successfully added to item');
+            } else {
+                console.log('Item was null in addbidforitem')
             }
 
-            if (!found) {
-                console.log('pushing chargeID ' + chargeID);
-                var data = {
-                    ID: userID,
-                    amount: newAmount,
-                    chargeIDs: [chargeID]
-                };
-                console.log(data);
-                item.bids.push(data);
-
-                item.amountRaised += newAmount;
-                item.save();
-            }
-
-            console.log('Bid successfully added to item');
-        } else {
-            console.log('Item was null in addbidforitem')
-        }
-
-    });
+        });
+    }
+    else {
+        
+    }
 
     var users = findAllUsers(function(users) {
         var usersLength = users.length;
