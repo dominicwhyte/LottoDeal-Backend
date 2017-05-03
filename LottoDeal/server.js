@@ -163,6 +163,8 @@ app.post('/performPaymentAndAddBid', function(request, response) {
         source: token,
     }, function(err, charge) {
 
+        dollarAmount = (charge.amount \ 100);
+
         if (err != null) {
             console.log(err);
         }
@@ -171,7 +173,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
             var userID = request.body.userID;
             var date = new Date();
             addBidForItem(itemID, userID, amountToCharge, charge.id);
-            addNotificationToUser(itemID, userID, "New Bid", "You just bid " + charge.amount + " dollar(s)", date);
+            addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + charge.amount, date);
             response.send("charge is" + charge.amount)
         } else {
             console.log('Error: charge is null in performPaymentAndAddBid');
