@@ -1007,7 +1007,7 @@ app.get('/getImagesForNotifications', function(request, response) {
                 '_id': itemIDs
             }, function(err, images) {
                 console.log("here are all your images" + images)
-                callback(images);
+                response.send(JSON.stringify(images));
             }, function() {
         response.status(404);
 
