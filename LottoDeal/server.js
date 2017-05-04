@@ -149,36 +149,40 @@ var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 
 // A user has bid on an item, add this bid to database
 app.post('/performPaymentAndAddBid', function(request, response) {
-    // get into database, access object, update it's bid field and add to user bids
-    var amountToCharge = request.body.amount;
-    console.log('Payment performing for ' + amountToCharge + " USD")
-        // var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
+    var accessToken = request.body["accessToken"];
+    validateAccessToken(accessToken, response, request, function(userID) {
+        // get into database, access object, update it's bid field and add to user bids
+        var amountToCharge = request.body.amount;
+        console.log('Payment performing for ' + amountToCharge + " USD")
 
-    var token = request.body.stripeToken; // Using Express
-    // Charge the user's card:
-    var charge = stripe.charges.create({
-        amount: amountToCharge * 100, //in cents
-        currency: "usd",
-        description: "Charge for LottoDeal " + request.body.itemTitle,
-        source: token,
-    }, function(err, charge) {
+        var token = request.body.stripeToken; // Using Express
+        // Charge the user's card:
+        var charge = stripe.charges.create({
+            amount: amountToCharge * 100, //in cents
+            currency: "usd",
+            description: "Charge for LottoDeal " + request.body.itemTitle,
+            source: token,
+        }, function(err, charge) {
 
-        dollarAmount = (charge.amount / 100);
+            dollarAmount = (charge.amount / 100);
 
-        if (err != null) {
-            console.log(err);
-        }
-        if (charge != null) {
-            var itemID = request.body.itemID;
-            var userID = request.body.userID;
-            var date = new Date();
-            addBidForItem(itemID, userID, amountToCharge, charge.id);
-            addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
-            response.send("charge is" + charge.amount)
-        } else {
-            console.log('Error: charge is null in performPaymentAndAddBid');
-        }
+            if (err != null) {
+                console.log(err);
+            }
+            if (charge != null) {
+                var itemID = request.body.itemID;
+                var date = new Date();
+                addBidForItem(itemID, userID, amountToCharge, charge.id);
+                addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
+                response.send("charge is" + charge.amount)
+            } else {
+                console.log('Error: charge is null in performPaymentAndAddBid');
+            }
+        });
     });
+
+
+
 })
 
 
@@ -186,20 +190,30 @@ app.post('/performPaymentAndAddBid', function(request, response) {
 
 //START USER AUTHENTICATION CODE
 
-var request = require("request");
+var httprequest = require("request");
 
-function validateAccessToken(accessToken, callback) {
-
-    console.log('Validating access Token');
-
-    request({
+//Validates an access token. Provide response and request in case a 404 
+//error should be thrown
+function validateAccessToken(accessToken, response, request, callback) {
+    console.log('Validating access Token: ' + accessToken);
+    httprequest({
         uri: "https://graph.facebook.com/me?access_token=" + accessToken,
         method: "GET",
         timeout: 10000,
         followRedirect: true,
         maxRedirects: 10
-    }, function(error, response, body) {
-        callback(error, response, body);
+    }, function(error, validateResponse, body) {
+        console.log('accessToken response: ' + validateResponse);
+        console.log('accessToken body: ' + body);
+        body = JSON.parse(body);
+        var userID = body.id;
+
+        if (error != null || userID == null) {
+            console.log('Error in get suggestions is not null or userID is null: ' + error);
+            send404(response, request);
+        } else {
+            callback(userID);
+        }
     });
 }
 
@@ -232,8 +246,6 @@ app.get('/getReviews', function(request, response) {
 // Check if a user is already registered in the database
 app.get('/checkIfUser', function(request, response) {
     var userID = request.query["userID"];
-
-
     if (userID != undefined) {
 
         User.find({
@@ -253,8 +265,6 @@ app.get('/checkIfUser', function(request, response) {
     }
 
 })
-
-
 
 // mark all notifications read
 app.get('/markRead', function(request, response) {
@@ -303,31 +313,20 @@ app.get('/getAccount', function(request, response) {
 
 app.get('/getSuggestions', function(request, response) {
     var accessToken = request.query["accessToken"];
-
-    validateAccessToken(accessToken, function(error, validateResponse, body) {
-        console.log('accessToken error: ' + error);
-        console.log('accessToken response: ' + validateResponse);
-        console.log('accessToken body: ' + body);
-
-        if (error != null) {
-            console.log('Error in get suggestions is not null');
+    validateAccessToken(accessToken, response, request, function(userID) {
+        findUser(userID, function(user) {
+            if (user != null) {
+                console.log("Returning suggestions for user");
+                suggestionsModule.computeSimilarities(userID, User, Item, function(suggestions) {
+                    response.send(JSON.stringify(suggestions));
+                });
+            } else {
+                console.log('Error: user is null in getAccount');
+            }
+        }, function() {
             send404(response, request);
-        } else {
-            body = JSON.parse(body);
-            var userID = body.id;
-            findUser(userID, function(user) {
-                if (user != null) {
-                    console.log("Returning suggestions for user");
-                    suggestionsModule.computeSimilarities(userID, User, Item, function(suggestions) {
-                        response.send(JSON.stringify(suggestions));
-                    });
-                } else {
-                    console.log('Error: user is null in getAccount');
-                }
-            }, function() {
-                send404(response, request);
-            });
-        }
+        });
+
 
     })
 })
@@ -335,6 +334,7 @@ app.get('/getSuggestions', function(request, response) {
 
 //Send 404 ERROR
 function send404(response, request) {
+    console.log('Sending 404');
     response.status(404);
 
     // respond with html page
@@ -831,19 +831,37 @@ app.delete('/deleteUser', function(request, response) {
 
 // Delete an Item
 app.delete('/deleteItem', function(request, response) {
-    // console.log(request.body);
-    // console.log(request);
-    var id = request.body.id;
+    var accessToken = request.body.accessToken;
+    var itemIDToDelete = response.body.id
+    validateAccessToken(accessToken, response, request, function(userID) {
+        findUser(userID, function(user) {
+            if (user != null) {
+                response.header('Access-Control-Allow-Methods', 'DELETE');
+                //Check that the user has the right to delete this item
+                var userCanDeleteItem = false;
+                for (var i = 0; i < user.bids.length; i++) {
+                    if (itemIDToDelete == user.bids[i].itemID) {
+                        userCanDeleteItem = true;
+                        break;
+                    }
+                }
+                if (userCanDeleteItem) {
+                    deleteItem(itemIDToDelete, function(message) {
+                        response.send(message);
+                    });
+                }
+                else {
+                    send404(response, request);
+                }
 
-    console.log("here");
-
-    response.header('Access-Control-Allow-Methods', 'DELETE');
-
-
-    deleteItem(id, function(message) {
-            response.send(message);
-        })
-        // response.send('Deleted')
+            } else {
+                console.log('Error: user is null in getAccount');
+                send404(response, request);
+            }
+        }, function() {
+            send404(response, request);
+        });
+    });
 })
 
 app.post('/editItem', function(request, response) {
