@@ -56,9 +56,7 @@ module.exports = {
 var helmet = require("helmet")
 app.use(helmet())
 
-var fs = require('fs'); 
-
-
+var fs = require('fs');
 
 
 
@@ -1571,7 +1569,6 @@ var findUser = function(fbid, callback, errorCallback) {
             // MAYBE NOT THE BEST IMPLEMENTATION? should it always return null?
             errorCallback();
             return;
-            callback(null);
         }
 
     });
@@ -1678,18 +1675,6 @@ var createImage = function(id, buffer) {
             });
         });
     });
-    // var newImage = new Image({
-    //     itemID: id,
-    //     img: {
-    //     	data: buffer
-    //     }
-    // });
-
-    // // call the built-in save method to save to the database
-    // newImage.save(function(err) {
-    //     if (err) throw err;
-    //     console.log('Image saved successfully!');
-    // });
 }
 
 var findImageByID = function(id, callback, errorCallback) {
@@ -1748,4 +1733,3 @@ exports.findUser = function(fbid, callback, errorCallback) {
 }
 
 //END EXPORTS FOR DATABASE MODULE
-

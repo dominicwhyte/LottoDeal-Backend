@@ -7,6 +7,7 @@ const SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES = 3;
 
 //Check if lotteries should be performed
 exports.checkIfServerShouldPerformLottery = function() {
+    console.log('checking lottery');
     // do whatever you like here
     // console.log('Checking if lottery should be performed')
     checkLotteries();
@@ -19,7 +20,7 @@ var checkLotteries = function() {
 	databaseModule.findAllItems(function(items) {
 		for (i = 0; i < items.length; i++) {
             var item = items[i];
-						
+			communicationsModule.emailBiddersForItem(item, "LottoDeal:" + item.title + " expired", "You have been fully refunded", "");
             if (item.expired || item.sold) {
                 continue;
             }
