@@ -238,34 +238,13 @@ app.get('/checkIfUser', function(request, response) {
 
             if (user.length > 1) {
                 console.log('ERROR: multiple users with FBID')
-                response.status(404);
-
-                // respond with html page
-                if (request.accepts('html')) {
-                    // CAN DO RESPONSE.RENDER HERE
-                    response.sendFile(__dirname + "/views/404.html", {
-                        url: request.url
-                    });
-                    return;
                 }
-                // respond with json
-                if (request.accepts('json')) {
-                    response.send({
-                        error: 'Not found'
-                    });
-                    return;
-                }
-
-                // default to plain-text. send()
-                response.type('txt').send('Not found');
-
-            } 
             else if (user.length == 1) { 
-                return true;
+                response.send(true);
             }
             else {
-                return false;
                 console.log("returning false")
+                response.send(false);
             }
         });
     }   
@@ -279,39 +258,22 @@ app.get('/checkIfUser', function(request, response) {
 app.get('/markRead', function(request, response) {
     var userID = request.query["userID"];
     if (userID != undefined) {
-        findUser(userID, function(user) {
-            if (user != null) {
-                var notifications = user.notifications;
-                for (var i = 0; i < notifications.length; i++) {
-                    notifications[i].read = true;
+        User.find({fbid: userID}, function(err, users) {
+            if (users.length != 0) {
+                var user = users[0];
+                if (user != null) {
+                    var notifications = user.notifications;
+                    for (var i = 0; i < notifications.length; i++) {
+                        notifications[i].read = true;
+                    }
+                    user.save();
+                    notifications = user.notifications;
+                    response.send(JSON.stringify(notifications));
+                } 
+                else {
+                    console.log('Error: user is null in getAccount');
                 }
-                user.save();
-                notifications = user.notifications;
-                response.send(JSON.stringify(notifications));
-            } else {
-                console.log('Error: user is null in getAccount');
             }
-        }, function() {
-            response.status(404);
-
-            // respond with html page
-            if (request.accepts('html')) {
-                // CAN DO RESPONSE.RENDER HERE
-                response.sendFile(__dirname + "/views/404.html", {
-                    url: request.url
-                });
-                return;
-            }
-            // respond with json
-            if (request.accepts('json')) {
-                response.send({
-                    error: 'Not found'
-                });
-                return;
-            }
-
-            // default to plain-text. send()
-            response.type('txt').send('Not found');
         });
     }
 })
@@ -1090,7 +1052,8 @@ app.get('/getImagesForNotifications', function(request, response) {
           });
       }
       else {
-          response.send();
+          response.send([]);
+          return;
       }
  })
 
@@ -1197,7 +1160,7 @@ mongoose.connect(url, function(err, db) {
 
 
 
-    // deleteAllUsers();
+    deleteAllUsers();
     // deleteAllItems();
     // deleteAllImages();
 
