@@ -234,6 +234,8 @@ app.get('/checkIfUser', function(request, response) {
     if (userID != undefined) {
 
         User.find({fbid: userID}, function(err, user) {
+            console.log(user.length + "lenght of users")
+
             if (user.length > 1) {
                 console.log('ERROR: multiple users with FBID')
                 response.status(404);
@@ -263,44 +265,11 @@ app.get('/checkIfUser', function(request, response) {
             }
             else {
                 return false;
+                console.log("returning false")
             }
         });
     }   
 
-
-
-    if (userID != undefined) {
-        findUser(userID, function(user) {
-            if (user == null) {
-                response.send(false);
-                console.log("the current user is not registered in the database")
-            } else {
-                response.send(true);
-                console.log("the current user is registered in the database")
-            }
-        }, function() {
-            response.status(404);
-
-            // respond with html page
-            if (request.accepts('html')) {
-                // CAN DO RESPONSE.RENDER HERE
-                response.sendFile(__dirname + "/views/404.html", {
-                    url: request.url
-                });
-                return;
-            }
-            // respond with json
-            if (request.accepts('json')) {
-                response.send({
-                    error: 'Not found'
-                });
-                return;
-            }
-
-            // default to plain-text. send()
-            response.type('txt').send('Not found');
-        });
-    }
 })
 
 
