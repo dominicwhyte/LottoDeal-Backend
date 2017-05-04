@@ -37,19 +37,19 @@ var upload = multer({
 var debug = false;
 
 module.exports = {
-	goToDebugMode: function() {
-		debug = true;
-		console.log(debug);
-	},
-	goToProductionMode: function() {
-		debug = false;
-		console.log(debug);
-	}
-}
-// exports.goToDebugMode = function() {
-// 	debug = true;
-// 	console.log(debug);
-// }
+        goToDebugMode: function() {
+            debug = true;
+            console.log(debug);
+        },
+        goToProductionMode: function() {
+            debug = false;
+            console.log(debug);
+        }
+    }
+    // exports.goToDebugMode = function() {
+    // 	debug = true;
+    // 	console.log(debug);
+    // }
 
 
 var helmet = require("helmet")
@@ -107,20 +107,20 @@ app.use(function(req, res, next) {
     var allowedOrigins = ['https://dominicwhyte.github.io'];
     var origin = req.headers.origin;
     if (allowedOrigins.indexOf(origin) > -1) {
-            res.setHeader('Access-Control-Allow-Origin', origin);
-            res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
-            res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-            res.header('Access-Control-Allow-Credentials', true);
-            return next();
-        } else {
-            res.send("Oops! You can't access our API")
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.header('Access-Control-Allow-Credentials', true);
+        return next();
+    } else {
+        res.send("Oops! You can't access our API")
     }
     // res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
     // res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
     // res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     // res.header('Access-Control-Allow-Credentials', true);
     // return next();
-    
+
 });
 
 // A user has bid on an item, add this bid to database
@@ -184,6 +184,29 @@ app.post('/performPaymentAndAddBid', function(request, response) {
 
 //End Stripe Code ------------------------------------------------------
 
+//START USER AUTHENTICATION CODE
+
+var request = require("request");
+
+function validateAccessToken(accessToken, callback) {
+
+    console.log('Validating access Token');
+
+    request({
+        uri: "https://graph.facebook.com/me?access_token=" + accessToken,
+        method: "GET",
+        timeout: 10000,
+        followRedirect: true,
+        maxRedirects: 10
+    }, function(error, response, body) {
+        callback(error, response, body);
+    });
+}
+
+
+
+//END USER AUTHENTICATION CODE
+
 // Send back the reviews on the passed in item parameter, in case user wants to
 // see the people that bid on his item
 app.get('/getReviews', function(request, response) {
@@ -200,27 +223,7 @@ app.get('/getReviews', function(request, response) {
             console.log('Error: user is null in getReviews');
         }
     }, function() {
-        response.status(404);
-
-
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
-            });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
-        }
-
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
+        send404(response, request);
     });
 })
 
@@ -233,24 +236,23 @@ app.get('/checkIfUser', function(request, response) {
 
     if (userID != undefined) {
 
-        User.find({fbid: userID}, function(err, user) {
+        User.find({
+            fbid: userID
+        }, function(err, user) {
             console.log(user.length + "lenght of users")
 
             if (user.length > 1) {
                 console.log('ERROR: multiple users with FBID')
-                }
-            else if (user.length == 1) { 
+            } else if (user.length == 1) {
                 response.send(true);
-            }
-            else {
+            } else {
                 console.log("returning false")
                 response.send(false);
             }
         });
-    }   
+    }
 
 })
-
 
 
 
@@ -258,7 +260,9 @@ app.get('/checkIfUser', function(request, response) {
 app.get('/markRead', function(request, response) {
     var userID = request.query["userID"];
     if (userID != undefined) {
-        User.find({fbid: userID}, function(err, users) {
+        User.find({
+            fbid: userID
+        }, function(err, users) {
             if (users.length != 0) {
                 var user = users[0];
                 if (user != null) {
@@ -269,8 +273,7 @@ app.get('/markRead', function(request, response) {
                     user.save();
                     notifications = user.notifications;
                     response.send(JSON.stringify(notifications));
-                } 
-                else {
+                } else {
                     console.log('Error: user is null in getAccount');
                 }
             }
@@ -294,67 +297,65 @@ app.get('/getAccount', function(request, response) {
             console.log('Error: user is null in getAccount');
         }
     }, function() {
-        response.status(404);
-
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
-            });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
-        }
-
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
+        send404(response, request);
     });
 })
 
 app.get('/getSuggestions', function(request, response) {
-    var userID = request.query["userID"];
+    var accessToken = request.query["accessToken"];
 
+    validateAccessToken(accessToken, function(error, validateResponse, body) {
+        console.log('accessToken error: ' + error);
+        console.log('accessToken response: ' + validateResponse);
+        console.log('accessToken body: ' + body);
 
-
-    findUser(userID, function(user) {
-        if (user != null) {
-            console.log("Returning suggestions for user");
-            suggestionsModule.computeSimilarities(userID, User, Item, function(suggestions) {
-                response.send(JSON.stringify(suggestions));
-            });
+        if (error != null) {
+            console.log('Error in get suggestions is not null');
+            send404(response, request);
         } else {
-            console.log('Error: user is null in getAccount');
-        }
-    }, function() {
-        response.status(404);
-
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
+            body = JSON.parse(body);
+            var userID = body.id;
+            findUser(userID, function(user) {
+                if (user != null) {
+                    console.log("Returning suggestions for user");
+                    suggestionsModule.computeSimilarities(userID, User, Item, function(suggestions) {
+                        response.send(JSON.stringify(suggestions));
+                    });
+                } else {
+                    console.log('Error: user is null in getAccount');
+                }
+            }, function() {
+                send404(response, request);
             });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
         }
 
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
-    });
+    })
 })
 
+
+//Send 404 ERROR
+function send404(response, request) {
+    response.status(404);
+
+    // respond with html page
+    if (request.accepts('html')) {
+        // CAN DO RESPONSE.RENDER HERE
+        response.sendFile(__dirname + "/views/404.html", {
+            url: request.url
+        });
+        return;
+    }
+    // respond with json
+    if (request.accepts('json')) {
+        response.send({
+            error: 'Not found'
+        });
+        return;
+    }
+
+    // default to plain-text. send()
+    response.type('txt').send('Not found');
+}
 
 
 app.get('/getNotifications', function(request, response) {
@@ -418,26 +419,7 @@ app.get('/getListedItemsForUsers', function(request, response) {
         }
 
     }, function() {
-        response.status(404);
-
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
-            });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
-        }
-
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
+        send404(response, request);
     });
 })
 
@@ -452,26 +434,7 @@ app.get('/getSoldItemsForUsers', function(request, response) {
         console.log("sold items = " + JSON.stringify(items));
         response.send(JSON.stringify(items));
     }, function() {
-        response.status(404);
-
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
-            });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
-        }
-
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
+        send404(response, request);
     });
 })
 
@@ -514,26 +477,7 @@ app.post('/debugPost', function(request, response) {
                 createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
                     response.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
                 }, function() {
-                    response.status(404);
-
-                    // respond with html page
-                    if (request.accepts('html')) {
-                        // CAN DO RESPONSE.RENDER HERE
-                        response.sendFile(__dirname + "/views/404.html", {
-                            url: request.url
-                        });
-                        return;
-                    }
-                    // respond with json
-                    if (request.accepts('json')) {
-                        response.send({
-                            error: 'Not found'
-                        });
-                        return;
-                    }
-
-                    // default to plain-text. send()
-                    response.type('txt').send('Not found');
+                    send404(response, request);
                 }, imageData);
             })
     })
@@ -671,26 +615,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
                 createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
                     res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
                 }, function() {
-                    res.status(404);
-
-                    // respond with html page
-                    if (req.accepts('html')) {
-                        // CAN DO RESPONSE.RENDER HERE
-                        res.sendFile(__dirname + "/views/404.html", {
-                            url: req.url
-                        });
-                        return;
-                    }
-                    // respond with json
-                    if (req.accepts('json')) {
-                        res.send({
-                            error: 'Not found'
-                        });
-                        return;
-                    }
-
-                    // default to plain-text. send()
-                    res.type('txt').send('Not found');
+                    send404(response, request);
                 }, imageData);
             })
     })
@@ -753,26 +678,7 @@ app.post('/updateSettings', function(request, response) {
         }
 
     }, function() {
-        response.status(404);
-
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
-            });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
-        }
-
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
+        send404(response, request);
     });
 
 })
@@ -883,26 +789,7 @@ app.get('/getItem', function(request, response) {
                 console.log(buffer);
                 response.send(JSON.stringify(item))
             }, function() {
-                response.status(404);
-
-                // respond with html page
-                if (request.accepts('html')) {
-                    // CAN DO RESPONSE.RENDER HERE
-                    response.sendFile(__dirname + "/views/404.html", {
-                        url: request.url
-                    });
-                    return;
-                }
-                // respond with json
-                if (request.accepts('json')) {
-                    response.send({
-                        error: 'Not found'
-                    });
-                    return;
-                }
-
-                // default to plain-text. send()
-                response.type('txt').send('Not found');
+                send404(response, request);
             })
 
             // response.send(JSON.stringify(item));
@@ -911,26 +798,7 @@ app.get('/getItem', function(request, response) {
         }
 
     }, function() {
-        response.status(404);
-
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
-            });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
-        }
-
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
+        send404(response, request);
     });
 })
 
@@ -1008,63 +876,33 @@ app.post('/editItem', function(request, response) {
 
 
 
-
 app.get('/getImagesForNotifications', function(request, response) {
-      var itemIDs = request.query["itemIDs"];
-      if (itemIDs != undefined) {
+    var itemIDs = request.query["itemIDs"];
+    if (itemIDs != undefined) {
 
-          Item.find({}, function (err, items) {
-              console.log("here are all your images" + items)
-              var imagesCompressed = [];
-              for (var i = 0; i < itemIDs.length; i++) {
-                  var id = itemIDs[i];
-                  for (var j = 0; j < items.length; j++) {
-                      if (items[j]._id == itemIDs[i]) {
-                          imagesCompressed.push(items[j].img.compressed)
-                      }
-                  }
-              }
-
-
-              response.send(JSON.stringify(imagesCompressed));
-
-          }, function () {
-              response.status(404);
-
-              // respond with html page
-              if (request.accepts('html')) {
-                  // CAN DO RESPONSE.RENDER HERE
-                  response.sendFile(__dirname + "/views/404.html", {
-                      url: request.url
-                  });
-                  return;
-              }
-              // respond with json
-              if (request.accepts('json')) {
-                  response.send({
-                      error: 'Not found'
-                  });
-                  return;
-              }
-
-              // default to plain-text. send()
-              response.type('txt').send('Not found');
-          });
-      }
-      else {
-          response.send([]);
-          return;
-      }
- })
+        Item.find({}, function(err, items) {
+            console.log("here are all your images" + items)
+            var imagesCompressed = [];
+            for (var i = 0; i < itemIDs.length; i++) {
+                var id = itemIDs[i];
+                for (var j = 0; j < items.length; j++) {
+                    if (items[j]._id == itemIDs[i]) {
+                        imagesCompressed.push(items[j].img.compressed)
+                    }
+                }
+            }
 
 
+            response.send(JSON.stringify(imagesCompressed));
 
-
-
-
-
-
-
+        }, function() {
+            send404(response, request);
+        });
+    } else {
+        response.send([]);
+        return;
+    }
+})
 
 
 
@@ -1160,7 +998,7 @@ mongoose.connect(url, function(err, db) {
 
 
 
-    deleteAllUsers();
+    //deleteAllUsers();
     // deleteAllItems();
     // deleteAllImages();
 
@@ -1375,30 +1213,8 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
 
 
     }, function() {
-        response.status(404);
-
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
-            });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
-        }
-
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
+        send404(response, request);
     });
-    // call the built-in save method to save to the database
-    // newItem.img.data = fs.readFileSync(image);
-    // newItem.img.contentType = 'image/png';    
 }
 
 
@@ -1547,26 +1363,7 @@ app.get('/getReviewerImagesandNames', function(request, response) {
         }
 
     }, function() {
-        response.status(404);
-
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
-            });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
-        }
-
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
+        send404(response, request);
     });
 });
 
@@ -1593,26 +1390,7 @@ var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
 
 
     }, function() {
-        response.status(404);
-
-        // respond with html page
-        if (request.accepts('html')) {
-            // CAN DO RESPONSE.RENDER HERE
-            response.sendFile(__dirname + "/views/404.html", {
-                url: request.url
-            });
-            return;
-        }
-        // respond with json
-        if (request.accepts('json')) {
-            response.send({
-                error: 'Not found'
-            });
-            return;
-        }
-
-        // default to plain-text. send()
-        response.type('txt').send('Not found');
+        send404(response, request);
     });
 }
 
@@ -1680,26 +1458,7 @@ function emailBiddersForItem(item, subject, message, winner) {
             // SHOULD COMMENT THIS BACK IN
             // sendEmailToAddress(user.email, subject, message);
         }, function() {
-            response.status(404);
-
-            // respond with html page
-            if (request.accepts('html')) {
-                // CAN DO RESPONSE.RENDER HERE
-                response.sendFile(__dirname + "/views/404.html", {
-                    url: request.url
-                });
-                return;
-            }
-            // respond with json
-            if (request.accepts('json')) {
-                response.send({
-                    error: 'Not found'
-                });
-                return;
-            }
-
-            // default to plain-text. send()
-            response.type('txt').send('Not found');
+            send404(response, request);
         });
     }
 }
@@ -1814,9 +1573,8 @@ var addBidForItem = function(itemID, userID, newAmount, chargeID) {
             }
 
         });
-    }
-    else {
-        
+    } else {
+
     }
 
     var users = findAllUsers(function(users) {
