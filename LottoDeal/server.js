@@ -268,27 +268,29 @@ app.get('/checkIfUser', function(request, response) {
 
 // mark all notifications read
 app.get('/markRead', function(request, response) {
-    var userID = request.query["userID"];
-    if (userID != undefined) {
-        User.find({
-            fbid: userID
-        }, function(err, users) {
-            if (users.length != 0) {
-                var user = users[0];
-                if (user != null) {
-                    var notifications = user.notifications;
-                    for (var i = 0; i < notifications.length; i++) {
-                        notifications[i].read = true;
+    var accessToken = request.query["accessToken"];
+    validateAccessToken(accessToken, response, request, function(userID) {
+        if (userID != undefined) {
+            User.find({
+                fbid: userID
+            }, function(err, users) {
+                if (users.length != 0) {
+                    var user = users[0];
+                    if (user != null) {
+                        var notifications = user.notifications;
+                        for (var i = 0; i < notifications.length; i++) {
+                            notifications[i].read = true;
+                        }
+                        user.save();
+                        notifications = user.notifications;
+                        response.send(JSON.stringify(notifications));
+                    } else {
+                        console.log('Error: user is null in getAccount');
                     }
-                    user.save();
-                    notifications = user.notifications;
-                    response.send(JSON.stringify(notifications));
-                } else {
-                    console.log('Error: user is null in getAccount');
                 }
-            }
-        });
-    }
+            });
+        }
+    });
 })
 
 
@@ -357,24 +359,18 @@ function send404(response, request) {
     response.type('txt').send('Not found');
 }
 
-
 app.get('/getNotifications', function(request, response) {
-    console.log('getting notifications');
-    // var userID = '1641988472497790';
-    // console.log(request)
-    // console.log(request.body);
-    var userID = request.query["userID"];
-
-    getNotificationsForUsers(userID, function(notifications) {
-        if (notifications != null) {
-            console.log('notifications = ' + JSON.stringify(notifications))
-            response.send(JSON.stringify(notifications));
-        } else {
-            console.log('Error: notifications is null in getNotifications');
-        }
-
+    var accessToken = request.query["accessToken"];
+    validateAccessToken(accessToken, response, request, function(userID) {
+        getNotificationsForUsers(userID, function(notifications) {
+            if (notifications != null) {
+                console.log('notifications = ' + JSON.stringify(notifications))
+                response.send(JSON.stringify(notifications));
+            } else {
+                console.log('Error: notifications is null in getNotifications');
+            }
+        });
     });
-
 })
 
 app.get('/getBidsofUsers', function(request, response) {
@@ -832,7 +828,7 @@ app.delete('/deleteUser', function(request, response) {
 // Delete an Item
 app.delete('/deleteItem', function(request, response) {
     var accessToken = request.body.accessToken;
-    var itemIDToDelete = response.body.id
+    var itemIDToDelete = request.body.id
     validateAccessToken(accessToken, response, request, function(userID) {
         findUser(userID, function(user) {
             if (user != null) {
@@ -849,8 +845,7 @@ app.delete('/deleteItem', function(request, response) {
                     deleteItem(itemIDToDelete, function(message) {
                         response.send(message);
                     });
-                }
-                else {
+                } else {
                     send404(response, request);
                 }
 

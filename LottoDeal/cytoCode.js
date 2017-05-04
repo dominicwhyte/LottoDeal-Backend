@@ -285,6 +285,10 @@ function getNameOfID(encodedID, users, items) {
         return "FBID:   " + user.fbid + '           User: ' + user.fullName
     } else if (indicator == 'i') {
         var item = getItem(id, items);
+        if (item == null) {
+            console.log('Item is null error');
+            return "";
+        }
         return "ItemID: " + item._id + "   Item: " + item.title
     }
 }
