@@ -3,7 +3,7 @@ var express = require('express')
 var app = express()
 var https = require('https')
 var fs = require('fs')
-const SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES = 3;
+
 var json = require('express-json')
 var bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({
@@ -11,7 +11,8 @@ app.use(bodyParser.urlencoded({
 }));
 
 const suggestionsModule = require('./cytoCode');
-
+const lotteryModule = require('./lottery');
+const databaseModule = require('./server');
 
 // SHOULD GET THIS TO WORK
 // var sharp = require("sharp");
@@ -55,48 +56,11 @@ module.exports = {
 var helmet = require("helmet")
 app.use(helmet())
 
-var fs = require('fs'); // add for file system
-// app.get('/',function(req,res){
-// fs.readFile('index.html',function (err, data){
-//     res.writeHead(200, {'Content-Type': 'text/html','Content-Length':data.length});
-//     res.write(data);
-//     res.end();
-// });
-
-// });
+var fs = require('fs'); 
 
 
-//Check if lotteries should be performed
-function checkIfServerShouldPerformLottery() {
-    // do whatever you like here
-    // console.log('Checking if lottery should be performed')
-    checkLotteries();
-    setTimeout(checkIfServerShouldPerformLottery, SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES * 1000);
-}
 
-function sendEmailToAddress(email, subjectText, contentText) {
-    var helper = require('sendgrid').mail;
-    from_email = new helper.Email("info@lottodeal.com");
-    to_email = new helper.Email(email);
-    subject = subjectText;
-    content = new helper.Content("text/plain", contentText);
-    mail = new helper.Mail(from_email, subject, to_email, content);
 
-    var sg = require('sendgrid')('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');
-    var request = sg.emptyRequest({
-        method: 'POST',
-        path: '/v3/mail/send',
-        body: mail.toJSON()
-    });
-
-    sg.API(request, function(error, response) {
-        console.log(response.statusCode);
-        console.log(response.body);
-        console.log(response.headers);
-    })
-}
-
-//app.use(express.bodyParser());
 
 var options = {
     key: fs.readFileSync('server.key'),
@@ -209,7 +173,7 @@ function validateAccessToken(accessToken, response, request, callback) {
         var userID = body.id;
 
         if (error != null || userID == null) {
-            console.log('Error in get suggestions is not null or userID is null: ' + error);
+            console.log('Error in validating accessToken. Error is not null or userID is null: ' + error);
             send404(response, request);
         } else {
             callback(userID);
@@ -292,7 +256,6 @@ app.get('/markRead', function(request, response) {
         }
     });
 })
-
 
 app.get('/getAccount', function(request, response) {
 
@@ -500,24 +463,6 @@ var cpUpload = upload.fields([{
     }]) // SHOULDNT LONG DESCRIPTION AND SHORT DESCRIPTION BE ADDED INTO THIS
 app.post('/createPost', cpUpload, function(req, res, next) {
 
-    // console.log('test');
-    // console.log(req.body);
-    // console.log('test');
-    // req.files is an object (String -> Array) where fieldname is the key, and the value is array of files
-    //
-    // e.g.
-    //  req.files['avatar'][0] -> File
-    //  req.files['gallery'] -> Array
-    //
-    // req.body will contain the text fields, if there were any
-    // console.log(req)
-    // console.log(req.files)
-    // console.log(req.body)
-    // img: {data: Buffer, // stores an image here
-    //         contentType: String},
-    // image
-
-    // console.log(req.files['picture'][0])
     // CHECK FOR SIZE OF IMAGE
     var imgSize = req.files['picture'][0].size;
     if (imgSize > maxSize) {
@@ -679,19 +624,6 @@ app.post('/updateSettings', function(request, response) {
 
 })
 
-// A user has bid on an item, add this bid to database
-// app.post('/addBid', function(request, response) {
-//     // get into database, access object, update it's bid field and add to user bids
-
-//     var itemID = request.body.itemID;
-//     var userID = request.body.userID;
-//     var newAmount = request.body.newAmount;
-
-//     addBidForItem(itemID, userID, newAmount);
-//     addNotificationToUser(userID, "New Bid", "You just bid " + newAmount + " dollar(s)");
-
-//     response.send("Bid added")
-// })
 
 // Send back all posts
 app.get('/getPosts', function(request, response) {
@@ -919,55 +851,6 @@ app.get('/getImagesForNotifications', function(request, response) {
 
 
 
-// app.get('/getImage', function(request, response) {
-//     var itemID = request.query["itemID"];
-
-//     findImageByID(itemID, function(buffer) {
-//         if (buffer != null) {
-//             response.send(buffer);
-//         } else {
-//             response.send("Error");
-//         }
-//     }, function() {
-//         response.status(404);
-
-//         // respond with html page
-//         if (request.accepts('html')) {
-//             // CAN DO RESPONSE.RENDER HERE
-//             response.sendFile(__dirname + "/views/404.html", {
-//                 url: request.url
-//             });
-//             return;
-//         }
-//         // respond with json
-//         if (request.accepts('json')) {
-//             response.send({
-//                 error: 'Not found'
-//             });
-//             return;
-//         }
-
-//         // default to plain-text. send()
-//         response.type('txt').send('Not found');
-//     });
-// })
-
-
-// Send back the bids on the passed in item parameter, in case user wants to
-// see the people that bid on his item
-// app.get('/getBids', function(request, response) {
-//     response.send("Here are all of the bids on this item")
-
-//     var title = request.body.title;
-//     var item = findItem(title);
-
-// })
-
-// Start the server at localhost:8000
-//app.listen(8000, function() {
-//   console.log("App is listening on port 8000")
-//})
-
 https.createServer(options, app).listen(8000, function() {
     console.log("Server started at port 8000");
 });
@@ -1060,7 +943,7 @@ mongoose.connect(url, function(err, db) {
         // console.log(images)
     })
 
-    checkIfServerShouldPerformLottery();
+    lotteryModule.checkIfServerShouldPerformLottery();
 });
 
 
@@ -1407,37 +1290,6 @@ var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
     });
 }
 
-
-//Check database for if lotteries should be performed
-var checkLotteries = function() {
-    Item.find({}, function(err, items) {
-        if (err) throw err;
-
-        for (i = 0; i < items.length; i++) {
-            var item = items[i]
-            if (item.expired || item.sold) {
-                continue;
-            }
-            var expirDate = new Date(item.expirationDate)
-            if (item.amountRaised >= item.price) {
-                var winner = performLottery(item);
-                console.log('Item sold to ' + winner)
-                emailBiddersForItem(item, "LottoDeal: You lost!", "Sorry, you lost your bid for " + item.title + ". Bid again on LottoDeal!", winner)
-            } else if (expirDate < Date.now()) {
-                //Refund and notify users
-                refundUsers(item);
-                console.log('Date has past - notifying users and marking item as expired');
-
-                emailBiddersForItem(item, "LottoDeal:" + item.title + " expired", "You have been fully refunded", "");
-                item.expired = true;
-                item.save();
-            } else {
-                // console.log('Item checked - no changes')
-            }
-        }
-    });
-}
-
 function refundUsers(item) {
     for (var j = 0; j < item.bids.length; j++) {
         console.log('attempting to refund user');
@@ -1457,22 +1309,6 @@ function refundUsers(item) {
                 }
             });
         }
-    }
-}
-
-//do not notify the winner
-function emailBiddersForItem(item, subject, message, winner) {
-    for (var j = 0; j < item.bids.length; j++) {
-        var bidderID = item.bids[j].ID;
-        if (bidderID == winner) {
-            continue;
-        }
-        findUser(bidderID, function(user) {
-            // SHOULD COMMENT THIS BACK IN
-            // sendEmailToAddress(user.email, subject, message);
-        }, function() {
-            send404(response, request);
-        });
     }
 }
 
@@ -1660,28 +1496,6 @@ var deleteUser = function(id, callback) {
             console.log('User not successfully deleted')
         }
     });
-
-
-    // User.remove({}, function(err) {
-    //     if (err) throw err;
-    //     console.log('All Uses successfully deleted!');
-    // });
-    // User.findById(id, function(err, user) {
-    //     // if (err) throw err;
-    //     if (err) console.log(err);
-    //     if (user != null) {
-    //         // delete
-    //         user.remove(function(err) {
-    //             // if (err) throw err;
-    //             if (err) console.log(err);
-    //             callback('User successfully deleted')
-    //             console.log('User successfully deleted');
-    //         });
-    //     } else {
-    //         callback('User not successfully deleted')
-    //         console.log('User not successfully deleted')
-    //     }
-    // });
 }
 
 
@@ -1812,6 +1626,7 @@ var findItemByID = function(id, callback, errorCallback) {
     });
 }
 
+
 var findAllItems = function(callback) {
     // get all the items
     Item.find({}, function(err, items) {
@@ -1919,3 +1734,18 @@ var deleteAllImages = function() {
     });
 
 }
+
+
+
+//START EXPORTS FOR DATABASE MODULE
+
+exports.findAllItems = function(callback) {
+    findAllItems(callback);
+}
+
+exports.findUser = function(fbid, callback, errorCallback) {
+    findUser(fbid, callback, errorCallback);
+}
+
+//END EXPORTS FOR DATABASE MODULE
+
