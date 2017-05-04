@@ -229,6 +229,46 @@ app.get('/getReviews', function(request, response) {
 // Check if a user is already registered in the database
 app.get('/checkIfUser', function(request, response) {
     var userID = request.query["userID"];
+
+
+    if (userID != undefined) {
+
+        User.find({fbid: userID}, function(err, user) {
+            if (user.length > 1) {
+                console.log('ERROR: multiple users with FBID')
+                response.status(404);
+
+                // respond with html page
+                if (request.accepts('html')) {
+                    // CAN DO RESPONSE.RENDER HERE
+                    response.sendFile(__dirname + "/views/404.html", {
+                        url: request.url
+                    });
+                    return;
+                }
+                // respond with json
+                if (request.accepts('json')) {
+                    response.send({
+                        error: 'Not found'
+                    });
+                    return;
+                }
+
+                // default to plain-text. send()
+                response.type('txt').send('Not found');
+
+            } 
+            else if (user.length == 1) { 
+                return true;
+            }
+            else {
+                return false;
+            }
+        });
+    }   
+
+
+
     if (userID != undefined) {
         findUser(userID, function(user) {
             if (user == null) {
