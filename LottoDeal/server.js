@@ -492,7 +492,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 
 
 
-    validateAccessToken(accessToken, response, request, function(sellerID) {
+    validateAccessToken(accessToken, res, req, function(sellerID) {
         var picture = req.files['picture'][0]
 
         // console.log("printing picture");
