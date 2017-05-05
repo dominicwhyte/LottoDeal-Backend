@@ -137,6 +137,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                     }
                 });
             } else {
+                console.log('Oops, you cannot bid on this item anymore!');
                 response.status(401);
                 response.type('txt').send('Error bidding on item');
                 return;
