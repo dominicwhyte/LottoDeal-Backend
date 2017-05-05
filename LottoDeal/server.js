@@ -81,25 +81,25 @@ app.use(function(req, res, next) {
 
 // A user has bid on an item, add this bid to database
 app.post('/createReview', function(request, response) {
-    // get into database, access object, update it's bid field and add to user bids
+        // get into database, access object, update it's bid field and add to user bids
 
-    var sellerID = request.body.sellerID;
-    var reviewerID = request.body.reviewerID;
-    var stars = request.body.stars;
-    var reviewDes = request.body.reviewDes;
-    var date = new Date();
+        var sellerID = request.body.sellerID;
+        var reviewerID = request.body.reviewerID;
+        var stars = request.body.stars;
+        var reviewDes = request.body.reviewDes;
+        var date = new Date();
 
-    console.log(date)
-    if (sellerID != reviewerID && reviewerID != undefined) {
+        console.log(date)
+        if (sellerID != reviewerID && reviewerID != undefined) {
 
-        createReview(sellerID, reviewerID, stars, reviewDes, date);
+            createReview(sellerID, reviewerID, stars, reviewDes, date);
 
-        response.send("review added!")
-    } else {
-        response.send("You can't review yourself!")
-    }
-})
-// Stripe Code---------------------------------------------------------
+            response.send("review added!")
+        } else {
+            response.send("You can't review yourself!")
+        }
+    })
+    // Stripe Code---------------------------------------------------------
 var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 
 // A user has bid on an item, add this bid to database
@@ -195,25 +195,25 @@ app.get('/getReviews', function(request, response) {
 
 // Check if a user is already registered in the database
 app.get('/checkIfUser', function(request, response) {
-    var userID = request.query["userID"];
-    if (userID != undefined) {
+    var accessToken = request.query["accessToken"];
+    validateAccessToken(accessToken, response, request, function(userID) {
+        if (userID != undefined) {
+            User.find({
+                fbid: userID
+            }, function(err, user) {
+                console.log(user.length + "lenght of users")
 
-        User.find({
-            fbid: userID
-        }, function(err, user) {
-            console.log(user.length + "lenght of users")
-
-            if (user.length > 1) {
-                console.log('ERROR: multiple users with FBID')
-            } else if (user.length == 1) {
-                response.send(true);
-            } else {
-                console.log("returning false")
-                response.send(false);
-            }
-        });
-    }
-
+                if (user.length > 1) {
+                    console.log('ERROR: multiple users with FBID')
+                } else if (user.length == 1) {
+                    response.send(true);
+                } else {
+                    console.log("returning false")
+                    response.send(false);
+                }
+            });
+        }
+    });
 })
 
 // mark all notifications read
@@ -269,7 +269,8 @@ app.get('/getSuggestions', function(request, response) {
             if (user != null) {
                 console.log("Returning suggestions for user");
                 suggestionsModule.computeSimilarities(userID, User, Item, function(suggestions) {
-                    response.send(JSON.stringify(suggestions));
+                    //trim the items to avoid sending back chargeIDs
+                    response.send(JSON.stringify(trimItems(suggestions)));
                 });
             } else {
                 console.log('Error: user is null in getAccount');
@@ -340,8 +341,8 @@ app.get('/getBiddedItemsofUsers', function(request, response) {
     var userID = request.query["userID"];
     getItemsForUsers(userID, function(items) {
         if (items != null) {
-            console.log("items you're bidding on = " + JSON.stringify(items));
-            response.send(JSON.stringify(items));
+            console.log("items you're bidding on = " + JSON.stringify(trimItems(items)));
+            response.send(JSON.stringify(trimItems(items)));
         } else {
             console.log('Error: items is null in getBiddedItemsofUsers');
         }
@@ -357,8 +358,8 @@ app.get('/getListedItemsForUsers', function(request, response) {
     getListedItemsForUsers(userID, function(items) {
         if (items != null) {
             console.log("fetching listed itemSchema")
-            console.log("selling items = " + JSON.stringify(items));
-            response.send(JSON.stringify(items));
+            console.log("selling items = " + JSON.stringify(trimItems(items)));
+            response.send(JSON.stringify(trimItems(items)));
         } else {
             console.log('Error: items is null in getListedItemsForUsers');
         }
@@ -377,7 +378,7 @@ app.get('/getSoldItemsForUsers', function(request, response) {
     getSoldItemsForUsers(userID, function(items) {
         console.log("fetching sold itemSchema")
         console.log("sold items = " + JSON.stringify(items));
-        response.send(JSON.stringify(items));
+        response.send(JSON.stringify(trimItems(items)));
     }, function() {
         send404(response, request);
     });
@@ -533,8 +534,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
                     expirationDate.setDate(date.getDate() + 7);
                 } else if (offset == 3) {
                     expirationDate.setDate(date.getDate() + 30);
-                }
-                else {
+                } else {
                     expirationDate.setSeconds(expirationDate.getSeconds() + 10);
                 }
                 var shortDescription = req.body.shortDescription;
@@ -1150,6 +1150,19 @@ var getBidsForUsers = function(userID, callback) {
     });
 }
 
+//Removes ChargeIDs from the item, to keep this information from leaving the server side
+function trimItems(items) {
+    var trimmedItems = []
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        for (var j = 0; j < item.bids; j++) {
+            var bid = item.bids[j];
+            bid.chargeIDs = null;
+        }
+        newItems.push(item);
+    }
+    return trimmedItems;
+}
 
 var getItemsForUsers = function(userID, callback) {
     User.find({
