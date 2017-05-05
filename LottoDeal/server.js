@@ -177,8 +177,6 @@ app.get('/getReviews', function(request, response) {
 
     var sellerID = request.query["sellerID"];
 
-
-
     findUser(sellerID, function(user) {
         if (user != null) {
             console.log("this is the user's reviews from User" + user.reviews)
@@ -243,17 +241,30 @@ app.get('/markRead', function(request, response) {
     });
 })
 
+//Get account, where account is the private account with all info of the logged in user
 app.get('/getAccount', function(request, response) {
+    var accessToken = request.query["accessToken"];
+    validateAccessToken(accessToken, response, request, function(userID) {
+        findUser(userID, function(user) {
+            if (user != null) {
+                console.log("this is the user's reviews" + user)
+                response.send(JSON.stringify(user));
+            } else {
+                console.log('Error: user is null in getAccount');
+            }
+        }, function() {
+            send404(response, request);
+        });
+    });
+})
 
-
+//Gets a public account for any FBID, with only public information returned
+app.get('/getPublicAccount', function(request, response) {
     var userID = request.query["userID"];
-
-    // suggestionsModule.computeSimilarities(userID, User, Item);
-
     findUser(userID, function(user) {
         if (user != null) {
-            console.log("this is the user's reviews" + user)
-            response.send(JSON.stringify(user));
+            console.log("this is the user's reviews" + trimUser(user));
+            response.send(JSON.stringify(trimUser(user)));
         } else {
             console.log('Error: user is null in getAccount');
         }
@@ -261,6 +272,7 @@ app.get('/getAccount', function(request, response) {
         send404(response, request);
     });
 })
+
 
 app.get('/getSuggestions', function(request, response) {
     var accessToken = request.query["accessToken"];
@@ -304,7 +316,6 @@ function send404(response, request) {
         });
         return;
     }
-
     // default to plain-text. send()
     response.type('txt').send('Not found');
 }
@@ -1166,6 +1177,21 @@ function trimItem(item) {
         bid.chargeIDs = null;
     }
 }
+
+function trimUsers(users) {
+    var trimmedUsers = []
+    for (var i = 0; i < users.length; i++) {
+        trimmedUsers.push(trimUser(users[i]));
+    }
+    return trimmedUsers;
+}
+
+function trimUser(user) {
+    user.userInfo = null;
+    user.notifications = null;
+    user.bids = null;
+}
+
 
 var getItemsForUsers = function(userID, callback) {
     User.find({
