@@ -474,10 +474,10 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var offset = req.body.expirDate;
     var shortDescription = req.body.shortDescription;
     var longDescription = req.body.longDescription;
-    var sellerID = req.body.userID;
+    var accessToken = request.body.accessToken;
 
 
-    if (title == null || price == null || offset == null || shortDescription == null || longDescription == null || sellerID == null) {
+    if (title == null || price == null || offset == null || shortDescription == null || longDescription == null || accessToken == null) {
         res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
         return;
     }
@@ -491,70 +491,76 @@ app.post('/createPost', cpUpload, function(req, res, next) {
         return;
     }
 
-    var picture = req.files['picture'][0]
-
-    // console.log("printing picture");
-    // console.log(picture);
-
-    if (picture.mimetype != "image/jpeg" && picture.mimetype != "image/png") {
-        res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
-        return;
-    }
 
 
+    validateAccessToken(accessToken, response, request, function(sellerID) {
+        var picture = req.files['picture'][0]
 
-    var imagePath = "./uploads/" + picture.filename;
-    var imageData = fs.readFileSync(imagePath);
-    var image = {}
-        // image["data"] = imageData
-    image["contentType"] = 'image/png';
+        // console.log("printing picture");
+        // console.log(picture);
 
-
-    // backend is done with the image now, so it can be deleted from uploads folder (since readfile was sync)
-    fs.unlink(imagePath, function(error) {
-        console.log("Removing created image from /uploads")
-        if (error != null) {
-            console.log(error);
+        if (picture.mimetype != "image/jpeg" && picture.mimetype != "image/png") {
+            res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
+            return;
         }
-    })
 
-    // create compressed version
-    Jimp.read(imageData, function(err, img) {
-        console.log(err);
-        img.scaleToFit(500, 500) // crop(100, 100, 300, 200) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
-            .write(imagePath + picture.filename + "compressed").getBase64(Jimp.AUTO, function(err, src) {
-                console.log(err);
-                // console.log(response);
-                // console.log(src);
-                // if (err != null) {
-                image["compressed"] = src;
-                // }
 
-                var title = req.body.title;
-                var price = req.body.price;
-                var offset = req.body.expirDate;
-                var expirationDate = new Date()
-                var date = new Date();
 
-                if (offset == 1) {
-                    expirationDate.setDate(date.getDate() + 1);
-                } else if (offset == 2) {
-                    expirationDate.setDate(date.getDate() + 7);
-                } else if (offset == 3) {
-                    expirationDate.setDate(date.getDate() + 30);
-                } else {
-                    expirationDate.setSeconds(expirationDate.getSeconds() + 10);
-                }
-                var shortDescription = req.body.shortDescription;
-                var longDescription = req.body.longDescription;
-                var sellerID = req.body.userID;
-                createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
-                    res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
-                }, function() {
-                    send404(res, req);
-                }, imageData);
-            })
-    })
+        var imagePath = "./uploads/" + picture.filename;
+        var imageData = fs.readFileSync(imagePath);
+        var image = {}
+            // image["data"] = imageData
+        image["contentType"] = 'image/png';
+
+
+        // backend is done with the image now, so it can be deleted from uploads folder (since readfile was sync)
+        fs.unlink(imagePath, function(error) {
+            console.log("Removing created image from /uploads")
+            if (error != null) {
+                console.log(error);
+            }
+        })
+
+        // create compressed version
+        Jimp.read(imageData, function(err, img) {
+            console.log(err);
+            img.scaleToFit(500, 500) // crop(100, 100, 300, 200) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
+                .write(imagePath + picture.filename + "compressed").getBase64(Jimp.AUTO, function(err, src) {
+                    console.log(err);
+                    // console.log(response);
+                    // console.log(src);
+                    // if (err != null) {
+                    image["compressed"] = src;
+                    // }
+
+                    var title = req.body.title;
+                    var price = req.body.price;
+                    var offset = req.body.expirDate;
+                    var expirationDate = new Date()
+                    var date = new Date();
+
+                    if (offset == 1) {
+                        expirationDate.setDate(date.getDate() + 1);
+                    } else if (offset == 2) {
+                        expirationDate.setDate(date.getDate() + 7);
+                    } else if (offset == 3) {
+                        expirationDate.setDate(date.getDate() + 30);
+                    } else {
+                        expirationDate.setSeconds(expirationDate.getSeconds() + 10);
+                    }
+                    var shortDescription = req.body.shortDescription;
+                    var longDescription = req.body.longDescription;
+                    var sellerID = req.body.userID;
+                    createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
+                        res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
+                    }, function() {
+                        send404(res, req);
+                    }, imageData);
+                })
+        })
+    });
+
+
 })
 
 
