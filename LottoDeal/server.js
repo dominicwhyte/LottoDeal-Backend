@@ -113,6 +113,10 @@ app.post('/performPaymentAndAddBid', function(request, response) {
         console.log('Payment performing for ' + amountToCharge + " USD")
 
         findItemByID(itemID, function(item) {
+            // isInt isn't working!
+
+            amountToCharge *= 1
+            // console.log(amountToCharge + 1)
             if (item != null && isInt(amountToCharge) && (!item.expired) && (!item.sold) && (item.amountRaised + amountToCharge <= item.price)) {
                 var token = request.body.stripeToken; // Using Express
                 // Charge the user's card:
