@@ -704,7 +704,7 @@ app.get('/getItem', function(request, response) {
                 console.log("printing item");
                 // console.log(item);
                 console.log(buffer);
-                response.send(JSON.stringify(item))
+                response.send(JSON.stringify(trimItem(item)));
             }, function() {
                 send404(response, request);
             })
@@ -1150,18 +1150,21 @@ var getBidsForUsers = function(userID, callback) {
     });
 }
 
-//Removes ChargeIDs from the item, to keep this information from leaving the server side
+//Removes ChargeIDs from the items, to keep this information from leaving the server side
 function trimItems(items) {
     var trimmedItems = []
     for (var i = 0; i < items.length; i++) {
-        var item = items[i];
-        for (var j = 0; j < item.bids; j++) {
-            var bid = item.bids[j];
-            bid.chargeIDs = null;
-        }
-        newItems.push(item);
+        trimmedItems.push(trimItem(items[i]));
     }
     return trimmedItems;
+}
+
+//Removes ChargeIDs from the item, to keep this information from leaving the server side
+function trimItem(item) {
+    for (var j = 0; j < item.bids; j++) {
+        var bid = item.bids[j];
+        bid.chargeIDs = null;
+    }
 }
 
 var getItemsForUsers = function(userID, callback) {
