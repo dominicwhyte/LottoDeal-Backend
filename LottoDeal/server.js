@@ -91,17 +91,19 @@ app.post('/createReview', function(request, response) {
         var date = new Date();
 
         console.log(date)
-        if (sellerID != reviewerID && reviewerID != undefined) {
-
+        if (accessToken != undefined) {
             // create Review
             validateAccessToken(accessToken, response, request, function(userID) {
-                if (userID != undefined) {
+                if (userID != undefined && sellerID != userID ) {
                     createReview(sellerID, userID, stars, reviewDes, date);
+                    response.send("review added!")
+                }
+                else {
+                    response.send("You can't review yourself!")
                 }
             });
-            response.send("review added!")
         } else {
-            response.send("You can't review yourself!")
+            response.send("Please logout and login before you review someone!")
         }
     })
     // Stripe Code---------------------------------------------------------
