@@ -113,7 +113,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
         console.log('Payment performing for ' + amountToCharge + " USD")
 
         findItemByID(itemID, function(item) {
-            if (item != null && (!item.expired) && (!item.sold) && (item.amountRaised + amountToCharge <= item.price)) {
+            if (item != null && Number.isInteger(amountToCharge) && (!item.expired) && (!item.sold) && (item.amountRaised + amountToCharge <= item.price)) {
                 var token = request.body.stripeToken; // Using Express
                 // Charge the user's card:
                 var charge = stripe.charges.create({
@@ -493,7 +493,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var accessToken = req.body.accessToken;
 
 
-    if (title == null || price == null || offset == null || shortDescription == null || longDescription == null || accessToken == null) {
+    if (title == null || price == null || !Number.isInteger(price) || offset == null || shortDescription == null || longDescription == null || accessToken == null) {
         res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
         return;
     }

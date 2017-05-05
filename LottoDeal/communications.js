@@ -2,7 +2,7 @@ const databaseModule = require('./server');
 const communicationsModule = require('./communications');
 
 //Email all bidders except the winner
-var emailBiddersForItem = function(item, subject, message, winner) {
+exports.emailBiddersForItem = function(item, subject, message, winner) {
     for (var j = 0; j < item.bids.length; j++) {
         var bidderID = item.bids[j].ID;
         if (bidderID == winner) {
