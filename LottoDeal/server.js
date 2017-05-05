@@ -106,6 +106,9 @@ app.post('/createReview', function(request, response) {
             response.send("Please logout and login before you review someone!")
         }
     })
+
+
+
     // Stripe Code---------------------------------------------------------
 var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 
@@ -933,9 +936,9 @@ mongoose.connect(url, function(err, db) {
 
     var postmark = require("postmark");
 
-    deleteAllUsers();
-    deleteAllItems();
-    deleteAllImages();
+    // deleteAllUsers();
+    // deleteAllItems();
+    // deleteAllImages();
 
     findAllUsers(function(users) {
         console.log(users)
