@@ -373,7 +373,7 @@ app.get('/verifyAccessToken', function(request, response) {
     });
 })
 
-app.get('/getBidsofUsers', function(request, response) {
+app.get('/getBidsOfUsers', function(request, response) {
     var userID = request.query["userID"];
     getBidsForUsers(userID, function(bids) {
         if (bids != null) {
@@ -387,7 +387,7 @@ app.get('/getBidsofUsers', function(request, response) {
 })
 
 
-app.get('/getBiddedItemsofUsers', function(request, response) {
+app.get('/getBiddedItemsOfUsers', function(request, response) {
     var accessToken = request.query["accessToken"];
     validateAccessToken(accessToken, response, request, function(userID) {
         getItemsForUsers(userID, function(items) {
