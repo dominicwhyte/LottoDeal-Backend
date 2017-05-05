@@ -880,71 +880,18 @@ mongoose.Promise = global.Promise;
 
 mongoose.connect(url, function(err, db) {
     assert.equal(null, err);
-
+    console.log("Connected successfully to server");
 
     var postmark = require("postmark");
-
-    // // Example request
-    //     var client = new postmark.Client("27c10544-6caa-46b9-8640-67b000036be3");
-
-    //     client.sendEmail({
-    //         "From": "dwhyte@princeton.edu",
-    //         "To": "whyte42@gmail.com",
-    //         "Subject": "Test", 
-    //         "TextBody": "Hello from Postmark!"
-    //     });
-
-
 
     // deleteAllUsers();
     // deleteAllItems();
     // deleteAllImages();
 
-
-    //findAllUsers();
-    console.log("Connected successfully to server");
-
-    // deleteItem('590267c9be88c312ba3d5d8a', function(result) {
-    //     console.log(result);
-    //     console.log('deleted');
-    // });
-
-    //addBidForItem("58efe4435363382e3d61137a", "58e8054642a9960421d3a566", 3);
-    // var date = new Date();
-
     findAllUsers(function(users) {
         console.log(users)
-            // if (users.length != 0) {
-            //     console.log('Computing similarity for: ' + users[0].fullName);
-            //     suggestionsModule.computeSimilarities(users[0].fbid, User, Item); 
-            // }
     });
-
-    // User.find({fbid: 1467343223328608}, function(err, user) {
-    //     if (err) throw err;
-    //     // object of all the users
-
-    //     data = {
-    //         userID : "Dom",
-    //         stars : 100,
-    //         reviewDes : "supaa good",
-    //     };
-    //     user[0].reviews.push(data);
-    //     user[0].save();
-    // });
-
-    findAllItems(function(items) {
-        // console.log(items);
-        //console.log('initiating refunds');
-        // for (var i = 0; i < items.length; i++) {
-        //     refundUsers(items[i]);
-        // }
-    });
-
-    findAllImages(function(images) {
-        // console.log(images)
-    })
-
+    //Begin checking if lotteries should be performed
     lotteryModule.checkIfServerShouldPerformLottery();
 });
 
