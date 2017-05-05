@@ -72,11 +72,10 @@ var performLottery = function(item) {
     item.winnerID = winner;
 
     console.log('the winner is:' + winner);
+
     databaseModule.findUser(winner, function(user) {
-        if (user != null && user.length != 0) {
-            // get the user name
-            console.log('test');
-            item.winnerName = user[0].fullName;
+        if (user != null) {
+            item.winnerName = user.fullName;
             item.save();
             return winner;
         } else {

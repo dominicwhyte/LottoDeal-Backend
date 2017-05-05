@@ -328,6 +328,7 @@ app.get('/getNotifications', function(request, response) {
     });
 })
 
+//Verifies an access token and returns the userID associated to it
 app.get('/verifyAccessToken', function(request, response) {
     var accessToken = request.query["accessToken"];
     validateAccessToken(accessToken, response, request, function(userID) {
@@ -1178,6 +1179,7 @@ function trimItem(item) {
         var bid = item.bids[j];
         bid.chargeIDs = null;
     }
+    return item;
 }
 
 function trimUsers(users) {
@@ -1192,6 +1194,7 @@ function trimUser(user) {
     user.userInfo = null;
     user.notifications = null;
     user.bids = null;
+    return user;
 }
 
 
