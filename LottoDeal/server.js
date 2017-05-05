@@ -85,7 +85,7 @@ app.post('/createReview', function(request, response) {
         // get into database, access object, update it's bid field and add to user bids
 
         var sellerID = request.body.sellerID;
-        var reviewerID = request.body.reviewerID;
+        var accessToken = request.body.accessToken;
         var stars = request.body.stars;
         var reviewDes = request.body.reviewDes;
         var date = new Date();
@@ -93,8 +93,12 @@ app.post('/createReview', function(request, response) {
         console.log(date)
         if (sellerID != reviewerID && reviewerID != undefined) {
 
-            createReview(sellerID, reviewerID, stars, reviewDes, date);
-
+            // create Review
+            validateAccessToken(accessToken, response, request, function(userID) {
+                if (userID != undefined) {
+                    createReview(sellerID, userID, stars, reviewDes, date);
+                }
+            });
             response.send("review added!")
         } else {
             response.send("You can't review yourself!")
@@ -927,9 +931,9 @@ mongoose.connect(url, function(err, db) {
 
     var postmark = require("postmark");
 
-    // deleteAllUsers();
-    // deleteAllItems();
-    // deleteAllImages();
+    deleteAllUsers();
+    deleteAllItems();
+    deleteAllImages();
 
     findAllUsers(function(users) {
         console.log(users)
