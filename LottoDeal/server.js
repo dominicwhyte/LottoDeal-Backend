@@ -77,12 +77,6 @@ app.use(function(req, res, next) {
     } else {
         res.send("Oops! You can't access our API")
     }
-    // res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
-    // res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, DELETE');
-    // res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    // res.header('Access-Control-Allow-Credentials', true);
-    // return next();
-
 });
 
 // A user has bid on an item, add this bid to database
@@ -105,7 +99,6 @@ app.post('/createReview', function(request, response) {
         response.send("You can't review yourself!")
     }
 })
-
 // Stripe Code---------------------------------------------------------
 var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 
@@ -142,9 +135,6 @@ app.post('/performPaymentAndAddBid', function(request, response) {
             }
         });
     });
-
-
-
 })
 
 
@@ -178,8 +168,6 @@ function validateAccessToken(accessToken, response, request, callback) {
         }
     });
 }
-
-
 
 //END USER AUTHENTICATION CODE
 
@@ -543,8 +531,11 @@ app.post('/createPost', cpUpload, function(req, res, next) {
                     expirationDate.setDate(date.getDate() + 1);
                 } else if (offset == 2) {
                     expirationDate.setDate(date.getDate() + 7);
-                } else {
+                } else if (offset == 3) {
                     expirationDate.setDate(date.getDate() + 30);
+                }
+                else {
+                    expirationDate.setSeconds(expirationDate.getSeconds() + 10);
                 }
                 var shortDescription = req.body.shortDescription;
                 var longDescription = req.body.longDescription;
@@ -834,8 +825,6 @@ app.get('/getImagesForNotifications', function(request, response) {
                     }
                 }
             }
-
-
             response.send(JSON.stringify(imagesCompressed));
 
         }, function() {
@@ -1096,9 +1085,7 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
                 createImage(newItem["_id"], buffer);
 
                 callback(newItem["_id"])
-                    // console.log(newItem);
             });
-
             newItem.save(function(err) {
                 if (err) throw err;
 
@@ -1107,8 +1094,6 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
         } else {
             console.log('Item saved unsuccessfully');
         }
-
-
     }, function() {
         send404(response, request);
     });
@@ -1131,7 +1116,6 @@ var addNotificationToUser = function(itemID, userID, titleText, descriptionText,
                 title: titleText,
                 description: descriptionText
             };
-
             user[0].notifications.push(data);
             user[0].save();
         }
@@ -1149,7 +1133,6 @@ var getNotificationsForUsers = function(userID, callback) {
             callback(null);
             console.log('Error: no users');
         }
-
     });
 }
 
@@ -1164,13 +1147,11 @@ var getBidsForUsers = function(userID, callback) {
             console.log('Error: no users');
             callback(null);
         }
-
     });
 }
 
 
 var getItemsForUsers = function(userID, callback) {
-
     User.find({
         fbid: userID
     }, function(err, user) {
@@ -1180,7 +1161,6 @@ var getItemsForUsers = function(userID, callback) {
             for (var i = 0; i < bids.length; i++) {
                 itemIDs.push(bids[i].itemID);
             }
-
             Item.find({
                 '_id': itemIDs
             }, function(err, items) {
@@ -1190,12 +1170,8 @@ var getItemsForUsers = function(userID, callback) {
         } else {
             console.log('Error: user array is empty');
             callback(null);
-
         }
-
-
     });
-
 }
 
 
@@ -1228,16 +1204,13 @@ var getSoldItemsForUsers = function(userID, callback, errorCallback) {
 
 app.get('/getReviewerImagesandNames', function(request, response) {
     var userID = request.query["userID"];
-
     var reviewersID = []
-
     findUser(userID, function(user) {
         if (user != null) {
             var reviews = user.reviews;
             for (var i = 0; i < reviews.length; i++) {
                 reviewersID.push(reviews[i].userID);
             }
-
             console.log("Here are all the reviewersID IDs" + reviewersID);
             User.find({
                 fbid: reviewersID
@@ -1258,12 +1231,10 @@ app.get('/getReviewerImagesandNames', function(request, response) {
         } else {
             console.log('User is null in getReviewerImagesandNames');
         }
-
     }, function() {
         send404(response, request);
     });
 });
-
 
 var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
     User.find({
@@ -1284,21 +1255,10 @@ var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
         } else {
             console.log('Error: user is null in create review');
         }
-
-
     }, function() {
         send404(response, request);
     });
 }
-
-
-
-
-// A.findById(a, function (err, doc) {
-//   if (err) return next(err);
-//   res.contentType(doc.img.contentType);
-//   res.send(doc.img.data);
-//   // how to send it back to the sever from my computer
 
 var addBidForItem = function(itemID, userID, newAmount, chargeID) {
     // get a item with ID and update the userID array
@@ -1509,22 +1469,18 @@ var findAllUsers = function(callback) {
 
 var deleteAllUsers = function() {
     // get all the users
-
     User.remove({}, function(err) {
         if (err) throw err;
         console.log('All Uses successfully deleted!');
     });
-
 }
 
 var deleteAllItems = function() {
     // get all the users
-
     Item.remove({}, function(err) {
         if (err) throw err;
         console.log('All Items successfully deleted!');
     });
-
 }
 
 
@@ -1538,13 +1494,7 @@ var findItemByID = function(id, callback, errorCallback) {
             errorCallback();
             return;
         }
-        // object of all the users
-        console.log(item);
-
-
-
         callback(item)
-            // return item;
     });
 }
 
@@ -1553,7 +1503,6 @@ var findAllItems = function(callback) {
     // get all the items
     Item.find({}, function(err, items) {
         if (err) throw err;
-        //console.log(items);
         callback(items)
     });
 
@@ -1573,9 +1522,6 @@ var editItem = function(title, price, expirationDate, shortDescription, longDesc
             console.log('Item updated successfully');
         });
     });
-    // call the built-in save method to save to the database
-    // newItem.img.data = fs.readFileSync(image);
-    // newItem.img.contentType = 'image/png';    
 }
 
 
@@ -1644,8 +1590,6 @@ var deleteAllImages = function() {
     });
 
 }
-
-
 
 //START EXPORTS FOR DATABASE MODULE
 
