@@ -1217,7 +1217,7 @@ var getSoldItemsForUsers = function(userID, callback, errorCallback) {
     });
 }
 
-app.get('/getReviewerImagesandNames', function(request, response) {
+app.get('/getReviewerImagesAndNames', function(request, response) {
     var userID = request.query["userID"];
     var reviewersID = []
     findUser(userID, function(user) {
