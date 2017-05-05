@@ -554,7 +554,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
                 createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
                     res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
                 }, function() {
-                    send404(response, request);
+                    send404(res, req);
                 }, imageData);
             })
     })
@@ -981,6 +981,9 @@ var userSchema = new Schema({
 
 var User = mongoose.model('User', userSchema);
 
+exports.Item = Item;
+exports.User = User;
+
 // create a schema
 var itemSchema = new Schema({
     title: String, // title of the item being sold (String)
@@ -1288,84 +1291,6 @@ var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
     });
 }
 
-function refundUsers(item) {
-    for (var j = 0; j < item.bids.length; j++) {
-        console.log('attempting to refund user');
-        var bid = item.bids[j];
-        for (var i = 0; i < bid.chargeIDs.length; i++) {
-            console.log('attempt refund for charge ID');
-            var chargeID = bid.chargeIDs[i];
-            var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
-
-            stripe.refunds.create({
-                charge: chargeID,
-            }, function(err, refund) {
-                if (refund != null) {
-                    console.log(refund.amount + " cents refunded successfully");
-                } else {
-                    console.log('Refund failed')
-                }
-            });
-        }
-    }
-}
-
-//Shuffle array - modified from http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-var shuffleArray = function(array) {
-    for (var i = array.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-    }
-    return array;
-}
-
-//returns the userID of the winner
-var performLottery = function(item) {
-    var bids = item.bids;
-    //Shuffle to ensure no bias (extra precaution)
-    var shuffledBids = shuffleArray(bids);
-    var randomNum = Math.random();
-    var num = 0.0;
-    var winner = "";
-    for (var j = 0; j < shuffledBids.length; j++) {
-        var bidderID = shuffledBids[j].ID;
-        var bidderAmount = shuffledBids[j].amount;
-        num += bidderAmount / item.price;
-        if (randomNum < num) {
-            winner = bidderID;
-            break;
-        }
-    }
-    if (winner == "") {
-        console.log('No winner - defaulting to first bidder in random array')
-        if (bids.length != 0) {
-            winner = shuffledBids[0].bidderID
-        }
-    }
-    item.sold = true;
-    item.winnerID = winner;
-    User.find({
-        fbid: winner
-    }, function(err, user) {
-        // if (err) throw err;
-        console.log(user);
-        if (err) console.log(err);
-        if (user != null) {
-            // get the user name
-            item.winnerName = user[0].fullName;
-            item.save();
-            return winner;
-        } else {
-            console.log('User not successfully found')
-            return null;
-        }
-    });
-
-    // item.save();
-    // return winner;
-}
 
 
 
@@ -1564,7 +1489,7 @@ var findUser = function(fbid, callback, errorCallback) {
             console.log(user[0]);
             callback(user[0]);
         } else {
-            console.log('returning null');
+            console.log('returning null when searching for: ' + fbid);
             // SHOULD REALLY TRY AND FIX THIS! - make sure this doesn't crash anything else
             // MAYBE NOT THE BEST IMPLEMENTATION? should it always return null?
             errorCallback();

@@ -31,7 +31,7 @@ var checkLotteries = function() {
                 communicationsModule.emailBiddersForItem(item, "LottoDeal: You lost!", "Sorry, you lost your bid for " + item.title + ". Bid again on LottoDeal!", winner);
             } else if (expirDate < Date.now()) {
                 //Refund and notify users
-                //refundUsers(item);
+                refundUsers(item);
                 console.log('Date has past - notifying users and marking item as expired');
 
                 communicationsModule.emailBiddersForItem(item, "LottoDeal:" + item.title + " expired", "You have been fully refunded", "");
