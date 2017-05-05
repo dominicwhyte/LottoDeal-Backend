@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({
 const suggestionsModule = require('./cytoCode');
 const lotteryModule = require('./lottery');
 const databaseModule = require('./server');
+const communicationsModule = require('./communications');
 
 // SHOULD GET THIS TO WORK
 // var sharp = require("sharp");
@@ -128,7 +129,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                 var itemID = request.body.itemID;
                 var date = new Date();
                 addBidForItem(itemID, userID, amountToCharge, charge.id);
-                addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
+                communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
                 response.send("charge is" + charge.amount)
             } else {
                 console.log('Error: charge is null in performPaymentAndAddBid');
@@ -549,7 +550,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
                     } else if (offset == 3) {
                         expirationDate.setDate(date.getDate() + 30);
                     } else {
-                        expirationDate.setSeconds(expirationDate.getSeconds() + 10);
+                        expirationDate.setSeconds(expirationDate.getSeconds() + 30);
                     }
                     var shortDescription = req.body.shortDescription;
                     var longDescription = req.body.longDescription;
@@ -1110,29 +1111,6 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
         }
     }, function() {
         send404(response, request);
-    });
-}
-
-
-var addNotificationToUser = function(itemID, userID, titleText, descriptionText, date) {
-    User.find({
-        fbid: userID
-    }, function(err, user) {
-        if (user.length != 1) {
-            console.log('ERROR: multiple users with FBID')
-        } else {
-            if (err) throw err;
-            var data = {
-
-                itemID: itemID,
-                datePosted: date,
-                read: false,
-                title: titleText,
-                description: descriptionText
-            };
-            user[0].notifications.push(data);
-            user[0].save();
-        }
     });
 }
 

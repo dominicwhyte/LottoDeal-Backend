@@ -33,8 +33,8 @@ var checkLotteries = function() {
                 //Refund and notify users
                 refundUsers(item);
                 console.log('Date has past - notifying users and marking item as expired');
-
-                communicationsModule.emailBiddersForItem(item, "LottoDeal:" + item.title + " expired", "You have been fully refunded", "");
+                var date = new Date();
+                communicationsModule.communicateToLosers(item, "LottoDeal:" + item.title + " expired", "You have been fully refunded", date, "");
                 item.expired = true;
                 item.save();
             } else {

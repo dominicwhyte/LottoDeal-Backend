@@ -1,7 +1,8 @@
 const databaseModule = require('./server');
+const communicationsModule = require('./communications');
 
 //Email all bidders except the winner
-exports.emailBiddersForItem = function(item, subject, message, winner) {
+var emailBiddersForItem = function(item, subject, message, winner) {
     for (var j = 0; j < item.bids.length; j++) {
         var bidderID = item.bids[j].ID;
         if (bidderID == winner) {
@@ -10,6 +11,24 @@ exports.emailBiddersForItem = function(item, subject, message, winner) {
         console.log('searching for user' + bidderID);
         databaseModule.findUser(bidderID, function(user) {
             sendEmailToAddress(user.email, subject, message);
+        }, function() {
+            console.log('Error in emailBiddersForItem');
+            // send404(response, request);
+        });
+    }
+}
+
+//Email and add notifications to all bidders, except the winner
+exports.communicateToLosers = function(item, subject, message, date, winner) {
+    for (var j = 0; j < item.bids.length; j++) {
+        var bidderID = item.bids[j].ID;
+        if (bidderID == winner) {
+            continue;
+        }
+        console.log('searching for user' + bidderID);
+        databaseModule.findUser(bidderID, function(user) {
+            sendEmailToAddress(user.email, subject, message);
+            communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date);
         }, function() {
             console.log('Error in emailBiddersForItem');
             // send404(response, request);
@@ -39,4 +58,20 @@ function sendEmailToAddress(email, subjectText, contentText) {
         console.log(response.body);
         console.log(response.headers);
     })
+}
+
+exports.addNotificationToUser = function(itemID, userID, titleText, descriptionText, date) {
+    databaseModule.findUser(userID, function(user) {
+        var data = {
+                itemID: itemID,
+                datePosted: date,
+                read: false,
+                title: titleText,
+                description: descriptionText
+            };
+            user.notifications.push(data);
+            user.save();
+    }, function() {
+        console.log('Error in addNotificationToUser');
+    });
 }
