@@ -549,7 +549,6 @@ app.post('/createPost', cpUpload, function(req, res, next) {
                     }
                     var shortDescription = req.body.shortDescription;
                     var longDescription = req.body.longDescription;
-                    var sellerID = req.body.userID;
                     createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
                         res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
                     }, function() {
