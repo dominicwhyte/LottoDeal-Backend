@@ -113,7 +113,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
         console.log('Payment performing for ' + amountToCharge + " USD")
 
         findItemByID(itemID, function(item) {
-            if (item != null && (item.amountRaised + amountToCharge <= item.price)) {
+            if (item != null && (!item.expired) && (!item.sold) && (item.amountRaised + amountToCharge <= item.price)) {
                 var token = request.body.stripeToken; // Using Express
                 // Charge the user's card:
                 var charge = stripe.charges.create({
