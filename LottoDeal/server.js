@@ -113,7 +113,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
         console.log('Payment performing for ' + amountToCharge + " USD")
 
         findItemByID(itemID, function(item) {
-            if (item != null && Number.isInteger(amountToCharge) && (!item.expired) && (!item.sold) && (item.amountRaised + amountToCharge <= item.price)) {
+            if (item != null && !isInt(amountToCharge) && (!item.expired) && (!item.sold) && (item.amountRaised + amountToCharge <= item.price)) {
                 var token = request.body.stripeToken; // Using Express
                 // Charge the user's card:
                 var charge = stripe.charges.create({
@@ -492,8 +492,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var longDescription = req.body.longDescription;
     var accessToken = req.body.accessToken;
 
-
-    if (title == null || price == null || !Number.isInteger(price) || offset == null || shortDescription == null || longDescription == null || accessToken == null) {
+    if (title == null || price == null || !isInt(price) || offset == null || shortDescription == null || longDescription == null || accessToken == null) {
         res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
         return;
     }
@@ -577,6 +576,15 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 
 
 })
+
+//modified from http://stackoverflow.com/questions/14636536/how-to-check-if-a-variable-is-an-integer-in-javascript
+function isInt(value) {
+  if (isNaN(value)) {
+    return false;
+  }
+  var x = parseFloat(value);
+  return (x | 0) === x;
+}
 
 
 // Will add a new user to our database
@@ -842,7 +850,6 @@ app.get('/getImagesForNotifications', function(request, response) {
     if (itemIDs != undefined) {
 
         Item.find({}, function(err, items) {
-            console.log("here are all your images" + items)
             var imagesCompressed = [];
             for (var i = 0; i < itemIDs.length; i++) {
                 var id = itemIDs[i];
