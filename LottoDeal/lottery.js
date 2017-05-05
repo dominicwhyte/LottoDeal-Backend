@@ -8,7 +8,7 @@ const SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES = 3;
 
 //Check if lotteries should be performed
 exports.checkIfServerShouldPerformLottery = function() {
-    // console.log('checking lottery');
+    console.log('checking lottery');
     // do whatever you like here
     // console.log('Checking if lottery should be performed')
     checkLotteries();
@@ -46,6 +46,7 @@ var checkLotteries = function() {
 
 //returns the userID of the winner
 var performLottery = function(item) {
+    console.log("Performing lottery");
     var bids = item.bids;
     //Shuffle to ensure no bias (extra precaution)
     var shuffledBids = shuffleArray(bids);
@@ -70,10 +71,11 @@ var performLottery = function(item) {
     item.sold = true;
     item.winnerID = winner;
 
-
+    console.log('the winner is:' + winner);
     databaseModule.findUser(winner, function(user) {
-        if (user != null) {
+        if (user != null && user.length != 0) {
             // get the user name
+            console.log('test');
             item.winnerName = user[0].fullName;
             item.save();
             return winner;

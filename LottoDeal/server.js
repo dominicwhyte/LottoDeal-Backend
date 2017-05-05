@@ -147,7 +147,6 @@ var httprequest = require("request");
 //Validates an access token. Provide response and request in case a 404 
 //error should be thrown
 function validateAccessToken(accessToken, response, request, callback) {
-    console.log('Validating access Token: ' + accessToken);
     httprequest({
         uri: "https://graph.facebook.com/me?access_token=" + accessToken,
         method: "GET",
@@ -155,8 +154,6 @@ function validateAccessToken(accessToken, response, request, callback) {
         followRedirect: true,
         maxRedirects: 10
     }, function(error, validateResponse, body) {
-        console.log('accessToken response: ' + validateResponse);
-        console.log('accessToken body: ' + body);
         body = JSON.parse(body);
         var userID = body.id;
 
@@ -199,8 +196,6 @@ app.get('/checkIfUser', function(request, response) {
             User.find({
                 fbid: userID
             }, function(err, user) {
-                console.log(user.length + "lenght of users")
-
                 if (user.length > 1) {
                     console.log('ERROR: multiple users with FBID')
                 } else if (user.length == 1) {
@@ -295,7 +290,6 @@ app.get('/getSuggestions', function(request, response) {
     })
 })
 
-
 //Send 404 ERROR
 function send404(response, request) {
     console.log('Sending 404');
@@ -331,6 +325,15 @@ app.get('/getNotifications', function(request, response) {
                 console.log('Error: notifications is null in getNotifications');
             }
         });
+    });
+})
+
+app.get('/verifyAccessToken', function(request, response) {
+    var accessToken = request.query["accessToken"];
+    validateAccessToken(accessToken, response, request, function(userID) {
+        if (userID != null) {
+            response.send(userID);
+        }
     });
 })
 
@@ -481,7 +484,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
         return;
     }
 
-    if (title.length > 100 || price > 1000000000 || (offset < 0 || offset > 3) || shortDescription.length > 200 || longDescription.length > 2000) {
+    if (title.length > 100 || price > 1000000000 || (offset < 0 || offset > 4) || shortDescription.length > 200 || longDescription.length > 2000) {
         res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
         return;
     }
