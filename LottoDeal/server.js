@@ -197,6 +197,26 @@ app.get('/getReviews', function(request, response) {
     });
 })
 
+// get the reviews on the item page based on the seller of the item
+app.get('/getReviewsOfSeller', function(request, response) {
+
+    var itemID = request.query["itemID"];
+
+    findItemByID(sellerID, function(item) {
+        if (user != null) {
+            findUser(item.sellerID, function(user){
+                response.send(JSON.stringify(user.reviews));
+
+            }, function () {
+                send404(response, request);
+            });
+        } else {
+            console.log('Error: user is null in getReviews');
+        }
+    }, function() {
+        send404(response, request);
+    });
+})
 
 
 // Check if a user is already registered in the database
