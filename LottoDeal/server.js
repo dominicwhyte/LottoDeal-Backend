@@ -106,34 +106,43 @@ var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 // A user has bid on an item, add this bid to database
 app.post('/performPaymentAndAddBid', function(request, response) {
     var accessToken = request.body["accessToken"];
+    var itemID = request.body.itemID;
+    var amountToCharge = request.body.amount; //Check that this is numerical
     validateAccessToken(accessToken, response, request, function(userID) {
         // get into database, access object, update it's bid field and add to user bids
-        var amountToCharge = request.body.amount;
         console.log('Payment performing for ' + amountToCharge + " USD")
 
-        var token = request.body.stripeToken; // Using Express
-        // Charge the user's card:
-        var charge = stripe.charges.create({
-            amount: amountToCharge * 100, //in cents
-            currency: "usd",
-            description: "Charge for LottoDeal " + request.body.itemTitle,
-            source: token,
-        }, function(err, charge) {
+        findItemByID(itemID, function(item) {
+            if (item != null && (item.amountRaised + amountToCharge <= item.price)) {
+                var token = request.body.stripeToken; // Using Express
+                // Charge the user's card:
+                var charge = stripe.charges.create({
+                    amount: amountToCharge * 100, //in cents
+                    currency: "usd",
+                    description: "Charge for LottoDeal " + request.body.itemTitle,
+                    source: token,
+                }, function(err, charge) {
+                    dollarAmount = (charge.amount / 100);
 
-            dollarAmount = (charge.amount / 100);
-
-            if (err != null) {
-                console.log(err);
-            }
-            if (charge != null) {
-                var itemID = request.body.itemID;
-                var date = new Date();
-                addBidForItem(itemID, userID, amountToCharge, charge.id);
-                communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
-                response.send("charge is" + charge.amount)
+                    if (err != null) {
+                        console.log(err);
+                    }
+                    if (charge != null) {
+                        var date = new Date();
+                        addBidForItem(itemID, userID, amountToCharge, charge.id);
+                        communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
+                        response.send("charge is" + charge.amount)
+                    } else {
+                        console.log('Error: charge is null in performPaymentAndAddBid');
+                    }
+                });
             } else {
-                console.log('Error: charge is null in performPaymentAndAddBid');
+                response.status(401);
+                response.type('txt').send('Error bidding on item');
+                return;
             }
+        }, function() {
+            send404(response, request);
         });
     });
 })
@@ -354,14 +363,16 @@ app.get('/getBidsofUsers', function(request, response) {
 
 
 app.get('/getBiddedItemsofUsers', function(request, response) {
-    var userID = request.query["userID"];
-    getItemsForUsers(userID, function(items) {
-        if (items != null) {
-            console.log("items you're bidding on = " + JSON.stringify(trimItems(items)));
-            response.send(JSON.stringify(trimItems(items)));
-        } else {
-            console.log('Error: items is null in getBiddedItemsofUsers');
-        }
+    var accessToken = request.query["accessToken"];
+    validateAccessToken(accessToken, response, request, function(userID) {
+        getItemsForUsers(userID, function(items) {
+            if (items != null) {
+                console.log("items you're bidding on = " + JSON.stringify(trimItems(items)));
+                response.send(JSON.stringify(trimItems(items)));
+            } else {
+                console.log('Error: items is null in getBiddedItemsofUsers');
+            }
+        });
     });
 })
 
