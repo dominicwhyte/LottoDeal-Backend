@@ -434,7 +434,7 @@ app.post('/debugPost', function(request, response) {
                     response.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
                 }, function() {
                     send404(response, request);
-                }, imageData);
+                }, imageData, response, request);
             })
     })
 });
@@ -553,7 +553,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
                         res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
                     }, function() {
                         send404(res, req);
-                    }, imageData);
+                    }, imageData, res, req);
                 })
         })
     });
@@ -891,7 +891,7 @@ mongoose.connect(url, function(err, db) {
 
 
 
-    //deleteAllUsers();
+    // deleteAllUsers();
     // deleteAllItems();
     // deleteAllImages();
 
@@ -1065,7 +1065,7 @@ var createUser = function(name, id, url, email, age, gender) {
 }
 
 
-var createItem = function(title, price, datePosted, expirationDate, shortDescription, longDescription, sellerID, picture, callback, errorCallback, buffer) {
+var createItem = function(title, price, datePosted, expirationDate, shortDescription, longDescription, sellerID, picture, callback, errorCallback, buffer, response, request) {
     findUser(sellerID, function(seller) {
         if (seller != null) {
             var newItem = new Item({
