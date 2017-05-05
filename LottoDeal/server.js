@@ -382,7 +382,6 @@ app.get('/getListedItemsForUsers', function(request, response) {
 
 
 app.get('/getSoldItemsForUsers', function(request, response) {
-
     var userID = request.query["userID"];
     console.log(userID);
     console.log("fetching sold itemSchema")
@@ -474,7 +473,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var offset = req.body.expirDate;
     var shortDescription = req.body.shortDescription;
     var longDescription = req.body.longDescription;
-    var accessToken = request.body.accessToken;
+    var accessToken = req.body.accessToken;
 
 
     if (title == null || price == null || offset == null || shortDescription == null || longDescription == null || accessToken == null) {
