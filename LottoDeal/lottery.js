@@ -8,7 +8,7 @@ const SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES = 3;
 
 //Check if lotteries should be performed
 exports.checkIfServerShouldPerformLottery = function() {
-    console.log('checking lottery');
+    // console.log('checking lottery');
     // do whatever you like here
     // console.log('Checking if lottery should be performed')
     checkLotteries();
