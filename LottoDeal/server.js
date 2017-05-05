@@ -521,15 +521,12 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     // create compressed version
     Jimp.read(imageData, function(err, img) {
         console.log(err);
-        console.log(img);
         img.scaleToFit(500, 500) // crop(100, 100, 300, 200) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
             .write(imagePath + picture.filename + "compressed").getBase64(Jimp.AUTO, function(err, src) {
-                console.log("here");
                 console.log(err);
                 // console.log(response);
                 // console.log(src);
                 // if (err != null) {
-                console.log("working");
                 image["compressed"] = src;
                 // }
 
@@ -551,8 +548,6 @@ app.post('/createPost', cpUpload, function(req, res, next) {
                 var shortDescription = req.body.shortDescription;
                 var longDescription = req.body.longDescription;
                 var sellerID = req.body.userID;
-                console.log(image);
-
                 createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
                     res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
                 }, function() {
