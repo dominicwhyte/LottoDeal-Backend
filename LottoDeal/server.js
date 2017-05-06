@@ -703,53 +703,70 @@ app.get('/getPosts', function(request, response) {
 
 })
 
+
+function compileReviews (item, accounts) {
+    var sellerID = item.sellerID;
+    for (var j = 0; j < users.length; j++) {
+        var user = users[j]
+        if (sellerID == user.fbid) {
+            if (user.reviews.length != 0) {
+                var reviews = user.reviews;
+                var length = reviews.length;
+                var total = 0;
+                var average = 0;
+                var averageRounded = 0;
+                if (length != 0) {
+                    var total = 0;
+                    for (var k = 0; k < length; k++) {
+                        total += parseInt(reviews[k].stars);
+                    }
+                    var average = total / length;
+                    var averageRounded = Math.round(average * 10) / 10
+
+                }
+                var account = {
+                    averageRating: averageRounded,
+                }
+                accounts.push(account);
+            } else {
+                var account = {
+                    averageRating: "No Ratings Yet",
+                }
+                accounts.push(account);
+            }
+        }
+    }
+    return accounts;
+}
+
 // Send back all the accounts average rating for all posts
 app.get('/getAccountsForPosts', function(request, response) {
     // get all of the accounts for all posts
 
 
-    var accounts = [];
+    var listedAccounts = [];
+    var soldAccounts = [];
+    var expiredAccounts = [];
+
     var items = findAllItems(function(items) {
         if (items != null) {
             findAllUsers(function(users) {
                 if (users != null) {
                     for (var i = 0; i < items.length; i++) {
-                        console.log(items.length)
                         var item = items[i];
-                        var sellerID = item.sellerID;
-                        for (var j = 0; j < users.length; j++) {
-                            var user = users[j]
-                            if (sellerID == user.fbid) {
-                                if (user.reviews != null) {
-
-                                    var reviews = user.reviews;
-                                    var length = reviews.length;
-                                    var total = 0;
-                                    var average = 0;
-                                    var averageRounded = 0;
-                                    if (length != 0) {
-                                        var total = 0;
-                                        for (var k = 0; k < length; k++) {
-                                            total += parseInt(reviews[k].stars);
-                                        }
-                                        var average = total / length;
-                                        var averageRounded = Math.round(average * 10) / 10
-                                    }
-                                    var account = {
-                                        averageRating: averageRounded,
-                                    }
-                                    accounts.push(account);
-                                } else {
-                                    var account = {
-                                        averageRating: "No Ratings Yet",
-                                    }
-                                    accounts.push(account);
-                                }
-                            }
+                        // listed items
+                        if (!item.sold && !item.expired) {
+                            listedAccounts = compileReviews(item, listedAccounts);
+                        }
+                        // sold items
+                        else if (item.sold && !item.expired) {
+                            soldAccounts = compileReviews(item, soldAccounts);
+                        }
+                        // expired items
+                        else {
+                            expiredAccounts = compileReviews(item, expiredAccounts);
                         }
                     }
-
-                    response.send(JSON.stringify(accounts))
                 } else {
                     console.log("Error: Users null");
                 }
@@ -759,6 +776,13 @@ app.get('/getAccountsForPosts', function(request, response) {
         }
 
     });
+
+    var allAccounts = {
+        listedAccounts: listedAccounts,
+        soldAccounts: soldAccounts,
+        expiredAccounts: expiredAccounts,
+    }
+    response.send(JSON.stringify(allAccounts))
 
 })
 
