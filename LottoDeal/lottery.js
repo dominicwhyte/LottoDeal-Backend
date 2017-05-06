@@ -28,7 +28,10 @@ var checkLotteries = function() {
             if (item.amountRaised >= item.price) {
                 var winner = performLottery(item);
                 console.log('Item sold to ' + winner)
-                communicationsModule.emailBiddersForItem(item, "LottoDeal: You lost!", "Sorry, you lost your bid for " + item.title + ". Bid again on LottoDeal!", winner);
+                var date = new Date();
+                communicationsModule.communicateToLosers(item, "LottoDeal: You lost!", "Sorry, you lost your bid for " + item.title + ". Bid again on LottoDeal!", date, winner);
+                communicationsModule.communicateToSingleUser(item, "LottoDeal: You won!", "Congratulations, you won your bid for" + item.title + "! We'll be in contact shortly to arrange item delivery.", date, winner);
+                communicationsModule.communicateToAdmins(item, "What's up admin, we've got a winner on LottoDeal!", "There was a winner for " + item.title + "." , date, winner);
             } else if (expirDate < Date.now()) {
                 //Refund and notify users
                 refundUsers(item);
