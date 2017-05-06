@@ -756,7 +756,7 @@ app.get('/getAccountsForPosts', function(request, response) {
                 if (users != null) {
                     for (var i = 0; i < items.length; i++) {
                         var item = items[i];
-                        console.log(item)
+                        console.log(item.title)
                         // listed items
                         if (!item.sold && !item.expired) {
                             listedAccounts = compileReviews(item, users, listedAccounts);
