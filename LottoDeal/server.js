@@ -765,7 +765,7 @@ app.get('/getAccountsForPosts', function(request, response) {
                         }
                         // expired items
                         else {
-                            expiredAccounts = compileReviews(item, users, sexpiredAccounts);
+                            expiredAccounts = compileReviews(item, users, expiredAccounts);
                         }
                     }
                 } else {
@@ -783,6 +783,7 @@ app.get('/getAccountsForPosts', function(request, response) {
         soldAccounts: soldAccounts,
         expiredAccounts: expiredAccounts,
     }
+    console.log(allAccounts);
     response.send(JSON.stringify(allAccounts))
 
 })
