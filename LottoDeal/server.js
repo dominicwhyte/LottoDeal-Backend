@@ -212,11 +212,11 @@ app.get('/getReviews', function(request, response) {
 
 // get the reviews on the item page based on the seller of the item
 app.get('/getReviewsOfSeller', function(request, response) {
-
     var itemID = request.query["itemID"];
+    console.log('Getting reviews of seller for item: ' + itemID);
 
-    findItemByID(sellerID, function(item) {
-        if (user != null) {
+    findItemByID(itemID, function(item) {
+        if (item != null) {
             findUser(item.sellerID, function(user){
                 response.send(JSON.stringify(user.reviews));
 
