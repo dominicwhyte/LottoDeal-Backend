@@ -396,14 +396,46 @@ app.get('/getBidsOfUsers', function(request, response) {
 })
 
 
+
 app.get('/getBiddedItemsOfUsers', function(request, response) {
     var accessToken = request.query["accessToken"];
     validateAccessToken(accessToken, response, request, function(userID) {
         getItemsForUsers(userID, function(items) {
-            if (items != null) {
-                console.log("items you're bidding on = " + JSON.stringify(trimItems(items)));
-                response.send(JSON.stringify(trimItems(items)));
-            } else {
+
+
+        var curBidsAccounts = [];
+        var oldBidsAccounts = [];
+
+
+        if (items != null) {
+            findAllUsers(function(users) {
+                if (users != null) {
+                    for (var i = 0; i < items.length; i++) {
+                        var item = items[i];
+                        // current bidded items
+                        if (!item.sold && !item.expired) {
+                            curBidsAccounts = compileReviews(item, users, curBidsAccounts);
+                        }
+                        // expored/sold items
+                        else {
+                            oldBidsAccounts = compileReviews(item, users, oldBidsAccounts);
+                        }
+                    }
+                } else {
+                    console.log("Error: Users null");
+                }
+
+
+                var allAccountsAndItems = {
+                    curBidsAccounts: curBidsAccounts,
+                    oldBidsAccounts: oldBidsAccounts,
+                    items: items,
+                }
+                console.log(allAccountsAndItems);
+                response.send(JSON.stringify(allAccountsAndItems))
+
+            });
+        }  else {
                 console.log('Error: items is null in getBiddedItemsofUsers');
             }
         });
