@@ -705,7 +705,7 @@ app.get('/getPosts', function(request, response) {
 
 // adds up all the reviews for a given seller into its respective accounts
 // array
-function compileReviews (item, accounts) {
+function compileReviews (item, users, accounts) {
     var sellerID = item.sellerID;
     for (var j = 0; j < users.length; j++) {
         var user = users[j]
@@ -757,15 +757,15 @@ app.get('/getAccountsForPosts', function(request, response) {
                         var item = items[i];
                         // listed items
                         if (!item.sold && !item.expired) {
-                            listedAccounts = compileReviews(item, listedAccounts);
+                            listedAccounts = compileReviews(item, users, listedAccounts);
                         }
                         // sold items
                         else if (item.sold && !item.expired) {
-                            soldAccounts = compileReviews(item, soldAccounts);
+                            soldAccounts = compileReviews(item, users, soldAccounts);
                         }
                         // expired items
                         else {
-                            expiredAccounts = compileReviews(item, expiredAccounts);
+                            expiredAccounts = compileReviews(item, users, sexpiredAccounts);
                         }
                     }
                 } else {
