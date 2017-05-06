@@ -703,7 +703,8 @@ app.get('/getPosts', function(request, response) {
 
 })
 
-
+// adds up all the reviews for a given seller into its respective accounts
+// array
 function compileReviews (item, accounts) {
     var sellerID = item.sellerID;
     for (var j = 0; j < users.length; j++) {
