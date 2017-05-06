@@ -659,25 +659,29 @@ app.post('/createUser', function(request, response) {
 
 // Will add a new user to our database
 app.post('/updateSettings', function(request, response) {
-    // Parse the response
-    console.log(request.body);
-    var email = request.body.email;
-    var userID = request.body.userID;
+    var accessToken = request.body["accessToken"];
+    validateAccessToken(accessToken, response, request, function(userID) {
+        if (userID != null) {
+        // Parse the response
+            console.log(request.body);
+            var email = request.body.email;
+            findUser(userID, function(user) {
+                if (user != null) {
+                    user.email = email;
+                    user.save();
+                    console.log("here's your new email" + user.email)
+                    response.send("updated settings");
+                } else {
+                    console.log("Failed to update settings");
+                    response.send("Failed to update settings");
+                }
 
-    findUser(userID, function(user) {
-        if (user != null) {
-            user.email = email;
-            user.save();
-            console.log("here's your new email" + user.email)
-            response.send("updated settings");
-        } else {
-            console.log("Failed to update settings");
-            response.send("Failed to update settings");
+            }, function() {
+                send404(response, request);
+            });
         }
-
-    }, function() {
-        send404(response, request);
     });
+    
 
 })
 
