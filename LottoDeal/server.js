@@ -124,7 +124,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
             amountToCharge *= 1
                 // console.log(amountToCharge + 1)
             if (item != null && isInt(amountToCharge) && (!item.expired) && (!item.sold) && (item.amountRaised + amountToCharge <= item.price)) {
-                addBidForItem(itemID, userID, amountToCharge, charge.id, function(status) {
+                addBidForItem(itemID, userID, amountToCharge, function(status) {
                     communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
                     var token = request.body.stripeToken; // Using Express
                     // Charge the user's card:
@@ -142,7 +142,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                         if (charge != null) {
                             var date = new Date();
 
-
+                            addChargeIDToItem(itemID, userID, chargeID);
                             response.send("charge is" + charge.amount)
                         } else {
                             console.log('Error: charge is null in performPaymentAndAddBid');
@@ -1315,7 +1315,25 @@ var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
     });
 }
 
-var addBidForItem = function(itemID, userID, newAmount, chargeID, completion) {
+//
+var addChargeIDToItem = function(itemID, userID, chargeID) {
+    Item.findById(itemID, function(err, item) {
+        if (item.bids != null) {
+            for (i = 0; i < item.bids.length; i++) {
+                if (item.bids[i].ID == userID) {
+                    item.bids[i].chargeIDs.push(chargeID);
+                    item.save();
+                    break;
+                }
+            }
+        }
+        else {
+            console.log('Error, bids is null in addChargeIDToItem');
+        }
+    });
+}
+
+var addBidForItem = function(itemID, userID, newAmount, completion) {
     // get a item with ID and update the userID array
     if (userID != undefined) {
         Item.findById(itemID, function(err, item) {
@@ -1330,7 +1348,6 @@ var addBidForItem = function(itemID, userID, newAmount, chargeID, completion) {
                             var curAmount = Number(item.bids[i].amount);
                             curAmount += Number(newAmount);
                             item.bids[i].amount = Number(curAmount);
-                            item.bids[i].chargeIDs.push(chargeID);
                             item.amountRaised += Number(newAmount);
                             item.save();
                             found = true;
@@ -1343,7 +1360,7 @@ var addBidForItem = function(itemID, userID, newAmount, chargeID, completion) {
                     var data = {
                         ID: userID,
                         amount: newAmount,
-                        chargeIDs: [chargeID]
+                        chargeIDs: []
                     };
                     item.bids.push(data);
 
