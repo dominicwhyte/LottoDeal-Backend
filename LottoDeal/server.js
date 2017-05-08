@@ -364,7 +364,8 @@ app.get('/getNotifications', function(request, response) {
         getNotificationsForUsers(userID, function(notifications) {
             if (notifications != null) {
                 console.log('notifications = ' + JSON.stringify(notifications))
-                response.send(JSON.stringify(notifications));
+                //Reverse to get right order on frontend
+                response.send(JSON.stringify(notifications.reverse()));
             } else {
                 console.log('Error: notifications is null in getNotifications');
             }
