@@ -125,7 +125,6 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                 // console.log(amountToCharge + 1)
             if (item != null && isInt(amountToCharge) && (!item.expired) && (!item.sold) && (item.amountRaised + amountToCharge <= item.price)) {
                 addBidForItem(itemID, userID, amountToCharge, function(status) {
-                    communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
                     var token = request.body.stripeToken; // Using Express
                     // Charge the user's card:
                     var charge = stripe.charges.create({
@@ -143,6 +142,8 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                             var date = new Date();
 
                             addChargeIDToItem(itemID, userID, chargeID);
+
+                            communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
                             response.send("charge is" + charge.amount)
                         } else {
                             console.log('Error: charge is null in performPaymentAndAddBid');
@@ -1326,8 +1327,7 @@ var addChargeIDToItem = function(itemID, userID, chargeID) {
                     break;
                 }
             }
-        }
-        else {
+        } else {
             console.log('Error, bids is null in addChargeIDToItem');
         }
     });
