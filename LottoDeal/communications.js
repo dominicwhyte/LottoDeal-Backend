@@ -59,7 +59,7 @@ exports.communicateToAdmins = function(item, subject, message, date, winnerID) {
             var adminID = ADMIN_FBIDS[j];
             databaseModule.findUser(adminID, function(user) {
                 console.log('emailing ' + user.fullName);
-                var appendMessage = "    The winner of this lottery was... " + user.fullName + "!!!";
+                var appendMessage = "    The winner of this lottery was... " + winner.fullName + "!!!";
                 sendEmailToAddress(user.email, subject, message + appendMessage);
                 communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message + appendMessage, date);
             }, function() {
