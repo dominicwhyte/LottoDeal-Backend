@@ -82,33 +82,32 @@ app.use(function(req, res, next) {
 
 // A user has bid on an item, add this bid to database
 app.post('/createReview', function(request, response) {
-        // get into database, access object, update it's bid field and add to user bids
+    // get into database, access object, update it's bid field and add to user bids
 
-        var sellerID = request.body.sellerID;
-        var accessToken = request.body.accessToken;
-        var stars = request.body.stars;
-        var reviewDes = request.body.reviewDes;
-        var date = new Date();
+    var sellerID = request.body.sellerID;
+    var accessToken = request.body.accessToken;
+    var stars = request.body.stars;
+    var reviewDes = request.body.reviewDes;
+    var date = new Date();
 
-        if (accessToken != undefined) {
-            // create Review
-            validateAccessToken(accessToken, response, request, function(userID) {
-                if (userID != undefined && sellerID != userID ) {
-                    createReview(sellerID, userID, stars, reviewDes, date);
-                    response.send("review added!")
-                }
-                else {
-                    response.send("You can't review yourself!")
-                }
-            });
-        } else {
-            response.send("Please logout and login before you review someone!")
-        }
-    })
-
+    if (accessToken != undefined) {
+        // create Review
+        validateAccessToken(accessToken, response, request, function(userID) {
+            if (userID != undefined && sellerID != userID) {
+                createReview(sellerID, userID, stars, reviewDes, date);
+                response.send("review added!")
+            } else {
+                response.send("You can't review yourself!")
+            }
+        });
+    } else {
+        response.send("Please logout and login before you review someone!")
+    }
+})
 
 
-    // Stripe Code---------------------------------------------------------
+
+// Stripe Code---------------------------------------------------------
 var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 
 // A user has bid on an item, add this bid to database
@@ -118,35 +117,37 @@ app.post('/performPaymentAndAddBid', function(request, response) {
     var amountToCharge = request.body.amount; //Check that this is numerical
     validateAccessToken(accessToken, response, request, function(userID) {
         // get into database, access object, update it's bid field and add to user bids
-        console.log('Payment performing for ' + amountToCharge + " USD")
+        console.log('Initiating Payment performing for ' + amountToCharge + " USD")
 
         findItemByID(itemID, function(item) {
             // isInt isn't working!
-
             amountToCharge *= 1
-            // console.log(amountToCharge + 1)
+                // console.log(amountToCharge + 1)
             if (item != null && isInt(amountToCharge) && (!item.expired) && (!item.sold) && (item.amountRaised + amountToCharge <= item.price)) {
-                var token = request.body.stripeToken; // Using Express
-                // Charge the user's card:
-                var charge = stripe.charges.create({
-                    amount: amountToCharge * 100, //in cents
-                    currency: "usd",
-                    description: "Charge for LottoDeal " + request.body.itemTitle,
-                    source: token,
-                }, function(err, charge) {
-                    dollarAmount = (charge.amount / 100);
+                addBidForItem(itemID, userID, amountToCharge, charge.id, function(status) {
+                    communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
+                    var token = request.body.stripeToken; // Using Express
+                    // Charge the user's card:
+                    var charge = stripe.charges.create({
+                        amount: amountToCharge * 100, //in cents
+                        currency: "usd",
+                        description: "Charge for LottoDeal " + request.body.itemTitle,
+                        source: token,
+                    }, function(err, charge) {
+                        dollarAmount = (charge.amount / 100);
 
-                    if (err != null) {
-                        console.log(err);
-                    }
-                    if (charge != null) {
-                        var date = new Date();
-                        addBidForItem(itemID, userID, amountToCharge, charge.id);
-                        communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
-                        response.send("charge is" + charge.amount)
-                    } else {
-                        console.log('Error: charge is null in performPaymentAndAddBid');
-                    }
+                        if (err != null) {
+                            console.log(err);
+                        }
+                        if (charge != null) {
+                            var date = new Date();
+
+
+                            response.send("charge is" + charge.amount)
+                        } else {
+                            console.log('Error: charge is null in performPaymentAndAddBid');
+                        }
+                    });
                 });
             } else {
                 console.log('Oops, you cannot bid on this item anymore!');
@@ -214,10 +215,10 @@ app.get('/getReviewsOfSeller', function(request, response) {
 
     findItemByID(itemID, function(item) {
         if (item != null) {
-            findUser(item.sellerID, function(user){
+            findUser(item.sellerID, function(user) {
                 response.send(JSON.stringify(user.reviews));
 
-            }, function () {
+            }, function() {
                 send404(response, request);
             });
         } else {
@@ -392,7 +393,7 @@ app.get('/getBidsOfUsers', function(request, response) {
 
 // adds up all the reviews for a given seller into its respective accounts
 // array
-function compileReviews (item, users, accounts) {
+function compileReviews(item, users, accounts) {
     var sellerID = item.sellerID;
     for (var j = 0; j < users.length; j++) {
         var user = users[j]
@@ -434,43 +435,43 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
         getItemsForUsers(userID, function(items) {
 
 
-        var curBidsAccounts = [];
-        var oldBidsAccounts = [];
-        var oldBiddedItems = [];
-        var curBiddedItems = [];
+            var curBidsAccounts = [];
+            var oldBidsAccounts = [];
+            var oldBiddedItems = [];
+            var curBiddedItems = [];
 
-        if (items != null) {
-            findAllUsers(function(users) {
-                if (users != null) {
-                    for (var i = 0; i < items.length; i++) {
-                        var item = items[i];
+            if (items != null) {
+                findAllUsers(function(users) {
+                    if (users != null) {
+                        for (var i = 0; i < items.length; i++) {
+                            var item = items[i];
 
-                        // current bidded items
-                        if (!item.sold && !item.expired) {
-                            curBiddedItems.push(item);
-                            curBidsAccounts = compileReviews(item, users, curBidsAccounts);
+                            // current bidded items
+                            if (!item.sold && !item.expired) {
+                                curBiddedItems.push(item);
+                                curBidsAccounts = compileReviews(item, users, curBidsAccounts);
+                            }
+                            // expored/sold items
+                            else {
+                                oldBiddedItems.push(item)
+                                oldBidsAccounts = compileReviews(item, users, oldBidsAccounts);
+                            }
                         }
-                        // expored/sold items
-                        else {
-                            oldBiddedItems.push(item)
-                            oldBidsAccounts = compileReviews(item, users, oldBidsAccounts);
-                        }
+                    } else {
+                        console.log("Error: Users null");
                     }
-                } else {
-                    console.log("Error: Users null");
-                }
 
 
-                var allAccountsAndItems = {
-                    oldBiddedItems: oldBiddedItems,
-                    curBiddedItems: curBiddedItems,
-                    curBidsAccounts: curBidsAccounts,
-                    oldBidsAccounts: oldBidsAccounts,
-                }
-                response.send(JSON.stringify(allAccountsAndItems))
+                    var allAccountsAndItems = {
+                        oldBiddedItems: oldBiddedItems,
+                        curBiddedItems: curBiddedItems,
+                        curBidsAccounts: curBidsAccounts,
+                        oldBidsAccounts: oldBidsAccounts,
+                    }
+                    response.send(JSON.stringify(allAccountsAndItems))
 
-            });
-        }  else {
+                });
+            } else {
                 console.log('Error: items is null in getBiddedItemsofUsers');
             }
         });
@@ -669,11 +670,11 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 
 //modified from http://stackoverflow.com/questions/14636536/how-to-check-if-a-variable-is-an-integer-in-javascript
 function isInt(value) {
-  if (isNaN(value)) {
-    return false;
-  }
-  var x = parseFloat(value);
-  return (x | 0) === x;
+    if (isNaN(value)) {
+        return false;
+    }
+    var x = parseFloat(value);
+    return (x | 0) === x;
 }
 
 
@@ -717,7 +718,7 @@ app.post('/updateSettings', function(request, response) {
     var accessToken = request.body["accessToken"];
     validateAccessToken(accessToken, response, request, function(userID) {
         if (userID != null) {
-        // Parse the response
+            // Parse the response
             var email = request.body.email;
             findUser(userID, function(user) {
                 if (user != null) {
@@ -734,7 +735,7 @@ app.post('/updateSettings', function(request, response) {
             });
         }
     });
-    
+
 
 })
 
@@ -1314,7 +1315,7 @@ var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
     });
 }
 
-var addBidForItem = function(itemID, userID, newAmount, chargeID) {
+var addBidForItem = function(itemID, userID, newAmount, chargeID, completion) {
     // get a item with ID and update the userID array
     if (userID != undefined) {
         Item.findById(itemID, function(err, item) {
@@ -1355,46 +1356,48 @@ var addBidForItem = function(itemID, userID, newAmount, chargeID) {
                 console.log('Item was null in addbidforitem')
             }
 
+
+            var users = findAllUsers(function(users) {
+                var usersLength = users.length;
+
+                for (var i = 0; i < usersLength; i++) {
+                    if (users[i].fbid === userID) {
+                        //response.send("User already exists");
+                        var user = users[i]
+                        var array = user.bids;
+                        var found = 0;
+                        if (user.bids != null) {
+                            for (i = 0; i < user.bids.length; i++) {
+                                if (user.bids[i].itemID == itemID) {
+                                    var curAmount = user.bids[i].amount;
+                                    curAmount += Number(newAmount);
+                                    user.bids[i].amount = curAmount;
+                                    user.save();
+                                    found = 1;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                var data = {
+                                    itemID: itemID,
+                                    amount: newAmount
+                                };
+                                user.bids.push(data);
+                                user.save();
+                            }
+                            // sendEmailToAddress(user.email, "Congrats!", "You bid $" + newAmount + " on " + item.title)
+                            console.log('Bid successfully added to user');
+                        }
+                        break;
+                    }
+                }
+                completion(true);
+            });
+
         });
     } else {
-
+        console.log('User is not defined');
     }
-
-    var users = findAllUsers(function(users) {
-        var usersLength = users.length;
-
-        for (var i = 0; i < usersLength; i++) {
-            if (users[i].fbid === userID) {
-                //response.send("User already exists");
-                var user = users[i]
-                var array = user.bids;
-                var found = 0;
-                if (user.bids != null) {
-                    for (i = 0; i < user.bids.length; i++) {
-                        if (user.bids[i].itemID == itemID) {
-                            var curAmount = user.bids[i].amount;
-                            curAmount += Number(newAmount);
-                            user.bids[i].amount = curAmount;
-                            user.save();
-                            found = 1;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        var data = {
-                            itemID: itemID,
-                            amount: newAmount
-                        };
-                        user.bids.push(data);
-                        user.save();
-                    }
-                    // sendEmailToAddress(user.email, "Congrats!", "You bid $" + newAmount + " on " + item.title)
-                    console.log('Bid successfully added to user');
-                }
-                break;
-            }
-        }
-    });
 }
 
 
@@ -1451,7 +1454,7 @@ var deleteItem = function(id, callback) {
                         //check if user bid on item
                         for (var i = 0; i < item.bids.length; i++) {
                             var userID = item.bids[i].ID
-                            //if user bid on the item, remove the bid
+                                //if user bid on the item, remove the bid
                             if (user.fbid == userID) {
                                 for (var k = 0; k < user.bids.length; k++) {
                                     var bid = user.bids[k];
