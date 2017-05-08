@@ -26,12 +26,13 @@ var checkLotteries = function() {
             }
             var expirDate = new Date(item.expirationDate);
             if (item.amountRaised >= item.price) {
-                var winner = performLottery(item);
-                console.log('Item sold to ' + winner)
-                var date = new Date();
-                communicationsModule.communicateToLosers(item, "LottoDeal: You lost!", "Sorry, you lost your bid for " + item.title + ". Bid again on LottoDeal!", date, winner);
-                communicationsModule.communicateToSingleUser(item, "LottoDeal: You won!", "Congratulations, you won your bid for" + item.title + "! We'll be in contact shortly to arrange item delivery.", date, winner);
-                communicationsModule.communicateToAdmins(item, "What's up admin, we've got a winner on LottoDeal!", "There was a winner for " + item.title + "." , date, winner);
+                performLottery(item, function(winner) {
+                    console.log('Item sold to ' + winner)
+                    var date = new Date();
+                    communicationsModule.communicateToLosers(item, "LottoDeal: You lost!", "Sorry, you lost your bid for " + item.title + ". Bid again on LottoDeal!", date, winner);
+                    communicationsModule.communicateToSingleUser(item, "LottoDeal: You won!", "Congratulations, you won your bid for" + item.title + "! We'll be in contact shortly to arrange item delivery.", date, winner);
+                    communicationsModule.communicateToAdmins(item, "What's up admin, we've got a winner on LottoDeal!", "There was a winner for " + item.title + ".", date, winner);
+                });
             } else if (expirDate < Date.now()) {
                 //Refund and notify users
                 refundUsers(item);
@@ -48,7 +49,7 @@ var checkLotteries = function() {
 }
 
 //returns the userID of the winner
-var performLottery = function(item) {
+var performLottery = function(item, completion) {
     console.log("Performing lottery");
     var bids = item.bids;
     //Shuffle to ensure no bias (extra precaution)
@@ -76,14 +77,14 @@ var performLottery = function(item) {
 
     console.log('the winner is:' + winner);
 
-    databaseModule.findUser(winner, function(user) {
+    databaseModule.findUser(winner, function(user, completion) {
         if (user != null) {
             item.winnerName = user.fullName;
             item.save();
-            return winner;
+            completeion(winner);
         } else {
             console.log('User not successfully found')
-            return null;
+            completeion(null);
         }
     }, function() {
         console.log('Error in performLottery');

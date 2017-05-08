@@ -48,8 +48,8 @@ exports.communicateToSingleUser = function(item, subject, message, date, userID)
     });
 }
 
-//Lucas and Prateek should add their FBIDs
-var ADMIN_FBIDS = ['1641988472497790', '1355884977768129', '10208239805023661'];
+//Prateek should add his FBID
+var ADMIN_FBIDS = ['1641988472497790', '1355884977768129', '10208239805023661', '1467343223328608'];
 
 //Emails and adds notifications to all admins, appending the winners name to the message.
 exports.communicateToAdmins = function(item, subject, message, date, winnerID) {
