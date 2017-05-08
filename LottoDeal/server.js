@@ -62,7 +62,7 @@ var fs = require('fs');
 
 
 var options = {
-    key: fs.readFileSync('server.crt'),
+    key: fs.readFileSync('domain.key'),
     cert: fs.readFileSync('chained.pem')
 };
 
