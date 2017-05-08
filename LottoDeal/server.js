@@ -443,7 +443,8 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
 
         var curBidsAccounts = [];
         var oldBidsAccounts = [];
-
+        var oldBiddedItems = [];
+        var curBiddedItems = [];
 
         if (items != null) {
             findAllUsers(function(users) {
@@ -453,11 +454,13 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
 
                         // current bidded items
                         if (!item.sold && !item.expired) {
+                            curBiddedItems.push(item);
                             curBidsAccounts = compileReviews(item, users, curBidsAccounts);
                             console.log(item.title);
                         }
                         // expored/sold items
                         else {
+                            oldBiddedItems.push(item)
                             oldBidsAccounts = compileReviews(item, users, oldBidsAccounts);
                             console.log(item.title);
                         }
@@ -468,12 +471,11 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
 
 
                 var allAccountsAndItems = {
+                    oldBiddedItems: oldBiddedItems,
+                    curBiddedItems: curBiddedItems,
                     curBidsAccounts: curBidsAccounts,
                     oldBidsAccounts: oldBidsAccounts,
-                    items: items,
                 }
-                console.log(curBidsAccounts + "CURRENT BIDS")
-                console.log(oldBidsAccounts + "CURRENT BIDS")
                 console.log(allAccountsAndItems);
                 response.send(JSON.stringify(allAccountsAndItems))
 
