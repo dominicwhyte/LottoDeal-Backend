@@ -81,10 +81,10 @@ var performLottery = function(item, completion) {
         if (user != null) {
             item.winnerName = user.fullName;
             item.save();
-            completeion(winner);
+            completion(winner);
         } else {
             console.log('User not successfully found')
-            completeion(null);
+            completion(null);
         }
     }, function() {
         console.log('Error in performLottery');
