@@ -53,10 +53,12 @@ var ADMIN_FBIDS = ['1641988472497790', '1355884977768129', '10208239805023661'];
 
 //Emails and adds notifications to all admins, appending the winners name to the message.
 exports.communicateToAdmins = function(item, subject, message, date, winnerID) {
+    console.log('emailing admins');
     databaseModule.findUser(winnerID, function(winner) {
         for (var j = 0; j < ADMIN_FBIDS.length; j++) {
             var adminID = ADMIN_FBIDS[j];
             databaseModule.findUser(adminID, function(user) {
+                console.log('emailing ' + user.fullName);
                 var appendMessage = "    The winner of this lottery was... " + user.fullName + "!!!";
                 sendEmailToAddress(user.email, subject, message + appendMessage);
                 communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message + appendMessage, date);

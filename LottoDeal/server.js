@@ -90,7 +90,6 @@ app.post('/createReview', function(request, response) {
         var reviewDes = request.body.reviewDes;
         var date = new Date();
 
-        console.log(date)
         if (accessToken != undefined) {
             // create Review
             validateAccessToken(accessToken, response, request, function(userID) {
@@ -200,7 +199,6 @@ app.get('/getReviews', function(request, response) {
 
     findUser(sellerID, function(user) {
         if (user != null) {
-            console.log("this is the user's reviews from User" + user.reviews)
             response.send(JSON.stringify(user.reviews));
         } else {
             console.log('Error: user is null in getReviews');
@@ -213,7 +211,6 @@ app.get('/getReviews', function(request, response) {
 // get the reviews on the item page based on the seller of the item
 app.get('/getReviewsOfSeller', function(request, response) {
     var itemID = request.query["itemID"];
-    console.log('Getting reviews of seller for item: ' + itemID);
 
     findItemByID(itemID, function(item) {
         if (item != null) {
@@ -286,7 +283,6 @@ app.get('/getAccount', function(request, response) {
     validateAccessToken(accessToken, response, request, function(userID) {
         findUser(userID, function(user) {
             if (user != null) {
-                console.log("this is the user's reviews" + user)
                 response.send(JSON.stringify(user));
             } else {
                 console.log('Error: user is null in getAccount');
@@ -302,7 +298,6 @@ app.get('/getPublicAccount', function(request, response) {
     var userID = request.query["userID"];
     findUser(userID, function(user) {
         if (user != null) {
-            console.log("this is the user's reviews" + trimUser(user));
             response.send(JSON.stringify(trimUser(user)));
         } else {
             console.log('Error: user is null in getAccount');
@@ -318,7 +313,6 @@ app.get('/getSuggestions', function(request, response) {
     validateAccessToken(accessToken, response, request, function(userID) {
         findUser(userID, function(user) {
             if (user != null) {
-                console.log("Returning suggestions for user");
                 suggestionsModule.computeSimilarities(userID, User, Item, function(suggestions) {
                     //trim the items to avoid sending back chargeIDs
                     response.send(JSON.stringify(trimItems(suggestions)));
@@ -363,7 +357,6 @@ app.get('/getNotifications', function(request, response) {
     validateAccessToken(accessToken, response, request, function(userID) {
         getNotificationsForUsers(userID, function(notifications) {
             if (notifications != null) {
-                console.log('notifications = ' + JSON.stringify(notifications))
                 //Reverse to get right order on frontend
                 response.send(JSON.stringify(notifications.reverse()));
             } else {
@@ -387,7 +380,6 @@ app.get('/getBidsOfUsers', function(request, response) {
     var userID = request.query["userID"];
     getBidsForUsers(userID, function(bids) {
         if (bids != null) {
-            console.log('bids = ' + JSON.stringify(bids))
             response.send(JSON.stringify(bids));
         } else {
             console.log('Error: bids is null in getBidsofUsers');
@@ -457,13 +449,11 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
                         if (!item.sold && !item.expired) {
                             curBiddedItems.push(item);
                             curBidsAccounts = compileReviews(item, users, curBidsAccounts);
-                            console.log(item.title);
                         }
                         // expored/sold items
                         else {
                             oldBiddedItems.push(item)
                             oldBidsAccounts = compileReviews(item, users, oldBidsAccounts);
-                            console.log(item.title);
                         }
                     }
                 } else {
@@ -477,7 +467,6 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
                     curBidsAccounts: curBidsAccounts,
                     oldBidsAccounts: oldBidsAccounts,
                 }
-                console.log(allAccountsAndItems);
                 response.send(JSON.stringify(allAccountsAndItems))
 
             });
@@ -492,12 +481,8 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
 app.get('/getListedItemsForUsers', function(request, response) {
 
     var userID = request.query["userID"];
-    console.log(userID);
-    console.log("fetching listed itemSchema")
     getListedItemsForUsers(userID, function(items) {
         if (items != null) {
-            console.log("fetching listed itemSchema")
-            console.log("selling items = " + JSON.stringify(trimItems(items)));
             response.send(JSON.stringify(trimItems(items)));
         } else {
             console.log('Error: items is null in getListedItemsForUsers');
@@ -511,11 +496,7 @@ app.get('/getListedItemsForUsers', function(request, response) {
 
 app.get('/getSoldItemsForUsers', function(request, response) {
     var userID = request.query["userID"];
-    console.log(userID);
-    console.log("fetching sold itemSchema")
     getSoldItemsForUsers(userID, function(items) {
-        console.log("fetching sold itemSchema")
-        console.log("sold items = " + JSON.stringify(items));
         response.send(JSON.stringify(trimItems(items)));
     }, function() {
         send404(response, request);
@@ -540,7 +521,6 @@ app.post('/debugPost', function(request, response) {
         img.scaleToFit(500, 500) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
             .getBase64(Jimp.AUTO, function(err, src) {
                 console.log(err);
-                console.log("Creating your debug item!");
                 image["compressed"] = src;
                 var title = request.body.title;
                 var price = request.body.price;
@@ -641,7 +621,6 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 
         // backend is done with the image now, so it can be deleted from uploads folder (since readfile was sync)
         fs.unlink(imagePath, function(error) {
-            console.log("Removing created image from /uploads")
             if (error != null) {
                 console.log(error);
             }
@@ -701,14 +680,12 @@ function isInt(value) {
 // Will add a new user to our database
 app.post('/createUser', function(request, response) {
     // Parse the response
-    console.log(request.body);
     var name = request.body.name;
     var id = request.body.fbid;
     var url = request.body.url;
     var email = request.body.email;
     var age = request.body.age;
     var gender = request.body.gender;
-    console.log("Age and gender: " + age + " " + gender);
 
     var users = findAllUsers(function(users) {
         if (users != null) {
@@ -741,13 +718,11 @@ app.post('/updateSettings', function(request, response) {
     validateAccessToken(accessToken, response, request, function(userID) {
         if (userID != null) {
         // Parse the response
-            console.log(request.body);
             var email = request.body.email;
             findUser(userID, function(user) {
                 if (user != null) {
                     user.email = email;
                     user.save();
-                    console.log("here's your new email" + user.email)
                     response.send("updated settings");
                 } else {
                     console.log("Failed to update settings");
@@ -819,7 +794,6 @@ app.get('/getAccountsForPosts', function(request, response) {
                     soldAccounts: soldAccounts,
                     expiredAccounts: expiredAccounts,
                 }
-                console.log(allAccounts);
                 response.send(JSON.stringify(allAccounts))
 
             });
@@ -842,9 +816,7 @@ app.get('/getItem', function(request, response) {
             findImageByID(item["_id"], function(buffer) {
                 // console.log(item);
                 item.img.compressed = buffer;
-                console.log("printing item");
                 // console.log(item);
-                console.log(buffer);
                 response.send(JSON.stringify(trimItem(item)));
             }, function() {
                 send404(response, request);
@@ -1114,11 +1086,7 @@ var createUser = function(name, id, url, email, age, gender) {
     if (gender == null) {
         gender = ""
     }
-    console.log(name)
-    console.log(id)
-    console.log(url)
-    console.log(email)
-    console.log(age)
+
 
     var newUser = new User({
         fullName: name,
@@ -1165,9 +1133,6 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
                 if (err) {
                     errorCallback();
                 }
-                console.log("Here is the new item");
-
-                console.log(newItem["_id"])
 
                 createImage(newItem["_id"], buffer);
 
@@ -1176,7 +1141,7 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
             newItem.save(function(err) {
                 if (err) throw err;
 
-                console.log('Item saved successfully');
+                console.log('Item created successfully');
             });
         } else {
             console.log('Item saved unsuccessfully');
@@ -1191,7 +1156,6 @@ var getNotificationsForUsers = function(userID, callback) {
         fbid: userID
     }, function(err, user) {
         if (user.length != 0) {
-            console.log('Got notifications for user' + userID);
             callback(user[0].notifications);
         } else {
             callback(null);
@@ -1204,7 +1168,6 @@ var getBidsForUsers = function(userID, callback) {
     User.find({
         fbid: userID
     }, function(err, user) {
-        console.log('Got bids for user' + userID)
         if (user.length != 0) {
             callback(user[0].bids);
         } else {
@@ -1261,7 +1224,6 @@ var getItemsForUsers = function(userID, callback) {
             Item.find({
                 '_id': itemIDs
             }, function(err, items) {
-                console.log("here are all your items" + items)
                 callback(items);
             });
         } else {
@@ -1308,11 +1270,9 @@ app.get('/getReviewerImagesAndNames', function(request, response) {
             for (var i = 0; i < reviews.length; i++) {
                 reviewersID.push(reviews[i].userID);
             }
-            console.log("Here are all the reviewersID IDs" + reviewersID);
             User.find({
                 fbid: reviewersID
             }, function(err, reviewers) {
-                console.log('got reviewers')
                 var reviewersToSend = [];
                 for (var i = 0; i < reviewersID.length; i++) {
                     for (var j = 0; j < reviewers.length; j++) {
@@ -1322,7 +1282,6 @@ app.get('/getReviewerImagesAndNames', function(request, response) {
                         }
                     }
                 }
-                console.log('got reviewers')
                 response.send(reviewersToSend);
             });
         } else {
@@ -1345,10 +1304,8 @@ var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
                 reviewDes: reviewDes,
                 datePosted: date
             };
-            console.log(data);
             user[0].reviews.push(data);
             user[0].save();
-            console.log(user[0].reviews)
         } else {
             console.log('Error: user is null in create review');
         }
@@ -1373,7 +1330,6 @@ var addBidForItem = function(itemID, userID, newAmount, chargeID) {
                             curAmount += Number(newAmount);
                             item.bids[i].amount = Number(curAmount);
                             item.bids[i].chargeIDs.push(chargeID);
-                            console.log('pushing chargeID ' + chargeID);
                             item.amountRaised += Number(newAmount);
                             item.save();
                             found = true;
@@ -1383,13 +1339,11 @@ var addBidForItem = function(itemID, userID, newAmount, chargeID) {
                 }
 
                 if (!found) {
-                    console.log('pushing chargeID ' + chargeID);
                     var data = {
                         ID: userID,
                         amount: newAmount,
                         chargeIDs: [chargeID]
                     };
-                    console.log(data);
                     item.bids.push(data);
 
                     item.amountRaised += newAmount;
@@ -1431,7 +1385,6 @@ var addBidForItem = function(itemID, userID, newAmount, chargeID) {
                             itemID: itemID,
                             amount: newAmount
                         };
-                        console.log(data);
                         user.bids.push(data);
                         user.save();
                     }
@@ -1452,7 +1405,6 @@ var deleteUser = function(id, callback) {
         fbid: id
     }, function(err, user) {
         // if (err) throw err;
-        console.log(user);
         if (err) console.log(err);
         if (user != null) {
             // delete
@@ -1496,11 +1448,9 @@ var deleteItem = function(id, callback) {
                     //iterate through users (one time) to delete the necessary bids
                     for (var j = 0; j < users.length; j++) {
                         var user = users[j];
-                        console.log('checking user');
                         //check if user bid on item
                         for (var i = 0; i < item.bids.length; i++) {
                             var userID = item.bids[i].ID
-                            console.log('UserID of a bidder is ' + userID);
                             //if user bid on the item, remove the bid
                             if (user.fbid == userID) {
                                 for (var k = 0; k < user.bids.length; k++) {
@@ -1543,7 +1493,6 @@ var findUser = function(fbid, callback, errorCallback) {
         }
         // if (err) throw err;
         if (user.length != 0) {
-            console.log(user[0]);
             callback(user[0]);
         } else {
             console.log('returning null when searching for: ' + fbid);
@@ -1646,7 +1595,6 @@ var createImage = function(id, buffer) {
 }
 
 var findImageByID = function(id, callback, errorCallback) {
-    console.log(id);
     Image.find({
         itemID: id
     }, function(err, images) {
