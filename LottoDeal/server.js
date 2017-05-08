@@ -141,7 +141,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                         if (charge != null) {
                             var date = new Date();
 
-                            addChargeIDToItem(itemID, userID, chargeID);
+                            addChargeIDToItem(itemID, userID, chargeID._id);
 
                             communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
                             response.send("charge is" + charge.amount)
