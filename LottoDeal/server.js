@@ -70,7 +70,7 @@ var options = {
 // };
 
 app.use(function(req, res, next) {
-    var allowedOrigins = ['https://dominicwhyte.github.io'];
+    var allowedOrigins = ['https://dominicwhyte.github.io', 'lottodeal.us'];
     var origin = req.headers.origin;
     if (allowedOrigins.indexOf(origin) > -1) {
         res.setHeader('Access-Control-Allow-Origin', origin);
