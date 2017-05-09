@@ -60,7 +60,7 @@ app.use(helmet())
 var fs = require('fs');
 
 var options = {
-    key: fs.readFileSync('server.key'),
+    key: fs.readFileSync('domain.key'),
     cert: fs.readFileSync('server.crt')
 };
 
