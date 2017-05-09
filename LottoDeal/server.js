@@ -1037,6 +1037,7 @@ var userSchema = new Schema({
         datePosted: Date, //date the notification was created (String - parse into Date object)
         itemID: String, // item associated with the notification
         sold: Boolean, 
+        winnerName: String,
     }],
 });
 

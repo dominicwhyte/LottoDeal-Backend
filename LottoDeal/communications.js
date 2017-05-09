@@ -47,6 +47,8 @@ exports.communicateToSingleUser = function(item, subject, message, date, userID,
     databaseModule.findUser(userID, function(user) {
         sendEmailToAddress(user.email, subject, message);
         if (sold == true) {
+            console.log("printing winner");
+            console.log(winner)
             communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date, true, winner);
         }
         else {
@@ -112,7 +114,26 @@ function sendEmailToAddress(email, subjectText, contentText) {
 
 exports.addNotificationToUser = function(itemID, userID, titleText, descriptionText, date, sold, winnerID) {
     databaseModule.findUser(userID, function(user) {
-        databaseModule.findUser(winnerID, function(winner) {
+        if (sold != null && sold != undefined) {
+            databaseModule.findUser(winnerID, function(winner) {
+                var data = {
+                    itemID: itemID,
+                    datePosted: date,
+                    read: false,
+                    title: titleText,
+                    description: descriptionText
+                };
+                if (sold != undefined && sold != null) {
+                    data["sold"] = true;
+                    data["winnerName"] = winner.fullName;
+                }
+                user.notifications.push(data);
+                user.save();
+            }, function() {
+            console.log('Error in addNotificationToUser');
+            })
+        }
+        else {
             var data = {
                 itemID: itemID,
                 datePosted: date,
@@ -120,26 +141,13 @@ exports.addNotificationToUser = function(itemID, userID, titleText, descriptionT
                 title: titleText,
                 description: descriptionText
             };
-            if (sold != undefined && sold != null) {
+            if (winner != undefined && winner != null) {
                 data["sold"] = true;
-                data["winnerName"] = winner.fullName;
+
             }
             user.notifications.push(data);
             user.save();
-        })
-        // var data = {
-        //     itemID: itemID,
-        //     datePosted: date,
-        //     read: false,
-        //     title: titleText,
-        //     description: descriptionText
-        // };
-        // if (winner != undefined && winner != null) {
-        //     data["sold"] = true;
-
-        // }
-        // user.notifications.push(data);
-        // user.save();
+        }
     }, function() {
         console.log('Error in addNotificationToUser');
     });
