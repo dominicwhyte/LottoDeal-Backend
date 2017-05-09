@@ -26,20 +26,20 @@ exports.communicateToLosers = function(item, subject, message, date, winner) {
             continue;
         }
         console.log('searching for user' + bidderID);
-        databaseModule.findUser(bidderID, function(user) {
-            sendEmailToAddress(user.email, subject, message);
-            communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date);
-        }, function() {
-            console.log('Error in emailBiddersForItem');
-            // send404(response, request);
-        });
+        communicateToSingleUser(item, subject, message, date, bidderID);
+        // databaseModule.findUser(bidderID, function(user) {
+        //     sendEmailToAddress(user.email, subject, message);
+        //     communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date);
+        // }, function() {
+        //     console.log('Error in emailBiddersForItem');
+        //     // send404(response, request);
+        // });
     }
 }
 
 //Email and add notifications to all bidders, except the winner
 exports.communicateToSingleUser = function(item, subject, message, date, userID) {
-    var bidderID = userID;
-    databaseModule.findUser(bidderID, function(user) {
+    databaseModule.findUser(userID, function(user) {
         sendEmailToAddress(user.email, subject, message);
         communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date);
     }, function() {
