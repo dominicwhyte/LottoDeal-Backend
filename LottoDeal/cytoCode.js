@@ -22,7 +22,7 @@ var cy = cytoscape({
 
 var stringSimilarity = require('string-similarity');
 var edgeWeights = {};
-var MAX_NUMBER_OF_SIMILARITIES_TO_RETURN = 5
+var MAX_NUMBER_OF_SIMILARITIES_TO_RETURN = 3
 
 exports.computeSimilarities = function(userID, User, Item, callback) {
     //Retrieve users and items
@@ -89,12 +89,13 @@ function selectItems(suggestedItems) {
         var item = suggestedItems[j];
         if (!item.expired && !item.sold) {
             selectedSuggestedItems.push(item);
+            count++;
         }
         if (count >= MAX_NUMBER_OF_SIMILARITIES_TO_RETURN) {
             break;
         }
     }
-    return selectedSuggestedItems
+    return selectedSuggestedItems;
 }
 
 // ADD VERTICES AND EDGES FOR ITEMS
