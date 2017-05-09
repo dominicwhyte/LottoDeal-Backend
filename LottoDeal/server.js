@@ -70,7 +70,7 @@ var options = {
 // };
 
 app.use(function(req, res, next) {
-    var allowedOrigins = ['https://dominicwhyte.github.io', 'lottodeal.us'];
+    var allowedOrigins = ['https://dominicwhyte.github.io', 'http://www.lottodeal.us'];
     var origin = req.headers.origin;
     if (allowedOrigins.indexOf(origin) > -1) {
         res.setHeader('Access-Control-Allow-Origin', origin);
@@ -991,9 +991,9 @@ mongoose.connect(url, function(err, db) {
 
     var postmark = require("postmark");
 
-    deleteAllUsers();
-    deleteAllItems();
-    deleteAllImages();
+    // deleteAllUsers();
+    // deleteAllItems();
+    // deleteAllImages();
 
     findAllUsers(function(users) {
         console.log(users)
