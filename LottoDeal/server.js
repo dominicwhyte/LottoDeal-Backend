@@ -59,12 +59,15 @@ app.use(helmet())
 
 var fs = require('fs');
 
-
-
 var options = {
-    key: fs.readFileSync('domain.key'),
-    cert: fs.readFileSync('chained.pem')
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.crt')
 };
+
+// var options = {
+//     key: fs.readFileSync('domain.key'),
+//     cert: fs.readFileSync('chained.pem')
+// };
 
 app.use(function(req, res, next) {
     var allowedOrigins = ['https://dominicwhyte.github.io'];
