@@ -168,7 +168,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
 //START USER AUTHENTICATION CODE
 
 var httprequest = require("request");
-var performance = require("performance");
+var performance = require("Performance");
 
 //Validates an access token. Provide response and request in case a 404 
 //error should be thrown
