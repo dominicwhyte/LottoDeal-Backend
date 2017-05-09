@@ -3,6 +3,7 @@ var express = require('express')
 var app = express()
 var https = require('https')
 var fs = require('fs')
+var http = require("http");
 
 var json = require('express-json')
 var bodyParser = require("body-parser")
@@ -59,10 +60,10 @@ app.use(helmet())
 
 var fs = require('fs');
 
-var options = {
-    key: fs.readFileSync('domain.key'),
-    cert: fs.readFileSync('server.crt')
-};
+// var options = {
+//     key: fs.readFileSync('domain.key'),
+//     cert: fs.readFileSync('server.crt')
+// };
 
 // var options = {
 //     key: fs.readFileSync('domain.key'),
@@ -960,9 +961,12 @@ app.get('/getImagesForNotifications', function(request, response) {
 
 
 
-https.createServer(options, app).listen(8000, function() {
-    console.log("Server started at port 8000");
-});
+// https.createServer(options, app).listen(8000, function() {
+//     console.log("Server started at port 8000");
+// });
+http.createServer(app).listen(8000, function() {
+    console.log("Server started at port 8000")
+})
 
 
 
