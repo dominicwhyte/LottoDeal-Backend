@@ -176,8 +176,6 @@ var httprequest = require("request");
 //Validates an access token. Provide response and request in case a 404 
 //error should be thrown
 function validateAccessToken(accessToken, response, request, callback) {
-    console.log('Validating access Token');
-    var startDate = new Date();
     httprequest({
         uri: "https://graph.facebook.com/me?access_token=" + accessToken,
         method: "GET",
@@ -185,9 +183,6 @@ function validateAccessToken(accessToken, response, request, callback) {
         followRedirect: true,
         maxRedirects: 10
     }, function(error, validateResponse, body) {
-        var endDate   = new Date();
-        var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
-        console.log('Validating access Token took ' + seconds + ' seconds');
         body = JSON.parse(body);
         var userID = body.id;
 
@@ -995,9 +990,9 @@ mongoose.connect(url, function(err, db) {
 
     var postmark = require("postmark");
 
-    // deleteAllUsers();
-    // deleteAllItems();
-    // deleteAllImages();
+    deleteAllUsers();
+    deleteAllItems();
+    deleteAllImages();
 
     findAllUsers(function(users) {
         console.log(users)
