@@ -988,9 +988,9 @@ mongoose.connect(url, function(err, db) {
 
     var postmark = require("postmark");
 
-    // deleteAllUsers();
-    // deleteAllItems();
-    // deleteAllImages();
+    deleteAllUsers();
+    deleteAllItems();
+    deleteAllImages();
 
     findAllUsers(function(users) {
         console.log(users)
