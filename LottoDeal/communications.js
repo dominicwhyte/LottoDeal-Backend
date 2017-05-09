@@ -141,7 +141,7 @@ exports.addNotificationToUser = function(itemID, userID, titleText, descriptionT
                 title: titleText,
                 description: descriptionText
             };
-            if (winner != undefined && winner != null) {
+            if (sold != undefined && sold != null) {
                 data["sold"] = true;
 
             }
