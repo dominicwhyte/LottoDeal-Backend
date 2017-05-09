@@ -27,7 +27,7 @@ exports.communicateToLosers = function(item, subject, message, date, winner, sol
         }
         console.log('searching for user' + bidderID);
         if (sold == true) {
-            communicateToSingleUser(item, subject, message, date, bidderID, true);
+            communicateToSingleUser(item, subject, message, date, bidderID, true, winner);
         }
         else {
             communicateToSingleUser(item, subject, message, date, bidderID);
@@ -43,14 +43,14 @@ exports.communicateToLosers = function(item, subject, message, date, winner, sol
 }
 
 //Email and add notifications to all bidders, except the winner
-exports.communicateToSingleUser = function(item, subject, message, date, userID, sold) {
+exports.communicateToSingleUser = function(item, subject, message, date, userID, sold, winner) {
     databaseModule.findUser(userID, function(user) {
         sendEmailToAddress(user.email, subject, message);
         if (sold == true) {
-            communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date, true);
+            communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date, true, winner);
         }
         else {
-            communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, null);
+            communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, null, null);
         }
     }, function() {
         console.log('Error in communicateToSingleUser');
@@ -110,20 +110,36 @@ function sendEmailToAddress(email, subjectText, contentText) {
     })
 }
 
-exports.addNotificationToUser = function(itemID, userID, titleText, descriptionText, date, winner) {
+exports.addNotificationToUser = function(itemID, userID, titleText, descriptionText, date, sold, winnerID) {
     databaseModule.findUser(userID, function(user) {
-        var data = {
-            itemID: itemID,
-            datePosted: date,
-            read: false,
-            title: titleText,
-            description: descriptionText
-        };
-        if (winner != undefined && winner != null) {
-            data["sold"] = true;
-        }
-        user.notifications.push(data);
-        user.save();
+        databaseModule.findUser(winnerID, function(winner) {
+            var data = {
+                itemID: itemID,
+                datePosted: date,
+                read: false,
+                title: titleText,
+                description: descriptionText
+            };
+            if (sold != undefined && sold != null) {
+                data["sold"] = true;
+                data["winnerName"] = winner.fullName;
+            }
+            user.notifications.push(data);
+            user.save();
+        })
+        // var data = {
+        //     itemID: itemID,
+        //     datePosted: date,
+        //     read: false,
+        //     title: titleText,
+        //     description: descriptionText
+        // };
+        // if (winner != undefined && winner != null) {
+        //     data["sold"] = true;
+
+        // }
+        // user.notifications.push(data);
+        // user.save();
     }, function() {
         console.log('Error in addNotificationToUser');
     });
