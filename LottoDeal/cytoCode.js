@@ -85,6 +85,7 @@ function addUserVerticesAndEdges(users) {
 function selectItems(suggestedItems) {
     var selectedSuggestedItems = []
     var count = 0;
+    console.log('selecting items from' + suggestionItems.length);
     for (var j = 0; j < suggestedItems; j++) {
         var item = suggestedItems[j];
         if (!item.expired && !item.sold) {
@@ -95,6 +96,7 @@ function selectItems(suggestedItems) {
             break;
         }
     }
+    console.log('selected items' + selectedSuggestedItems.length);
     return selectedSuggestedItems;
 }
 
