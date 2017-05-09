@@ -22,7 +22,7 @@ var cy = cytoscape({
 
 var stringSimilarity = require('string-similarity');
 var edgeWeights = {};
-var MAX_NUMBER_OF_SIMILARITIES_TO_RETURN = 5
+var MAX_NUMBER_OF_SIMILARITIES_TO_RETURN = 3
 
 exports.computeSimilarities = function(userID, User, Item, callback) {
     //Retrieve users and items
@@ -42,8 +42,8 @@ exports.computeSimilarities = function(userID, User, Item, callback) {
                         console.log('Graph set up');
                         var suggestions = getSuggestedItems(userID, users);  
                         printSuggestions(users, items, suggestions);
-                        var suggestionItems = getItemsFromStructs(suggestions.suggestions.slice(0, MAX_NUMBER_OF_SIMILARITIES_TO_RETURN), items);
-                        callback(suggestionItems);
+                        var suggestionItems = getItemsFromStructs(suggestions.suggestions, items);
+                        callback(selectItems(suggestionItems));
                     } else {
                         console.log("Oops, there are no users and/or items!");
                     }
@@ -79,7 +79,25 @@ function addUserVerticesAndEdges(users) {
             });
         }
     }
+}
 
+//slices items and removes sold/expired ones
+function selectItems(suggestedItems) {
+    var selectedSuggestedItems = []
+    var count = 0;
+    console.log('selecting items from' + suggestionItems.length);
+    for (var j = 0; j < suggestedItems; j++) {
+        var item = suggestedItems[j];
+        if (!item.expired && !item.sold) {
+            selectedSuggestedItems.push(item);
+            count++;
+        }
+        if (count >= MAX_NUMBER_OF_SIMILARITIES_TO_RETURN) {
+            break;
+        }
+    }
+    console.log('selected items' + selectedSuggestedItems.length);
+    return selectedSuggestedItems;
 }
 
 // ADD VERTICES AND EDGES FOR ITEMS
