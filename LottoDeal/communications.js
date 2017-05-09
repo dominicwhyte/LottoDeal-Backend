@@ -46,7 +46,7 @@ exports.communicateToLosers = function(item, subject, message, date, winner, sol
 exports.communicateToSingleUser = function(item, subject, message, date, userID, sold, winner) {
     databaseModule.findUser(userID, function(user) {
         sendEmailToAddress(user.email, subject, message);
-        if (sold == true) {
+        if (sold != undefined && sold == true) {
             console.log("printing winner");
             console.log(winner)
             communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date, true, winner);
