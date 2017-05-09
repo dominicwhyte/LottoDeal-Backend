@@ -86,7 +86,7 @@ function selectItems(suggestedItems) {
     var selectedSuggestedItems = []
     var count = 0;
     console.log('selecting items from' + suggestedItems.length);
-    for (var j = 0; j < suggestedItems; j++) {
+    for (var j = 0; j < suggestedItems.length; j++) {
         var item = suggestedItems[j];
         if (!item.expired && !item.sold) {
             selectedSuggestedItems.push(item);
