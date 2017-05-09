@@ -19,14 +19,19 @@ exports.emailBiddersForItem = function(item, subject, message, winner) {
 }
 
 //Email and add notifications to all bidders, except the winner
-exports.communicateToLosers = function(item, subject, message, date, winner) {
+exports.communicateToLosers = function(item, subject, message, date, winner, sold) {
     for (var j = 0; j < item.bids.length; j++) {
         var bidderID = item.bids[j].ID;
         if (bidderID == winner) {
             continue;
         }
         console.log('searching for user' + bidderID);
-        communicateToSingleUser(item, subject, message, date, bidderID);
+        if (sold == true) {
+            communicateToSingleUser(item, subject, message, date, bidderID, true);
+        }
+        else {
+            communicateToSingleUser(item, subject, message, date, bidderID);
+        }
         // databaseModule.findUser(bidderID, function(user) {
         //     sendEmailToAddress(user.email, subject, message);
         //     communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date);
@@ -38,10 +43,15 @@ exports.communicateToLosers = function(item, subject, message, date, winner) {
 }
 
 //Email and add notifications to all bidders, except the winner
-exports.communicateToSingleUser = function(item, subject, message, date, userID) {
+exports.communicateToSingleUser = function(item, subject, message, date, userID, sold) {
     databaseModule.findUser(userID, function(user) {
         sendEmailToAddress(user.email, subject, message);
-        communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date);
+        if (sold == true) {
+            communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date, true);
+        }
+        else {
+            communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, null);
+        }
     }, function() {
         console.log('Error in communicateToSingleUser');
         // send404(response, request);
@@ -100,7 +110,7 @@ function sendEmailToAddress(email, subjectText, contentText) {
     })
 }
 
-exports.addNotificationToUser = function(itemID, userID, titleText, descriptionText, date) {
+exports.addNotificationToUser = function(itemID, userID, titleText, descriptionText, date, winner) {
     databaseModule.findUser(userID, function(user) {
         var data = {
             itemID: itemID,
@@ -109,6 +119,9 @@ exports.addNotificationToUser = function(itemID, userID, titleText, descriptionT
             title: titleText,
             description: descriptionText
         };
+        if (winner != undefined && winner != null) {
+            data["sold"] = true;
+        }
         user.notifications.push(data);
         user.save();
     }, function() {

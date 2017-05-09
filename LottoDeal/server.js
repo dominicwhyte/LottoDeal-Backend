@@ -1036,6 +1036,7 @@ var userSchema = new Schema({
         description: String,
         datePosted: Date, //date the notification was created (String - parse into Date object)
         itemID: String, // item associated with the notification
+        sold: Boolean, 
     }],
 });
 
@@ -1306,14 +1307,14 @@ app.get('/getReviewerImagesAndNames', function(request, response) {
     });
 });
 
-var createReview = function(sellerID, reviewerID, stars, reviewDes, date) {
+var createReview = function(sellerID, userID, stars, reviewDes, date) {
     User.find({
         fbid: sellerID
     }, function(err, user) {
         if (user != null) {
             if (err) throw err;
             var data = {
-                reviewerID: reviewerID,
+                userID: userID,
                 stars: stars,
                 reviewDes: reviewDes,
                 datePosted: date
