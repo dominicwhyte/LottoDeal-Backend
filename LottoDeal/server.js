@@ -172,6 +172,8 @@ var httprequest = require("request");
 //Validates an access token. Provide response and request in case a 404 
 //error should be thrown
 function validateAccessToken(accessToken, response, request, callback) {
+    console.log('Validating access Token');
+    var t0 = performance.now();
     httprequest({
         uri: "https://graph.facebook.com/me?access_token=" + accessToken,
         method: "GET",
@@ -179,6 +181,8 @@ function validateAccessToken(accessToken, response, request, callback) {
         followRedirect: true,
         maxRedirects: 10
     }, function(error, validateResponse, body) {
+        var t1 = performance.now();
+        console.log("Call validateAccessToken took " + (t1 - t0) + " milliseconds.");
         body = JSON.parse(body);
         var userID = body.id;
 
