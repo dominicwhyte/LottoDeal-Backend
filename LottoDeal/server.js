@@ -112,7 +112,7 @@ app.post('/createReview', function(request, response) {
 
 
 // Stripe Code---------------------------------------------------------
-var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
+var stripe = require("stripe")("sk_live_msslA7kve35X187k6sYkfl7v");
 
 // A user has bid on an item, add this bid to database
 app.post('/performPaymentAndAddBid', function(request, response) {
