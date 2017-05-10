@@ -88,7 +88,7 @@ function selectItems(suggestedItems) {
     console.log('selecting items from' + suggestedItems.length);
     for (var j = 0; j < suggestedItems.length; j++) {
         var item = suggestedItems[j];
-        if (!item.expired && !item.sold) {
+        if ((item != null) && (item != undefined) && !item.expired && !item.sold) {
             selectedSuggestedItems.push(item);
             count++;
         }
@@ -193,7 +193,16 @@ function computeEdgeWeights(users, items) {
 //been bid on
 function getSuggestedItems(user_fbid, users) {
     // bids that have already been made by the user
-    var bids = getUser(user_fbid, users).bids;
+    var foundUser = getUser(user_fbid, users)
+    if (foundUser == null) {
+        var struct = {
+            suggestions: [],
+            dijkstra: null
+        }
+        return struct;
+    }
+
+    var bids = foundUser.bids;
 
     var query = "u" + user_fbid;
 
@@ -251,7 +260,9 @@ function getItemsFromStructs(struct, items) {
     for (var i = 0; i < struct.length; i++) {
         var itemID = struct[i].itemID
         var item = getItem(itemID, items);
-        itemsToReturn.push(item);
+        if (item != null) {
+            itemsToReturn.push(item);
+        }
     }
     return itemsToReturn;
 }
@@ -301,6 +312,9 @@ function getNameOfID(encodedID, users, items) {
     var id = encodedID.substring(1, encodedID.length);
     if (indicator == 'u') {
         var user = getUser(id, users);
+        if (user == null) {
+            return "";
+        }
         return "FBID:   " + user.fbid + '           User: ' + user.fullName
     } else if (indicator == 'i') {
         var item = getItem(id, items);
@@ -330,6 +344,7 @@ function getItem(itemID, items) {
             return items[i];
         }
     }
+    return null;
 }
 
 //test function, not efficient
@@ -339,4 +354,5 @@ function getUser(fbid, users) {
             return users[i];
         }
     }
+    return null;
 }
