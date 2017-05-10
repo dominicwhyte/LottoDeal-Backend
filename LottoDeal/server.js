@@ -273,7 +273,7 @@ app.get('/markRead', function(request, response) {
                         }
                         user.save();
                         notifications = user.notifications;
-                        response.send(JSON.stringify(notifications));
+                        response.send(JSON.stringify(notifications.reverse()));
                     } else {
                         console.log('Error: user is null in getAccount');
                     }
