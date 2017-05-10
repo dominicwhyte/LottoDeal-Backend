@@ -876,6 +876,7 @@ app.delete('/deleteItem', function(request, response) {
                 response.header('Access-Control-Allow-Methods', 'DELETE');
                 //Check that the user has the right to delete this item
                 var userCanDeleteItem = false;
+                console.log('testing123');
                 for (var i = 0; i < user.bids.length; i++) {
                     console.log('test' + user.bids[i].itemID);
                     if (itemIDToDelete == user.bids[i].itemID) {
@@ -896,6 +897,7 @@ app.delete('/deleteItem', function(request, response) {
                 send404(response, request);
             }
         }, function() {
+            console.log('Error in deleteItem');
             send404(response, request);
         });
     });
