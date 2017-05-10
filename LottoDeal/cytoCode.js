@@ -40,7 +40,7 @@ exports.computeSimilarities = function(userID, User, Item, callback) {
                         addConnectingEdges(users);
                         computeEdgeWeights(users, items);
                         console.log('Graph set up');
-                        var suggestions = getSuggestedItems(userID, users);  
+                        var suggestions = getSuggestedItems(userID, users);
                         printSuggestions(users, items, suggestions);
                         var suggestionItems = getItemsFromStructs(suggestions.suggestions, items);
                         callback(selectItems(suggestionItems));
@@ -157,7 +157,7 @@ function computeEdgeWeights(users, items) {
     // ADD EDGE WEIGHTS FOR USERS
     for (var i = 0; i < users.length; i++) {
         for (var j = i + 1; j < users.length; j++) {
-            var similarity = Math.abs(users[i].userInfo.age - users[j].userInfo.age); 
+            var similarity = Math.abs(users[i].userInfo.age - users[j].userInfo.age);
             if (users[i].userInfo.gender == users[j].userInfo.gender) {
                 similarity /= USER_GENDER_DISPARITY_MULTIPLIER;
                 edge = "u" + users[i].fbid + "," + users[j].fbid;
@@ -173,7 +173,7 @@ function computeEdgeWeights(users, items) {
     // ADD EDGE WEIGHTS FOR ITEMS
     for (var i = 0; i < items.length; i++) {
         for (var j = i + 1; j < items.length; j++) {
-            var similarity = (1 - stringSimilarity.compareTwoStrings(items[i].title, items[j].title)) * TITLE_MULTIPLIER; 
+            var similarity = (1 - stringSimilarity.compareTwoStrings(items[i].title, items[j].title)) * TITLE_MULTIPLIER;
             similarity += 1 - stringSimilarity.compareTwoStrings(items[i].shortDescription, items[j].shortDescription);
             similarity += 1 - stringSimilarity.compareTwoStrings(items[i].longDescription, items[j].longDescription);
             similarity *= ITEM_SIMILARITY_MULTIPLIER // mult
@@ -267,8 +267,10 @@ function printSuggestions(users, items, suggestionsStruct) {
     for (var i = 0; i < suggestions.length; i++) {
         var itemStruct = suggestions[i];
         var item = getItem(itemStruct.itemID, items);
-        console.log('Weight from user: ' + itemStruct.weight + ": " + item.title)
-        printPathToItem(item._id, dijkstra, users, items);
+        if (item != null && item != undefined) {
+            console.log('Weight from user: ' + itemStruct.weight + ": " + item.title)
+            printPathToItem(item._id, dijkstra, users, items);
+        }
         console.log();
     }
 
@@ -286,8 +288,7 @@ function printPathToItem(itemID, dijkstra, users, items) {
         //skip over the edges in the path, just look at nodes
         if (!(path[i].id().indexOf(',') > -1)) {
             console.log(getNameOfID(path[i].id(), users, items));
-        }
-        else {
+        } else {
             console.log('Edge with weight: ' + edgeWeights[path[i].id()]);
         }
     }
