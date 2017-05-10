@@ -871,20 +871,11 @@ app.delete('/deleteItem', function(request, response) {
     var accessToken = request.body.accessToken;
     var itemIDToDelete = request.body.id
     validateAccessToken(accessToken, response, request, function(userID) {
-        findUser(userID, function(user) {
-            if (user != null) {
+        findItemByID(itemID, function(item) {
+            if (item != null) {
                 response.header('Access-Control-Allow-Methods', 'DELETE');
                 //Check that the user has the right to delete this item
-                var userCanDeleteItem = false;
-                console.log('testing123');
-                for (var i = 0; i < user.bids.length; i++) {
-                    console.log('test' + user.bids[i].itemID);
-                    if (itemIDToDelete == user.bids[i].itemID) {
-                        userCanDeleteItem = true;
-                        break;
-                    }
-                }
-                if (userCanDeleteItem) {
+                if (item.sellerID == userID) {
                     deleteItem(itemIDToDelete, function(message) {
                         response.send(message);
                     });
@@ -893,9 +884,15 @@ app.delete('/deleteItem', function(request, response) {
                 }
 
             } else {
-                console.log('Error: user is null in getAccount');
                 send404(response, request);
             }
+        }, function() {
+            console.log('Error: user is null in getAccount');
+            send404(response, request);
+        });
+
+        findUser(userID, function(user) {
+            
         }, function() {
             console.log('Error in deleteItem');
             send404(response, request);
@@ -1035,7 +1032,7 @@ var userSchema = new Schema({
         description: String,
         datePosted: Date, //date the notification was created (String - parse into Date object)
         itemID: String, // item associated with the notification
-        sold: Boolean, 
+        sold: Boolean,
         winnerName: String,
     }],
 });
