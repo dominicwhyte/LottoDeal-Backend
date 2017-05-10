@@ -944,7 +944,7 @@ app.get('/getImagesForNotifications', function(request, response) {
                     }
                 }
             }
-            response.send(JSON.stringify(imagesCompressed.reverse()));
+            response.send(JSON.stringify(imagesCompressed));
 
         }, function() {
             send404(response, request);
