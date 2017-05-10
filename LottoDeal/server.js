@@ -138,21 +138,27 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                         description: "Charge for LottoDeal " + request.body.itemTitle,
                         source: token,
                     }, function(err, charge) {
-                        dollarAmount = (charge.amount / 100);
+                        if (charge.amount != null) {
+                            dollarAmount = (charge.amount / 100);
 
-                        if (err != null) {
-                            console.log(err);
+                            if (err != null) {
+                                console.log(err);
+                            }
+                            if (charge != null) {
+                                var date = new Date();
+
+                                addChargeIDToItem(itemID, userID, charge._id);
+
+                                communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
+                                response.send("charge is" + charge.amount)
+                            } else {
+                                console.log('Error: charge is null in performPaymentAndAddBid');
+                            }
                         }
-                        if (charge != null) {
-                            var date = new Date();
-
-                            addChargeIDToItem(itemID, userID, charge._id);
-
-                            communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
-                            response.send("charge is" + charge.amount)
-                        } else {
-                            console.log('Error: charge is null in performPaymentAndAddBid');
+                        else {
+                            console.log('MAJOR ERROR: Stripe charge is null');
                         }
+
                     });
                 });
             } else {
@@ -876,7 +882,7 @@ app.delete('/deleteItem', function(request, response) {
             if (item != null) {
                 response.header('Access-Control-Allow-Methods', 'DELETE');
                 //Check that the user has the right to delete this item
-                if (item.sellerID == userID && (!item.sold) &&  (!item.expired)) {
+                if (item.sellerID == userID && (!item.sold) && (!item.expired)) {
                     deleteItem(itemIDToDelete, function(message) {
                         response.send(message);
                     });
@@ -893,7 +899,7 @@ app.delete('/deleteItem', function(request, response) {
         });
 
         findUser(userID, function(user) {
-            
+
         }, function() {
             console.log('Error in deleteItem');
             send404(response, request);
