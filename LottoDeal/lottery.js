@@ -32,7 +32,7 @@ var checkLotteries = function() {
                     communicationsModule.communicateToLosers(item, "LottoDeal: You lost!", "Sorry, you lost your bid for " + item.title + ". Bid again on LottoDeal!", date, winner, true);
                     communicationsModule.communicateToSingleUser(item, "LottoDeal: You won!", "Congratulations, you won your bid for" + item.title + "! We'll be in contact shortly to arrange item delivery.", date, winner, true, winner );
                     communicationsModule.communicateToAdmins(item, "What's up admin, we've got a winner on LottoDeal!", "There was a winner for " + item.title + ".", date, winner);
-                    communicationsModule.communicateToSingleUser(item, "LottoDeal: Your item" + item.title + "has been sold!", "Click here to view who won:", date, item.sellerID, true, winner);
+                    communicationsModule.communicateToSingleUser(item, "LottoDeal: Your item " + item.title + " has been sold!", "Click here to view who won:", date, item.sellerID, true, winner);
                 });
             } else if (expirDate < Date.now()) {
                 //Refund and notify users
