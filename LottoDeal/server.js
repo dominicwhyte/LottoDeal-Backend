@@ -888,11 +888,13 @@ app.delete('/deleteItem', function(request, response) {
             if (item != null) {
                 response.header('Access-Control-Allow-Methods', 'DELETE');
                 //Check that the user has the right to delete this item
-                if (item.sellerID == userID && (!item.sold) && (!item.expired)) {
+                var isCorrectUser = (item.sellerID == userID);
+                if (isCorrectUser && (!item.sold) && (!item.expired)) {
                     deleteItem(itemIDToDelete, function(message) {
                         response.send(message);
                     });
                 } else {
+                    console.log('Item cannot be deleted. Sold = ' + item.sold + '. Expired = ' + item.expired + '. Is user item: ' + isCorrectUser);
                     send404(response, request);
                 }
 
