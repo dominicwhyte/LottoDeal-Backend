@@ -871,7 +871,7 @@ app.delete('/deleteItem', function(request, response) {
     var accessToken = request.body.accessToken;
     var itemIDToDelete = request.body.id
     validateAccessToken(accessToken, response, request, function(userID) {
-        findItemByID(itemID, function(item) {
+        findItemByID(itemIDToDelete, function(item) {
             if (item != null) {
                 response.header('Access-Control-Allow-Methods', 'DELETE');
                 //Check that the user has the right to delete this item
