@@ -190,7 +190,12 @@ function validateAccessToken(accessToken, response, request, callback) {
         followRedirect: true,
         maxRedirects: 10
     }, function(error, validateResponse, body) {
-        body = JSON.parse(body);
+        if (body == undefined || body === "undefined") {
+            console.log('Error in validating accessToken. Error is not null or userID is null: ' + error);
+            send404(response, request);
+        }
+        else {
+            body = JSON.parse(body);
         var userID = body.id;
 
         if (error != null || userID == null) {
@@ -198,6 +203,7 @@ function validateAccessToken(accessToken, response, request, callback) {
             send404(response, request);
         } else {
             callback(userID);
+        }
         }
     });
 }
