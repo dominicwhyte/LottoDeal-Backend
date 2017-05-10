@@ -867,6 +867,7 @@ app.delete('/deleteUser', function(request, response) {
 
 // Delete an Item
 app.delete('/deleteItem', function(request, response) {
+    console.log('Deleting Item');
     var accessToken = request.body.accessToken;
     var itemIDToDelete = request.body.id
     validateAccessToken(accessToken, response, request, function(userID) {
@@ -876,6 +877,7 @@ app.delete('/deleteItem', function(request, response) {
                 //Check that the user has the right to delete this item
                 var userCanDeleteItem = false;
                 for (var i = 0; i < user.bids.length; i++) {
+                    console.log('test' + user.bids[i].itemID);
                     if (itemIDToDelete == user.bids[i].itemID) {
                         userCanDeleteItem = true;
                         break;
@@ -1461,6 +1463,7 @@ var deleteUser = function(id, callback) {
 
 
 var deleteItem = function(id, callback) {
+
     // Remove Item
     Item.findById(id, function(err, item) {
         //TODO: Need to replace this error by an error callback
