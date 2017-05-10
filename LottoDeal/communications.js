@@ -27,10 +27,10 @@ exports.communicateToLosers = function(item, subject, message, date, winner, sol
         }
         console.log('searching for user' + bidderID);
         if (sold == true) {
-            communicateToSingleUser(item, subject, message, date, bidderID, true, winner);
+            communicationsModule.communicateToSingleUser(item, subject, message, date, bidderID, true, winner);
         }
         else {
-            communicateToSingleUser(item, subject, message, date, bidderID);
+            communicationsModule.communicateToSingleUser(item, subject, message, date, bidderID);
         }
         // databaseModule.findUser(bidderID, function(user) {
         //     sendEmailToAddress(user.email, subject, message);
