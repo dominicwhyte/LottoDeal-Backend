@@ -138,7 +138,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                         description: "Charge for LottoDeal " + request.body.itemTitle,
                         source: token,
                     }, function(err, charge) {
-                        if (charge.amount != null) {
+                        if (charge != null) {
                             dollarAmount = (charge.amount / 100);
 
                             if (err != null) {
