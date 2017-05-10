@@ -875,7 +875,7 @@ app.delete('/deleteItem', function(request, response) {
             if (item != null) {
                 response.header('Access-Control-Allow-Methods', 'DELETE');
                 //Check that the user has the right to delete this item
-                if (item.sellerID == userID) {
+                if (item.sellerID == userID && (!item.sold) &&  (!item.expired)) {
                     deleteItem(itemIDToDelete, function(message) {
                         response.send(message);
                     });
