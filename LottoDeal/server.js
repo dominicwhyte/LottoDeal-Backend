@@ -1490,6 +1490,7 @@ var deleteItem = function(id, callback) {
                 if (item.bids.length == 0) {
                     console.log('Deleting item with no bids');
                 } else {
+                    lotteryModule.refundUsers(item);
                     console.log('Deleting item with bids');
                     //iterate through users (one time) to delete the necessary bids
                     for (var j = 0; j < users.length; j++) {

@@ -36,7 +36,7 @@ var checkLotteries = function() {
                 });
             } else if (expirDate < Date.now()) {
                 //Refund and notify users
-                refundUsers(item);
+                lotteryModule.refundUsers(item);
                 console.log('Date has past - notifying users and marking item as expired');
                 var date = new Date();
                 communicationsModule.communicateToLosers(item, "LottoDeal:" + item.title + " expired", "You have been fully refunded", date, "");
@@ -103,7 +103,7 @@ var shuffleArray = function(array) {
     return array;
 }
 
-function refundUsers(item) {
+exports.refundUsers = function(item) {
     for (var j = 0; j < item.bids.length; j++) {
         console.log('attempting to refund user');
         var bid = item.bids[j];
