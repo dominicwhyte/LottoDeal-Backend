@@ -1,4 +1,4 @@
-var cytoscape = require('./suggestionsAlgorithm');
+var cytoscape = require('cytoscape');
 
 
 var cy = cytoscape({});
