@@ -145,10 +145,19 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                                 console.log('Error: amountToCharge is not equal to dollarAmount');
                                 //remove the bid that was added
                                 removeBidForItem(itemID, userID, amountToCharge, function(status) {
+                                    //Refund the user
+                                    stripe.refunds.create({
+                                        charge: charge._id,
+                                    }, function(err, refund) {
+                                        if (refund == null || err != null) {
+                                            console.log('Refund failed')
+                                        }
+                                    });
                                     if (!status) {
                                         console.log('Error: removeBidForItem');
                                     }
-                                    response.send("Charge was erroneous");
+                                    response.status(401);
+                                    response.type('txt').send('Error bidding on item');
                                 })
                             } else {
                                 addChargeIDToItem(itemID, userID, charge._id);
@@ -158,12 +167,21 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                         } else {
                             //remove the bid for the item
                             removeBidForItem(itemID, userID, amountToCharge, function(status) {
+                                //Refund the user
+                                stripe.refunds.create({
+                                    charge: charge._id,
+                                }, function(err, refund) {
+                                    if (refund == null || err != null) {
+                                        console.log('Refund failed')
+                                    }
+                                });
                                 if (!status) {
                                     console.log('Error: removeBidForItem');
                                 }
-                                response.send("Charge was erroneous");
                             })
-                            console.log('Error: Stripe charge is null');
+                            console.log('Error: Stripe charge is null - removing bid');
+                            response.status(401);
+                            response.type('txt').send('Error bidding on item');
                         }
 
                     });
