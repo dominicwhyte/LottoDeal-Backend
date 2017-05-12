@@ -24,7 +24,7 @@ exports.computeSimilarities = function(userID, User, Item, callback) {
                         addConnectingEdges(users);
                         computeEdgeWeights(users, items);
                         var suggestions = getSuggestedItems(userID, users);
-                        printSuggestions(users, items, suggestions);
+                        //printSuggestions(users, items, suggestions);
                         var suggestionItems = getItemsFromStructs(suggestions.suggestions, items);
                         callback(selectItems(suggestionItems));
                     } else {
