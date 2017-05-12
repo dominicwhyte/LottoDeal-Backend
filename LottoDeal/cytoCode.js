@@ -42,6 +42,7 @@ exports.computeSimilarities = function(userID, User, Item, callback) {
 function addUserVerticesAndEdges(users) {
 
     for (var i = 0; i < users.length; i++) {
+        console.log('Adding: ' + String("u" + users[i].fbid));
         cy.add({
                 group: "nodes",
                 data: {
@@ -55,9 +56,9 @@ function addUserVerticesAndEdges(users) {
             cy.add({
                 group: "edges",
                 data: {
-                    id: "u" + users[i].fbid + "," + users[j].fbid,
-                    source: "u" + users[i].fbid,
-                    target: "u" + users[j].fbid
+                    id: String("u" + users[i].fbid + "," + users[j].fbid),
+                    source: String("u" + users[i].fbid),
+                    target: String("u" + users[j].fbid)
                 }
             });
         }
@@ -97,7 +98,7 @@ function addItemVerticesAndEdges(items) {
             cy.add({
                 group: "edges",
                 data: {
-                    id: "i" + items[i]._id + "," + items[j]._id,
+                    id: String("i" + items[i]._id + "," + items[j]._id),
                     source: "i" + items[i]._id,
                     target: "i" + items[j]._id
                 }
