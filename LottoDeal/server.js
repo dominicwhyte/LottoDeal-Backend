@@ -117,6 +117,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
     var accessToken = request.body["accessToken"];
     var itemID = request.body.itemID;
     var amountToCharge = request.body.amount; //Check that this is numerical
+    amountToCharge = 10;
     validateAccessToken(accessToken, response, request, function(userID) {
         // get into database, access object, update it's bid field and add to user bids
         findItemByID(itemID, function(item) {
