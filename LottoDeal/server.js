@@ -132,7 +132,6 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                         description: "Charge for LottoDeal " + request.body.itemTitle,
                         source: token,
                     }, function(err, charge) {
-                        charge = null //temp
                         if (charge != null) {
                             dollarAmount = (charge.amount / 100);
                             console.log('Charging payment for ' + dollarAmount);
@@ -146,13 +145,16 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                                 //remove the bid that was added
                                 removeBidForItem(itemID, userID, amountToCharge, function(status) {
                                     //Refund the user
-                                    stripe.refunds.create({
-                                        charge: charge._id,
-                                    }, function(err, refund) {
-                                        if (refund == null || err != null) {
-                                            console.log('Refund failed')
-                                        }
-                                    });
+                                    if (charge != null) {
+                                        stripe.refunds.create({
+                                            charge: charge._id,
+                                        }, function(err, refund) {
+                                            if (refund == null || err != null) {
+                                                console.log('Refund failed')
+                                            }
+                                        });
+                                    }
+
                                     if (!status) {
                                         console.log('Error: removeBidForItem');
                                     }
@@ -168,13 +170,15 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                             //remove the bid for the item
                             removeBidForItem(itemID, userID, amountToCharge, function(status) {
                                 //Refund the user
-                                stripe.refunds.create({
-                                    charge: charge._id,
-                                }, function(err, refund) {
-                                    if (refund == null || err != null) {
-                                        console.log('Refund failed')
-                                    }
-                                });
+                                if (charge != null) {
+                                    stripe.refunds.create({
+                                        charge: charge._id,
+                                    }, function(err, refund) {
+                                        if (refund == null || err != null) {
+                                            console.log('Refund failed')
+                                        }
+                                    });
+                                }
                                 if (!status) {
                                     console.log('Error: removeBidForItem');
                                 }
