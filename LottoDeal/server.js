@@ -140,11 +140,21 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                             }
                             if (charge != null) {
                                 var date = new Date();
-
-                                addChargeIDToItem(itemID, userID, charge._id);
-
-                                communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
-                                response.send("charge is" + charge.amount)
+                                //Check that amountToCharge is same as actual stripe payment that came through
+                                if (amountToCharge != dollarAmount) {
+                                    console.log('Error: amountToCharge is not equal to dollarAmount');
+                                    //remove the bid that was added
+                                    removeBidForItem(itemID, userID, amountToCharge, function(status) {
+                                        if (!status) {
+                                            console.log('Error: removeBidForItem');
+                                        }
+                                        response.send("Charge was erroneous");
+                                    })
+                                } else {
+                                    addChargeIDToItem(itemID, userID, charge._id);
+                                    communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
+                                    response.send("charge is" + charge.amount);
+                                }
                             } else {
                                 console.log('Error: charge is null in performPaymentAndAddBid');
                             }
@@ -1376,41 +1386,99 @@ var addBidForItem = function(itemID, userID, newAmount, completion) {
             }
 
 
-            var users = findAllUsers(function(users) {
-                var usersLength = users.length;
-
-                for (var i = 0; i < usersLength; i++) {
-                    if (users[i].fbid === userID) {
-                        //response.send("User already exists");
-                        var user = users[i]
-                        var array = user.bids;
-                        var found = 0;
-                        if (user.bids != null) {
-                            for (i = 0; i < user.bids.length; i++) {
-                                if (user.bids[i].itemID == itemID) {
-                                    var curAmount = user.bids[i].amount;
-                                    curAmount += Number(newAmount);
-                                    user.bids[i].amount = curAmount;
-                                    user.save();
-                                    found = 1;
-                                    break;
-                                }
-                            }
-                            if (!found) {
-                                var data = {
-                                    itemID: itemID,
-                                    amount: newAmount
-                                };
-                                user.bids.push(data);
+            findUser(userID, function(user) {
+                if (user != null) {
+                    var array = user.bids;
+                    var found = 0;
+                    if (user.bids != null) {
+                        for (i = 0; i < user.bids.length; i++) {
+                            if (user.bids[i].itemID == itemID) {
+                                var curAmount = user.bids[i].amount;
+                                curAmount += Number(newAmount);
+                                user.bids[i].amount = curAmount;
                                 user.save();
+                                found = 1;
+                                break;
                             }
                         }
-                        break;
+                        if (!found) {
+                            var data = {
+                                itemID: itemID,
+                                amount: newAmount
+                            };
+                            user.bids.push(data);
+                            user.save();
+                        }
                     }
+                } else {
+                    console.log('Error: user is null in addBidForItem');
                 }
                 completion(true);
+            }, function() {
+                console.log('Error: user is null in addBidForItem');
+                completion(false);
             });
+        });
+    } else {
+        console.log('Error: User is not defined');
+    }
+}
 
+//Removes a bid from item for userID
+var removeBidForItem = function(itemID, userID, newAmount, completion) {
+    // get a item with ID and update the userID array
+    if (userID != undefined) {
+        Item.findById(itemID, function(err, item) {
+            if (err) {
+                console.log('Error finding item');
+            }
+
+            //Find the bid on the item and remove newAmount from it
+            if (item != null) {
+                var array = item.bids;
+
+                if (item.bids != null) {
+                    for (i = 0; i < item.bids.length; i++) {
+                        // if they already bidded on the item
+                        if (item.bids[i].ID == userID) {
+                            var curAmount = Number(item.bids[i].amount);
+                            curAmount -= Number(newAmount);
+                            item.bids[i].amount = Number(curAmount);
+                            item.amountRaised -= Number(newAmount);
+                            item.save();
+                            break;
+                        }
+                    }
+                }
+            } else {
+                console.log('Item was null in removeBidForItem')
+            }
+
+            //Find the user's bid on the item and remove newAmount from it
+            findUser(userID, function(user) {
+                if (user != null) {
+                    var found = false;
+                    for (i = 0; i < user.bids.length; i++) {
+                        if (user.bids[i].itemID == itemID) {
+                            var curAmount = user.bids[i].amount;
+                            curAmount -= Number(newAmount);
+                            user.bids[i].amount = curAmount;
+                            user.save();
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        console.log("Error: bid to be removed not found");
+                    }
+                } else {
+                    console.log('Error: user is null in removeBidForItem');
+                }
+                completion(true);
+            }, function() {
+                console.log('Error: user is null in removeBidForItem');
+                completion(false);
+            });
         });
     } else {
         console.log('Error: User is not defined');
