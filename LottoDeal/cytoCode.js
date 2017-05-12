@@ -7,7 +7,6 @@ var stringSimilarity = require('string-similarity');
 var edgeWeights = {};
 var MAX_NUMBER_OF_SIMILARITIES_TO_RETURN = 3 //Change to alter the number suggestions to show on the website
 
-
 //Computes the suggestions for userID, called back in callback. Takes in the User and Item schemas
 exports.computeSimilarities = function(userID, User, Item, callback) {
     //Retrieve users and items
@@ -84,14 +83,13 @@ function selectItems(suggestedItems) {
 
 // ADD VERTICES AND EDGES FOR ITEMS
 function addItemVerticesAndEdges(items) {
-
     for (var i = 0; i < items.length; i++) {
         cy.add({
                 group: "nodes",
                 data: {
                     id: String("i" + items[i]._id)
                 }
-            } // may or may not have to specify a position here (x, y)
+            } 
         );
     }
     for (var i = 0; i < items.length; i++) {
@@ -161,7 +159,6 @@ function computeEdgeWeights(users, items) {
             similarity += 1 - stringSimilarity.compareTwoStrings(items[i].longDescription, items[j].longDescription);
             similarity *= ITEM_SIMILARITY_MULTIPLIER // mult
             edge = "i" + items[i]._id + "," + items[j]._id;
-            // should the edge going the other way be added too?
             edgeWeights[edge] = similarity;
         }
     }
@@ -283,7 +280,7 @@ function printPathToItem(itemID, dijkstra, users, items) {
     }
 }
 
-//PARSE AN ENCODED STRING FROM THE GRPAH, RETURNS ITEM OR USER
+//PARSE AN ENCODED STRING FROM THE GRAPH, RETURNS ITEM OR USER IN STRING FORMAT
 function getNameOfID(encodedID, users, items) {
     var indicator = encodedID.charAt(0);
     var id = encodedID.substring(1, encodedID.length);

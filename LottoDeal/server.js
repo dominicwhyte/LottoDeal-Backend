@@ -122,12 +122,8 @@ app.post('/performPaymentAndAddBid', function(request, response) {
     var amountToCharge = request.body.amount; //Check that this is numerical
     validateAccessToken(accessToken, response, request, function(userID) {
         // get into database, access object, update it's bid field and add to user bids
-        console.log('Initiating Payment performing for ' + amountToCharge + " USD")
-
         findItemByID(itemID, function(item) {
-            // isInt isn't working!
             amountToCharge *= 1
-                // console.log(amountToCharge + 1)
             if (item != null && isInt(amountToCharge) && (!item.expired) && (!item.sold) && (item.amountRaised + amountToCharge <= item.price)) {
                 addBidForItem(itemID, userID, amountToCharge, function(status) {
                     var token = request.body.stripeToken; // Using Express
@@ -142,7 +138,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                             dollarAmount = (charge.amount / 100);
 
                             if (err != null) {
-                                console.log(err);
+                                console.log("Error: " + err);
                             }
                             if (charge != null) {
                                 var date = new Date();
@@ -154,9 +150,8 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                             } else {
                                 console.log('Error: charge is null in performPaymentAndAddBid');
                             }
-                        }
-                        else {
-                            console.log('MAJOR ERROR: Stripe charge is null');
+                        } else {
+                            console.log('Error: Stripe charge is null');
                         }
 
                     });
@@ -193,17 +188,16 @@ function validateAccessToken(accessToken, response, request, callback) {
         if (body == undefined || body === "undefined") {
             console.log('Error in validating accessToken. Error is not null or userID is null: ' + error);
             send404(response, request);
-        }
-        else {
-            body = JSON.parse(body);
-        var userID = body.id;
-
-        if (error != null || userID == null) {
-            console.log('Error in validating accessToken. Error is not null or userID is null: ' + error);
-            send404(response, request);
         } else {
-            callback(userID);
-        }
+            body = JSON.parse(body);
+            var userID = body.id;
+
+            if (error != null || userID == null) {
+                console.log('Error in validating accessToken. Error is not null or userID is null: ' + error);
+                send404(response, request);
+            } else {
+                callback(userID);
+            }
         }
     });
 }
@@ -257,11 +251,11 @@ app.get('/checkIfUser', function(request, response) {
                 fbid: userID
             }, function(err, user) {
                 if (user.length > 1) {
-                    console.log('ERROR: multiple users with FBID')
+                    console.log('Error: multiple users with FBID')
                 } else if (user.length == 1) {
                     response.send(true);
                 } else {
-                    console.log("returning false")
+                    console.log("Error: returning false in checkIfUser")
                     response.send(false);
                 }
             });
@@ -349,7 +343,7 @@ app.get('/getSuggestions', function(request, response) {
 
 //Send 404 ERROR
 function send404(response, request) {
-    console.log('Sending 404');
+    console.log('Error: Sending 404');
     response.status(404);
 
     // respond with html page
@@ -538,7 +532,9 @@ app.post('/debugPost', function(request, response) {
     Jimp.read(imagePath, function(err, img) {
         img.scaleToFit(500, 500) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
             .getBase64(Jimp.AUTO, function(err, src) {
-                console.log(err);
+                if (err) {
+                    console.log("Error: " + err);
+                }
                 image["compressed"] = src;
                 var title = request.body.title;
                 var price = request.body.price;
@@ -621,10 +617,6 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 
     validateAccessToken(accessToken, res, req, function(sellerID) {
         var picture = req.files['picture'][0]
-
-        // console.log("printing picture");
-        // console.log(picture);
-
         if (picture.mimetype != "image/jpeg" && picture.mimetype != "image/png") {
             res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
             return;
@@ -642,22 +634,21 @@ app.post('/createPost', cpUpload, function(req, res, next) {
         // backend is done with the image now, so it can be deleted from uploads folder (since readfile was sync)
         fs.unlink(imagePath, function(error) {
             if (error != null) {
-                console.log(error);
+                console.log("Error: " + error);
             }
         })
 
         // create compressed version
         Jimp.read(imageData, function(err, img) {
-            console.log(err);
+            if (err) {
+                console.log("Error: " + err);
+            }
             img.scaleToFit(500, 500) // crop(100, 100, 300, 200) // CAN EDIT THE SCALING HERE TO BE A LITTLE SMALLER FOR PERFORMANCE
                 .write(imagePath + picture.filename + "compressed").getBase64(Jimp.AUTO, function(err, src) {
-                    console.log(err);
-                    // console.log(response);
-                    // console.log(src);
-                    // if (err != null) {
+                    if (err) {
+                        console.log("Error: " + err);
+                    }
                     image["compressed"] = src;
-                    // }
-
                     var title = req.body.title;
                     var price = req.body.price;
                     var offset = req.body.expirDate;
@@ -722,7 +713,7 @@ app.get('/getReviewerImagesAndNames', function(request, response) {
                 response.send(reviewersToSend);
             });
         } else {
-            console.log('User is null in getReviewerImagesandNames');
+            console.log('Error: User is null in getReviewerImagesandNames');
         }
     }, function() {
         send404(response, request);
@@ -778,7 +769,7 @@ app.post('/updateSettings', function(request, response) {
                     user.save();
                     response.send("updated settings");
                 } else {
-                    console.log("Failed to update settings");
+                    console.log("Error: Failed to update settings");
                     response.send("Failed to update settings");
                 }
 
@@ -795,9 +786,6 @@ app.post('/updateSettings', function(request, response) {
 // Send back all posts
 app.get('/getPosts', function(request, response) {
     // get all of the posts and return them to frontend to load on feed
-    // might not need to include bids
-    // console.log(request);
-
     var items = findAllItems(function(items) {
         if (items != null) {
             response.send(JSON.stringify(items));
@@ -867,15 +855,11 @@ app.get('/getItem', function(request, response) {
     findItemByID(itemID, function(item) {
         if (item != null) {
             findImageByID(item["_id"], function(buffer) {
-                // console.log(item);
                 item.img.compressed = buffer;
-                // console.log(item);
                 response.send(JSON.stringify(trimItem(item)));
             }, function() {
                 send404(response, request);
             })
-
-            // response.send(JSON.stringify(item));
         } else {
             console.log("Error: item is null in getItem");
         }
@@ -901,20 +885,15 @@ app.get('/getUsers', function(request, response) {
 
 // Delete a user account
 app.delete('/deleteUser', function(request, response) {
-    // console.log(request.body);
-    // console.log(request);
     var id = request.body.id;
-
     deleteUser(id, function(message) {
-            response.send(message);
-        })
-        // response.send('Deleted')
-})
+        response.send(message);
+    })
 
+})
 
 // Delete an Item
 app.delete('/deleteItem', function(request, response) {
-    console.log('Deleting Item');
     var accessToken = request.body.accessToken;
     var itemIDToDelete = request.body.id
     validateAccessToken(accessToken, response, request, function(userID) {
@@ -928,7 +907,7 @@ app.delete('/deleteItem', function(request, response) {
                         response.send(message);
                     });
                 } else {
-                    console.log('Item cannot be deleted. Sold = ' + item.sold + '. Expired = ' + item.expired + '. Is user item: ' + isCorrectUser);
+                    console.log('Error: Item cannot be deleted');
                     send404(response, request);
                 }
 
@@ -1004,16 +983,9 @@ app.get('/getImagesForNotifications', function(request, response) {
     }
 })
 
-
-
-// https.createServer(options, app).listen(8000, function() {
-//     console.log("Server started at port 8000");
-// });
 http.createServer(app).listen(8000, function() {
     console.log("Server started at port 8000")
 })
-
-
 
 /* START OF MONGO FUNCTIONS */
 const ITEM_COLLECTION = 'Items';
@@ -1035,9 +1007,9 @@ mongoose.Promise = global.Promise;
 
 
 mongoose.connect(url, function(err, db) {
-    assert.equal(null, err);
-    console.log("Connected successfully to server");
-
+    if (err) {
+        console.log('Error: connecting to mongo server');
+    }
     var postmark = require("postmark");
 
     // deleteAllUsers();
@@ -1164,8 +1136,9 @@ var createUser = function(name, id, url, email, age, gender) {
 
     // call the built-in save method to save to the database
     newUser.save(function(err) {
-        if (err) throw err;
-        console.log('User saved successfully!');
+        if (err) {
+            console.log('Error: saving new user');
+        }
     });
 }
 
@@ -1200,11 +1173,9 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
             });
             newItem.save(function(err) {
                 if (err) throw err;
-
-                console.log('Item created successfully');
             });
         } else {
-            console.log('Item saved unsuccessfully');
+            console.log('Error: Item saved unsuccessfully');
         }
     }, function() {
         send404(response, request);
@@ -1402,8 +1373,6 @@ var addBidForItem = function(itemID, userID, newAmount, completion) {
                     item.amountRaised += newAmount;
                     item.save();
                 }
-
-                console.log('Bid successfully added to item');
             } else {
                 console.log('Item was null in addbidforitem')
             }
@@ -1437,8 +1406,6 @@ var addBidForItem = function(itemID, userID, newAmount, completion) {
                                 user.bids.push(data);
                                 user.save();
                             }
-                            // sendEmailToAddress(user.email, "Congrats!", "You bid $" + newAmount + " on " + item.title)
-                            console.log('Bid successfully added to user');
                         }
                         break;
                     }
@@ -1448,7 +1415,7 @@ var addBidForItem = function(itemID, userID, newAmount, completion) {
 
         });
     } else {
-        console.log('User is not defined');
+        console.log('Error: User is not defined');
     }
 }
 
@@ -1472,11 +1439,7 @@ var deleteUser = function(id, callback) {
                 }, function(err) {
                     if (err) throw err;
                     callback('User successfully deleted')
-                    console.log('Items successfully deleted!');
                 });
-
-                // callback('User successfully deleted')
-                console.log('User successfully deleted');
             });
         } else {
             callback('User not successfully deleted')
@@ -1498,11 +1461,8 @@ var deleteItem = function(id, callback) {
             //delete the bid from the users bids
             findAllUsers(function(users) {
                 // if no one has bid on the item
-                if (item.bids.length == 0) {
-                    console.log('Deleting item with no bids');
-                } else {
+                if (item.bids.length != 0) {
                     lotteryModule.refundUsers(item);
-                    console.log('Deleting item with bids');
                     //iterate through users (one time) to delete the necessary bids
                     for (var j = 0; j < users.length; j++) {
                         var user = users[j];
@@ -1516,7 +1476,6 @@ var deleteItem = function(id, callback) {
                                     if (bid.itemID == id) {
                                         user.bids.splice(k, 1);
                                         user.save();
-                                        console.log('Removing bid from user');
                                     }
                                 }
                                 break;
@@ -1527,12 +1486,13 @@ var deleteItem = function(id, callback) {
                 //Delete the item
                 callback("1");
                 item.remove(function(err) {
-                    if (err) throw err;
-                    console.log('Item successfully deleted!');
+                    if (err) {
+                        console.log('Error: removing item');
+                    }
                 });
             });
         } else {
-            console.log('Trying to remove null item');
+            console.log('Error: Trying to remove null item');
         }
 
     });
@@ -1545,7 +1505,7 @@ var findUser = function(fbid, callback, errorCallback) {
         fbid: fbid
     }, function(err, user) {
         if (err) {
-            console.log('Error finding user');
+            console.log('Error: finding user');
             errorCallback();
             return;
         }
@@ -1565,7 +1525,9 @@ var findUser = function(fbid, callback, errorCallback) {
 var findAllUsers = function(callback) {
     // get all the users
     User.find({}, function(err, users) {
-        if (err) throw err;
+        if (err) {
+            console.log("Error finding user");
+        }
         callback(users)
     });
 }
@@ -1574,8 +1536,9 @@ var findAllUsers = function(callback) {
 var deleteAllUsers = function() {
     // get all the users
     User.remove({}, function(err) {
-        if (err) throw err;
-        console.log('All Uses successfully deleted!');
+        if (err) {
+            console.log('Error: removing user');
+        }
     });
 }
 
@@ -1583,8 +1546,9 @@ var deleteAllUsers = function() {
 var deleteAllItems = function() {
     // get all the users
     Item.remove({}, function(err) {
-        if (err) throw err;
-        console.log('All Items successfully deleted!');
+        if (err) {
+            console.log("Error removing item");
+        }
     });
 }
 
@@ -1607,7 +1571,9 @@ var findItemByID = function(id, callback, errorCallback) {
 var findAllItems = function(callback) {
     // get all the items
     Item.find({}, function(err, items) {
-        if (err) throw err;
+        if (err) {
+            console.log("Error finding item");
+        }
         callback(items)
     });
 
@@ -1624,8 +1590,9 @@ var editItem = function(title, price, expirationDate, shortDescription, longDesc
         item.longDescription = longDescription;
         item.image = image;
         item.save(function(err) {
-            if (err) throw err;
-            console.log('Item updated successfully');
+            if (err) {
+                console.log("Error finding item");
+            }
         });
     });
 }
@@ -1633,22 +1600,18 @@ var editItem = function(title, price, expirationDate, shortDescription, longDesc
 // create an Image
 var createImage = function(id, buffer) {
     Jimp.read(buffer, function(err, img) {
-        // console.log(err);
-        // console.log(img);
         img.scaleToFit(1000, 1000).getBase64(Jimp.AUTO, function(err, src) {
-            // console.log(src);
             var newImage = new Image({
                 itemID: id,
                 img: {
                     data: src
                 }
             });
-            // console.log(newImage);
-
             // call the built-in save method to save to the database
             newImage.save(function(err) {
-                if (err) throw err;
-                console.log('Image saved successfully!');
+                if (err) {
+                    console.log("Image saved successfully");
+                }
             });
         });
     });
@@ -1659,13 +1622,11 @@ var findImageByID = function(id, callback, errorCallback) {
     Image.find({
         itemID: id
     }, function(err, images) {
-        // console.log(images);
         if (err) {
             errorCallback();
             return;
         }
         if (images == null || images.length == 0) {
-            console.log("here")
             errorCallback();
             return;
         }
@@ -1682,8 +1643,9 @@ var findImageByID = function(id, callback, errorCallback) {
 // find all images
 var findAllImages = function(callback) {
     Image.find({}, function(err, items) {
-        if (err) throw err;
-        //console.log(items);
+        if (err) {
+            console.log('Error: finding images')
+        }
         callback(items)
     });
 }
@@ -1693,14 +1655,14 @@ var deleteAllImages = function() {
     // get all the users
 
     Image.remove({}, function(err) {
-        if (err) throw err;
-        console.log('All Images successfully deleted!');
+        if (err) {
+            console.log('Error removing image');
+        }
     });
 
 }
 
 //START EXPORTS FOR DATABASE MODULE
-
 exports.findAllItems = function(callback) {
     findAllItems(callback);
 }
