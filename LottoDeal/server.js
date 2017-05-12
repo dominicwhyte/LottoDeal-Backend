@@ -227,7 +227,7 @@ app.get('/getReviews', function(request, response) {
     });
 })
 
-// get the reviews on the item page based on the seller of the item
+// send the reviews on the item page based on the seller of the item
 app.get('/getReviewsOfSeller', function(request, response) {
     var itemID = request.query["itemID"];
 
@@ -326,7 +326,7 @@ app.get('/getPublicAccount', function(request, response) {
     });
 })
 
-
+// send back all the suggested items
 app.get('/getSuggestions', function(request, response) {
     var accessToken = request.query["accessToken"];
     validateAccessToken(accessToken, response, request, function(userID) {
@@ -371,6 +371,7 @@ function send404(response, request) {
     response.type('txt').send('Not found');
 }
 
+// send back all the notifications
 app.get('/getNotifications', function(request, response) {
     var accessToken = request.query["accessToken"];
     validateAccessToken(accessToken, response, request, function(userID) {
@@ -395,6 +396,7 @@ app.get('/verifyAccessToken', function(request, response) {
     });
 })
 
+// send back all the bids of a user
 app.get('/getBidsOfUsers', function(request, response) {
     var userID = request.query["userID"];
     getBidsForUsers(userID, function(bids) {
@@ -446,7 +448,8 @@ function compileReviews(item, users, accounts) {
     return accounts;
 }
 
-
+// send back all the items that a user bidded on and sorts them into active items
+// and items that have already sold or expired.
 app.get('/getBiddedItemsOfUsers', function(request, response) {
     var accessToken = request.query["accessToken"];
     validateAccessToken(accessToken, response, request, function(userID) {
@@ -496,7 +499,7 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
     });
 })
 
-
+// send back all the items that user has listed
 app.get('/getListedItemsForUsers', function(request, response) {
 
     var userID = request.query["userID"];
@@ -512,7 +515,7 @@ app.get('/getListedItemsForUsers', function(request, response) {
     });
 })
 
-
+// send back all the items that a user has sold
 app.get('/getSoldItemsForUsers', function(request, response) {
     var userID = request.query["userID"];
     getSoldItemsForUsers(userID, function(items) {
@@ -523,7 +526,7 @@ app.get('/getSoldItemsForUsers', function(request, response) {
 })
 
 
-
+// test to see if the server is running
 app.get('/', function(request, response) {
     response.send("API is working!")
 })
@@ -585,6 +588,8 @@ var cpUpload = upload.fields([{
         name: 'userID',
         maxCount: 1
     }]) // SHOULDNT LONG DESCRIPTION AND SHORT DESCRIPTION BE ADDED INTO THIS
+
+// create a post/item 
 app.post('/createPost', cpUpload, function(req, res, next) {
 
     // CHECK FOR SIZE OF IMAGE
@@ -695,6 +700,8 @@ function isInt(value) {
     return (x | 0) === x;
 }
 
+// finds all the reviews of a user and returns the associated image 
+// and names of the people that reviewed the given perosn 
 app.get('/getReviewerImagesAndNames', function(request, response) {
     var userID = request.query["userID"];
     var reviewersID = []
@@ -1265,6 +1272,7 @@ function trimUsers(users) {
     return trimmedUsers;
 }
 
+// trims a given users important information
 function trimUser(user) {
     user.userInfo = null;
     user.notifications = null;
@@ -1323,7 +1331,8 @@ var getSoldItemsForUsers = function(userID, callback, errorCallback) {
     });
 }
 
-
+// creates a review for a given seller given the seller's facebook ID
+// the reviewers ID, the stars the gave, the review description, and the date
 var createReview = function(sellerID, userID, stars, reviewDes, date) {
     User.find({
         fbid: sellerID
@@ -1346,7 +1355,7 @@ var createReview = function(sellerID, userID, stars, reviewDes, date) {
     });
 }
 
-//
+// adds stripes charge ID to an item given the item's ID, a user's ID, and their chargeID
 var addChargeIDToItem = function(itemID, userID, chargeID) {
     Item.findById(itemID, function(err, item) {
         if (item.bids != null) {
@@ -1363,6 +1372,8 @@ var addChargeIDToItem = function(itemID, userID, chargeID) {
     });
 }
 
+// adds a bid for an item given the itemID and the bidders facebook ID, userID, 
+// and the amount they are bidding.
 var addBidForItem = function(itemID, userID, newAmount, completion) {
     // get a item with ID and update the userID array
     if (userID != undefined) {
@@ -1374,6 +1385,7 @@ var addBidForItem = function(itemID, userID, newAmount, completion) {
 
                 if (item.bids != null) {
                     for (i = 0; i < item.bids.length; i++) {
+                        // if they already bidded on the item
                         if (item.bids[i].ID == userID) {
                             var curAmount = Number(item.bids[i].amount);
                             curAmount += Number(newAmount);
@@ -1448,7 +1460,7 @@ var addBidForItem = function(itemID, userID, newAmount, completion) {
 }
 
 
-
+// remove a user given their faceboook ID
 var deleteUser = function(id, callback) {
     // Remove User
     User.find({
@@ -1481,6 +1493,7 @@ var deleteUser = function(id, callback) {
 }
 
 
+// delete an item given their itemID
 var deleteItem = function(id, callback) {
 
     // Remove Item
@@ -1532,7 +1545,7 @@ var deleteItem = function(id, callback) {
     });
 }
 
-
+// find a user given their facebook ID 
 var findUser = function(fbid, callback, errorCallback) {
     // get all the users
     User.find({
@@ -1557,6 +1570,7 @@ var findUser = function(fbid, callback, errorCallback) {
     });
 }
 
+// find all users
 var findAllUsers = function(callback) {
     // get all the users
     User.find({}, function(err, users) {
@@ -1565,6 +1579,7 @@ var findAllUsers = function(callback) {
     });
 }
 
+// delete all the users
 var deleteAllUsers = function() {
     // get all the users
     User.remove({}, function(err) {
@@ -1573,6 +1588,7 @@ var deleteAllUsers = function() {
     });
 }
 
+// delete all the items
 var deleteAllItems = function() {
     // get all the users
     Item.remove({}, function(err) {
@@ -1581,7 +1597,7 @@ var deleteAllItems = function() {
     });
 }
 
-
+// find an Item by its ID
 var findItemByID = function(id, callback, errorCallback) {
     // get all the Items
     Item.findById(id, function(err, item) {
@@ -1596,7 +1612,7 @@ var findItemByID = function(id, callback, errorCallback) {
     });
 }
 
-
+// find all the Items
 var findAllItems = function(callback) {
     // get all the items
     Item.find({}, function(err, items) {
@@ -1606,6 +1622,7 @@ var findAllItems = function(callback) {
 
 }
 
+// edit the item ?? i thought we got rid of this functionality 
 var editItem = function(title, price, expirationDate, shortDescription, longDescription, itemID, image) {
 
     Item.findById(itemID, function(err, item) {
@@ -1622,7 +1639,7 @@ var editItem = function(title, price, expirationDate, shortDescription, longDesc
     });
 }
 
-
+// create an Image
 var createImage = function(id, buffer) {
     Jimp.read(buffer, function(err, img) {
         // console.log(err);
@@ -1646,6 +1663,7 @@ var createImage = function(id, buffer) {
     });
 }
 
+// find an image by its ID
 var findImageByID = function(id, callback, errorCallback) {
     Image.find({
         itemID: id
@@ -1670,6 +1688,7 @@ var findImageByID = function(id, callback, errorCallback) {
 
 }
 
+// find all images
 var findAllImages = function(callback) {
     Image.find({}, function(err, items) {
         if (err) throw err;
@@ -1678,6 +1697,7 @@ var findAllImages = function(callback) {
     });
 }
 
+// delete all images
 var deleteAllImages = function() {
     // get all the users
 
