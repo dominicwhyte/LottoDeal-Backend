@@ -1,29 +1,14 @@
-//TEST CODE TEMPORARILY IN SERVER.JS
-// CYTOSCAPE CODE
-
 var cytoscape = require('cytoscape');
 
 
-
-// WHEN SERVER IS RESTARTED, CYTOSCAPE SHOULD BE REINITIALIZED
-var cy = cytoscape({
-    //   elements: [ // list of graph elements to start with
-    //     { // node a
-    //       data: { id: 'a' }
-    //     },
-    //     { // node b
-    //       data: { id: 'b' }
-    //     },
-    //     { // edge ab
-    //       data: { id: 'ab', source: 'a', target: 'b' }
-    //     }
-    //   ],
-});
+var cy = cytoscape({});
 
 var stringSimilarity = require('string-similarity');
 var edgeWeights = {};
-var MAX_NUMBER_OF_SIMILARITIES_TO_RETURN = 3
+var MAX_NUMBER_OF_SIMILARITIES_TO_RETURN = 3 //Change to alter the number suggestions to show on the website
 
+
+//Computes the suggestions for userID, called back in callback. Takes in the User and Item schemas
 exports.computeSimilarities = function(userID, User, Item, callback) {
     //Retrieve users and items
     User.find({}, function(err, users) {
@@ -39,7 +24,6 @@ exports.computeSimilarities = function(userID, User, Item, callback) {
                         addItemVerticesAndEdges(items);
                         addConnectingEdges(users);
                         computeEdgeWeights(users, items);
-                        console.log('Graph set up');
                         var suggestions = getSuggestedItems(userID, users);
                         printSuggestions(users, items, suggestions);
                         var suggestionItems = getItemsFromStructs(suggestions.suggestions, items);
@@ -81,11 +65,10 @@ function addUserVerticesAndEdges(users) {
     }
 }
 
-//slices items and removes sold/expired ones
+//slices suggestedItems and removes sold/expired ones
 function selectItems(suggestedItems) {
     var selectedSuggestedItems = []
     var count = 0;
-    console.log('selecting items from' + suggestedItems.length);
     for (var j = 0; j < suggestedItems.length; j++) {
         var item = suggestedItems[j];
         if ((item != null) && (item != undefined) && !item.expired && !item.sold) {
@@ -96,7 +79,6 @@ function selectItems(suggestedItems) {
             break;
         }
     }
-    console.log('selected items' + selectedSuggestedItems.length);
     return selectedSuggestedItems;
 }
 
@@ -146,12 +128,13 @@ function addConnectingEdges(users) {
     }
 }
 
+//These can be changed to alter the suggestions algorithm, to place more emphasis on different variables
 var ITEM_SIMILARITY_MULTIPLIER = 2;
 var USER_GENDER_DISPARITY_MULTIPLIER = 2;
 var BID_MUTLIPLIER = 3;
 var TITLE_MULTIPLIER = 3;
 
-// COMPUTE THE EDGE WEIGHTS
+// COMPUTE THE EDGE WEIGHTS FOR THE GRAPH
 function computeEdgeWeights(users, items) {
 
     // ADD EDGE WEIGHTS FOR USERS
@@ -183,10 +166,6 @@ function computeEdgeWeights(users, items) {
         }
     }
 }
-
-// console.log('test: ' + stringSimilarity.compareTwoStrings("HP 15-ay018nr 15.6-Inch Laptop (Intel Core i7, 8GB RAM, 256GB SSD)", " Razor 62042 High Roller BMX/Freestyle Bike"));
-
-// console.log('test2: ' + stringSimilarity.compareTwoStrings("bike", "Used bike"));
 
 
 //Compute the shortest paths for user_fbid. Only include items that have not already
@@ -239,7 +218,6 @@ function getSuggestedItems(user_fbid, users) {
                 sortedItems.push(struct);
             }
         }
-
     });
 
     sortedItems.sort(function(a, b) {
@@ -267,7 +245,7 @@ function getItemsFromStructs(struct, items) {
     return itemsToReturn;
 }
 
-//Prints the cy graph. Innefficient - just for testing
+//Prints the cy graph. Note that function use should be avoided in production code
 function printSuggestions(users, items, suggestionsStruct) {
     printGraph(users, items);
     var suggestions = suggestionsStruct.suggestions
@@ -288,10 +266,10 @@ function printSuggestions(users, items, suggestionsStruct) {
     console.log('------------End Print Suggestions----------------');
 }
 
+//Prints out a path dijkstra to an item with itemID, printing out just the nodes along with edges weights.
 function printPathToItem(itemID, dijkstra, users, items) {
     var itemNode = cy.getElementById('i' + itemID);
     var path = dijkstra.pathTo(itemNode)
-    console.log('START PATH');
     for (var i = 0; i < path.length; i++) {
         var indicator = path[i].id().charAt(0);
         var id = path[i].id().substring(1, path[i].id().length);
@@ -303,7 +281,6 @@ function printPathToItem(itemID, dijkstra, users, items) {
             console.log('Edge with weight: ' + edgeWeights[path[i].id()]);
         }
     }
-    console.log('END PATH');
 }
 
 //PARSE AN ENCODED STRING FROM THE GRPAH, RETURNS ITEM OR USER
@@ -326,6 +303,7 @@ function getNameOfID(encodedID, users, items) {
     }
 }
 
+//Prints out the graph in a user readable format
 function printGraph(users, items) {
     console.log('------------Begin printing Graph----------------');
 
@@ -337,7 +315,7 @@ function printGraph(users, items) {
 
 
 
-//test function, not efficient
+//Gets an item from an itemID. Note that function use should be avoided in production code
 function getItem(itemID, items) {
     for (var i = 0; i < items.length; i++) {
         if (items[i]._id == itemID) {
@@ -347,7 +325,7 @@ function getItem(itemID, items) {
     return null;
 }
 
-//test function, not efficient
+//Gets a user from an fbid. Note that function use should be avoided in production code
 function getUser(fbid, users) {
     for (var i = 0; i < users.length; i++) {
         if (users[i].fbid == fbid) {

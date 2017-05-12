@@ -8,15 +8,12 @@ const SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES = 3;
 
 //Check if lotteries should be performed
 exports.checkIfServerShouldPerformLottery = function() {
-    // console.log('checking lottery');
-    // do whatever you like here
-    // console.log('Checking if lottery should be performed')
     checkLotteries();
     setTimeout(lotteryModule.checkIfServerShouldPerformLottery, SECONDS_UNTIL_CHECK_FOR_PERFROMING_LOTTERIES * 1000);
 }
 
 
-//Check database for if lotteries should be performed
+//Check database for if lotteries should be performed. Performs lottery and communicates to users if necessary
 var checkLotteries = function() {
     databaseModule.findAllItems(function(items) {
         for (i = 0; i < items.length; i++) {
@@ -27,7 +24,6 @@ var checkLotteries = function() {
             var expirDate = new Date(item.expirationDate);
             if (item.amountRaised >= item.price) {
                 performLottery(item, function(winner) {
-                    console.log('Item sold to ' + winner)
                     var date = new Date();
                     communicationsModule.communicateToLosers(item, "LottoDeal: You lost!", "Sorry, you lost your bid for " + item.title + ". Bid again on LottoDeal!", date, winner, true);
                     communicationsModule.communicateToSingleUser(item, "LottoDeal: You won!", "Congratulations, you won your bid for" + item.title + "! We'll be in contact shortly to arrange item delivery.", date, winner, true, winner );
@@ -37,7 +33,6 @@ var checkLotteries = function() {
             } else if (expirDate < Date.now()) {
                 //Refund and notify users
                 lotteryModule.refundUsers(item);
-                console.log('Date has past - notifying users and marking item as expired');
                 var date = new Date();
                 communicationsModule.communicateToLosers(item, "LottoDeal:" + item.title + " expired", "You have been fully refunded", date, "");
                 item.expired = true;
@@ -49,9 +44,8 @@ var checkLotteries = function() {
     });
 }
 
-//returns the userID of the winner
+//Performs the lottery for item, calling completion with the userID of the winner
 var performLottery = function(item, completion) {
-    console.log("Performing lottery");
     var bids = item.bids;
     //Shuffle to ensure no bias (extra precaution)
     var shuffledBids = shuffleArray(bids);
@@ -68,15 +62,13 @@ var performLottery = function(item, completion) {
         }
     }
     if (winner == "") {
-        console.log('No winner - defaulting to first bidder in random array')
+        console.log('Error: No winner - defaulting to first bidder in random array')
         if (bids.length != 0) {
             winner = shuffledBids[0].bidderID
         }
     }
     item.sold = true;
     item.winnerID = winner;
-
-    console.log('the winner is:' + winner);
 
     databaseModule.findUser(winner, function(user) {
         if (user != null) {
@@ -92,6 +84,7 @@ var performLottery = function(item, completion) {
     });
 }
 
+//Shuffles an array to assure randomness
 //Shuffle array - modified from http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 var shuffleArray = function(array) {
     for (var i = array.length - 1; i > 0; i--) {
@@ -103,21 +96,18 @@ var shuffleArray = function(array) {
     return array;
 }
 
+//Refunds the bidders of an item
 exports.refundUsers = function(item) {
     for (var j = 0; j < item.bids.length; j++) {
-        console.log('attempting to refund user');
         var bid = item.bids[j];
         for (var i = 0; i < bid.chargeIDs.length; i++) {
-            console.log('attempt refund for charge ID');
             var chargeID = bid.chargeIDs[i];
             var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 
             stripe.refunds.create({
                 charge: chargeID,
             }, function(err, refund) {
-                if (refund != null) {
-                    console.log(refund.amount + " cents refunded successfully");
-                } else {
+                if (refund == null || err != null) {
                     console.log('Refund failed')
                 }
             });
