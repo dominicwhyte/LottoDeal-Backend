@@ -117,13 +117,13 @@ app.post('/performPaymentAndAddBid', function(request, response) {
     var accessToken = request.body["accessToken"];
     var itemID = request.body.itemID;
     var amountToCharge = request.body.amount; //Check that this is numerical
-    console.log(typeof(amountToCharge));
     validateAccessToken(accessToken, response, request, function(userID) {
         // get into database, access object, update it's bid field and add to user bids
         findItemByID(itemID, function(item) {
             amountToCharge *= 1
             if (item != null && isInt(amountToCharge) && (!item.expired) && (!item.sold) && (item.amountRaised + amountToCharge <= item.price)) {
                 addBidForItem(itemID, userID, amountToCharge, function(status) {
+                    console.log('Adding payment for ' + amountToCharge);
                     var token = request.body.stripeToken; // Using Express
                     // Charge the user's card:
                     var charge = stripe.charges.create({
@@ -134,7 +134,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                     }, function(err, charge) {
                         if (charge != null) {
                             dollarAmount = (charge.amount / 100);
-
+                            console.log('Charging payment for ' + dollarAmount);
                             if (err != null) {
                                 console.log("Error: " + err);
                             }
