@@ -9,6 +9,8 @@ var MAX_NUMBER_OF_SIMILARITIES_TO_RETURN = 3 //Change to alter the number sugges
 
 //Computes the suggestions for userID, called back in callback. Takes in the User and Item schemas
 exports.computeSimilarities = function(userID, User, Item, callback) {
+    edgeWeights = {};
+    cy = cytoscape({});
     //Retrieve users and items
     User.find({}, function(err, users) {
         if (err) {
