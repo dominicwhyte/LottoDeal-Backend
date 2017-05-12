@@ -117,7 +117,6 @@ app.post('/performPaymentAndAddBid', function(request, response) {
     var accessToken = request.body["accessToken"];
     var itemID = request.body.itemID;
     var amountToCharge = request.body.amount; //Check that this is numerical
-    amountToCharge = 10;
     validateAccessToken(accessToken, response, request, function(userID) {
         // get into database, access object, update it's bid field and add to user bids
         findItemByID(itemID, function(item) {
@@ -133,33 +132,37 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                         description: "Charge for LottoDeal " + request.body.itemTitle,
                         source: token,
                     }, function(err, charge) {
+                        charge = null //temp
                         if (charge != null) {
                             dollarAmount = (charge.amount / 100);
                             console.log('Charging payment for ' + dollarAmount);
                             if (err != null) {
                                 console.log("Error: " + err);
                             }
-                            if (charge != null) {
-                                var date = new Date();
-                                //Check that amountToCharge is same as actual stripe payment that came through
-                                if (amountToCharge != dollarAmount) {
-                                    console.log('Error: amountToCharge is not equal to dollarAmount');
-                                    //remove the bid that was added
-                                    removeBidForItem(itemID, userID, amountToCharge, function(status) {
-                                        if (!status) {
-                                            console.log('Error: removeBidForItem');
-                                        }
-                                        response.send("Charge was erroneous");
-                                    })
-                                } else {
-                                    addChargeIDToItem(itemID, userID, charge._id);
-                                    communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
-                                    response.send("charge is" + charge.amount);
-                                }
+                            var date = new Date();
+                            //Check that amountToCharge is same as actual stripe payment that came through
+                            if (amountToCharge != dollarAmount) {
+                                console.log('Error: amountToCharge is not equal to dollarAmount');
+                                //remove the bid that was added
+                                removeBidForItem(itemID, userID, amountToCharge, function(status) {
+                                    if (!status) {
+                                        console.log('Error: removeBidForItem');
+                                    }
+                                    response.send("Charge was erroneous");
+                                })
                             } else {
-                                console.log('Error: charge is null in performPaymentAndAddBid');
+                                addChargeIDToItem(itemID, userID, charge._id);
+                                communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
+                                response.send("charge is" + charge.amount);
                             }
                         } else {
+                            //remove the bid for the item
+                            removeBidForItem(itemID, userID, amountToCharge, function(status) {
+                                if (!status) {
+                                    console.log('Error: removeBidForItem');
+                                }
+                                response.send("Charge was erroneous");
+                            })
                             console.log('Error: Stripe charge is null');
                         }
 
