@@ -1,4 +1,4 @@
-var cytoscape = require('cytoscape');
+var cytoscape = require('suggestionsAlgorithm');
 
 
 var cy = cytoscape({});
@@ -44,7 +44,6 @@ exports.computeSimilarities = function(userID, User, Item, callback) {
 function addUserVerticesAndEdges(users) {
 
     for (var i = 0; i < users.length; i++) {
-        console.log('Adding: ' + String("u" + users[i].fbid));
         cy.add({
                 group: "nodes",
                 data: {

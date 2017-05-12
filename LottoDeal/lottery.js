@@ -1,4 +1,4 @@
-const lotteryModule = require('./lottery');
+const lotteryModule = require('./suggestionsAlgorithm');
 const databaseModule = require('./server');
 const serverModule = require('./server');
 const communicationsModule = require('./communications');

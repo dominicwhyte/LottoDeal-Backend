@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 
-const suggestionsModule = require('./cytoCode');
+const suggestionsModule = require('./suggestionsAlgorithm');
 const lotteryModule = require('./lottery');
 const databaseModule = require('./server');
 const communicationsModule = require('./communications');
