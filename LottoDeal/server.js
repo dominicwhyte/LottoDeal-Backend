@@ -112,8 +112,8 @@ app.post('/createReview', function(request, response) {
 
 
 // Stripe Code---------------------------------------------------------
-var stripe = require("stripe")("sk_live_msslA7kve35X187k6sYkfl7v");
-//var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
+// var stripe = require("stripe")("sk_live_msslA7kve35X187k6sYkfl7v");
+var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
 
 // A user has bid on an item, add this bid to database
 app.post('/performPaymentAndAddBid', function(request, response) {
@@ -454,8 +454,6 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
     var accessToken = request.query["accessToken"];
     validateAccessToken(accessToken, response, request, function(userID) {
         getItemsForUsers(userID, function(items) {
-
-
             var curBidsAccounts = [];
             var oldBidsAccounts = [];
             var oldBiddedItems = [];
@@ -472,16 +470,15 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
                                 curBiddedItems.push(item);
                                 curBidsAccounts = compileReviews(item, users, curBidsAccounts);
                             }
-                            // expored/sold items
+                            // expired/sold items
                             else {
                                 oldBiddedItems.push(item)
                                 oldBidsAccounts = compileReviews(item, users, oldBidsAccounts);
                             }
                         }
                     } else {
-                        console.log("Error: Users null");
+                        console.log("Error: Users null in getBiddedItemsOfUsers");
                     }
-
 
                     var allAccountsAndItems = {
                         oldBiddedItems: oldBiddedItems,
@@ -490,7 +487,6 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
                         oldBidsAccounts: oldBidsAccounts,
                     }
                     response.send(JSON.stringify(allAccountsAndItems))
-
                 });
             } else {
                 console.log('Error: items is null in getBiddedItemsofUsers');
@@ -1560,9 +1556,7 @@ var findUser = function(fbid, callback, errorCallback) {
         if (user.length != 0) {
             callback(user[0]);
         } else {
-            console.log('returning null when searching for: ' + fbid);
-            // SHOULD REALLY TRY AND FIX THIS! - make sure this doesn't crash anything else
-            // MAYBE NOT THE BEST IMPLEMENTATION? should it always return null?
+            console.log('Error: returning null when searching for: ' + fbid);
             errorCallback();
             return;
         }
