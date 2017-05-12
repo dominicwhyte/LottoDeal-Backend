@@ -1218,30 +1218,29 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
 
 // gets the notifications for a given user based on the facebook ID
 var getNotificationsForUsers = function(userID, callback) {
-    User.find({
-        fbid: userID
-    }, function(err, user) {
-        if (user.length != 0) {
-            callback(user[0].notifications);
+    findUser(userID, function(user) {
+        if (user != null) {
+            callback(user.notifications);
         } else {
-            callback(null);
-            console.log('Error: no users');
+            console.log('Error: user is null in getNotificationsForUsers');
         }
+    }, function() {
+        console.log('Error: user is null in getNotificationsForUsers');
     });
 }
 
 // gets the bids for a user given their facebook ID
 var getBidsForUsers = function(userID, callback) {
-    User.find({
-        fbid: userID
-    }, function(err, user) {
-        if (user.length != 0) {
-            callback(user[0].bids);
+    findUser(userID, function(user) {
+        if (user != null) {
+            callback(user.bids);
         } else {
-            console.log('Error: no users');
-            callback(null);
+            console.log('Error: user is null in getBidsForUsers');
         }
+    }, function() {
+        console.log('Error: user is null in getBidsForUsers');
     });
+
 }
 
 //Removes ChargeIDs from the items, to keep this information from leaving the server side
