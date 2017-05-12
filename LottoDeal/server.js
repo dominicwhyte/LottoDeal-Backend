@@ -695,6 +695,37 @@ function isInt(value) {
     return (x | 0) === x;
 }
 
+app.get('/getReviewerImagesAndNames', function(request, response) {
+    var userID = request.query["userID"];
+    var reviewersID = []
+    findUser(userID, function(user) {
+        if (user != null) {
+            var reviews = user.reviews;
+            for (var i = 0; i < reviews.length; i++) {
+                reviewersID.push(reviews[i].userID);
+            }
+            User.find({
+                fbid: reviewersID
+            }, function(err, reviewers) {
+                var reviewersToSend = [];
+                for (var i = 0; i < reviewersID.length; i++) {
+                    for (var j = 0; j < reviewers.length; j++) {
+                        if (reviewersID[i] == reviewers[j].fbid) {
+                            reviewersToSend.push(reviewers[j]);
+                            break;
+                        }
+                    }
+                }
+                response.send(reviewersToSend);
+            });
+        } else {
+            console.log('User is null in getReviewerImagesandNames');
+        }
+    }, function() {
+        send404(response, request);
+    });
+});
+
 
 // Will add a new user to our database
 app.post('/createUser', function(request, response) {
@@ -1028,27 +1059,27 @@ var userSchema = new Schema({
     email: String, // facebook given email
     pictureURL: String, //profile pic URL from Facebook (String)
     bids: [{
-        itemID: String,
-        amount: Number
+        itemID: String, // item they bidded on
+        amount: Number // amount they bidded
     }], //Bid object as dictionary containing all current bids of that user (indexed by itemID).  If a person bids twice on an item, the bid for that itemID is increased (Dictionary)
     reviews: [{ // reviews on sellers
-        userID: String,
-        stars: Number,
-        reviewDes: String,
+        userID: String, // who reviewed them
+        stars: Number, // how many stars given
+        reviewDes: String, // description of review
         datePosted: Date, //date the review was created (String - parse into Date object)
     }],
     userInfo: {
-        age: Number,
-        gender: String
+        age: Number, // age of user
+        gender: String // gender of user
     },
     notifications: [{ // notifications to show user
-        read: Boolean,
-        title: String,
-        description: String,
+        read: Boolean, // whether they read them
+        title: String, // title of notification
+        description: String, // description of notification
         datePosted: Date, //date the notification was created (String - parse into Date object)
         itemID: String, // item associated with the notification
-        sold: Boolean,
-        winnerName: String,
+        sold: Boolean, // whether the item associated with the notification was sold
+        winnerName: String, // the winner's name if applicable to an item
     }],
 });
 
@@ -1067,15 +1098,15 @@ var itemSchema = new Schema({
     expirationDate: Date, // date when if the item was not sold then everyone gets refunded (String- parse into Date object)
     amountRaised: Number, //total amount raised
     bids: [{
-        ID: String,
-        amount: Number,
+        ID: String, // who bidded on the item
+        amount: Number, // how much they bidded
         chargeIDs: [String] ////charge ID, in case refund should be issued
     }], //Dictionary of fbid’s of users who have placed bids (Dictionary)
     shortDescription: String, // text string of what exactly is being sold (String)
-    longDescription: String,
+    longDescription: String, // long description of what is being sold
     img: {
         data: Buffer, // stores an image here
-        compressed: String,
+        compressed: String, // compressed version
         contentType: String
     },
     // picture: String,
@@ -1091,21 +1122,23 @@ var Item = mongoose.model('Item', itemSchema);
 
 
 var imageSchema = new Schema({
-    itemID: String,
+    itemID: String, // item associated with the image
     img: {
-        data: String,
+        data: String, // the actual image
     }
 })
 
 var Image = mongoose.model('Image', imageSchema);
 
 
-
+// allows them to be used outside of this module
 module.exports = User;
 module.exports = Item;
 module.exports = Image;
 
 
+// create a user in the database given their name, facebook ID, url of the picture
+// email address, age, and gender
 var createUser = function(name, id, url, email, age, gender) {
     if (age == null || isNaN(age)) {
         age = 25
@@ -1136,7 +1169,7 @@ var createUser = function(name, id, url, email, age, gender) {
     });
 }
 
-
+// create an item given the title, price, current date, expiraation data, descriptions, seller ID, and picture.
 var createItem = function(title, price, datePosted, expirationDate, shortDescription, longDescription, sellerID, picture, callback, errorCallback, buffer, response, request) {
     findUser(sellerID, function(seller) {
         if (seller != null) {
@@ -1178,6 +1211,7 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
     });
 }
 
+// gets the notifications for a given user based on the facebook ID
 var getNotificationsForUsers = function(userID, callback) {
     User.find({
         fbid: userID
@@ -1191,6 +1225,7 @@ var getNotificationsForUsers = function(userID, callback) {
     });
 }
 
+// gets the bids for a user given their facebook ID
 var getBidsForUsers = function(userID, callback) {
     User.find({
         fbid: userID
@@ -1237,7 +1272,7 @@ function trimUser(user) {
     return user;
 }
 
-
+// gets all the items that a person bidded on given their facebook ID
 var getItemsForUsers = function(userID, callback) {
     User.find({
         fbid: userID
@@ -1260,7 +1295,7 @@ var getItemsForUsers = function(userID, callback) {
     });
 }
 
-
+// finds all the items that a person listed given their facebook ID
 var getListedItemsForUsers = function(userID, callback, errorCallback) {
     Item.find({
         sellerID: userID,
@@ -1274,7 +1309,7 @@ var getListedItemsForUsers = function(userID, callback, errorCallback) {
     });
 }
 
-
+// finds all the items that a person sold given their facebook ID
 var getSoldItemsForUsers = function(userID, callback, errorCallback) {
     Item.find({
         sellerID: userID,
@@ -1288,36 +1323,6 @@ var getSoldItemsForUsers = function(userID, callback, errorCallback) {
     });
 }
 
-app.get('/getReviewerImagesAndNames', function(request, response) {
-    var userID = request.query["userID"];
-    var reviewersID = []
-    findUser(userID, function(user) {
-        if (user != null) {
-            var reviews = user.reviews;
-            for (var i = 0; i < reviews.length; i++) {
-                reviewersID.push(reviews[i].userID);
-            }
-            User.find({
-                fbid: reviewersID
-            }, function(err, reviewers) {
-                var reviewersToSend = [];
-                for (var i = 0; i < reviewersID.length; i++) {
-                    for (var j = 0; j < reviewers.length; j++) {
-                        if (reviewersID[i] == reviewers[j].fbid) {
-                            reviewersToSend.push(reviewers[j]);
-                            break;
-                        }
-                    }
-                }
-                response.send(reviewersToSend);
-            });
-        } else {
-            console.log('User is null in getReviewerImagesandNames');
-        }
-    }, function() {
-        send404(response, request);
-    });
-});
 
 var createReview = function(sellerID, userID, stars, reviewDes, date) {
     User.find({
