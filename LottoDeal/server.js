@@ -16,9 +16,6 @@ const lotteryModule = require('./lottery');
 const databaseModule = require('./server');
 const communicationsModule = require('./communications');
 
-// SHOULD GET THIS TO WORK
-// var sharp = require("sharp");
-
 var Jimp = require("jimp");
 
 app.use(bodyParser.json())
@@ -120,6 +117,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
     var accessToken = request.body["accessToken"];
     var itemID = request.body.itemID;
     var amountToCharge = request.body.amount; //Check that this is numerical
+    console.log(typeof(amountToCharge));
     validateAccessToken(accessToken, response, request, function(userID) {
         // get into database, access object, update it's bid field and add to user bids
         findItemByID(itemID, function(item) {

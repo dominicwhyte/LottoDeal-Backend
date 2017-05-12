@@ -244,7 +244,6 @@ function getItemsFromStructs(struct, items) {
 
 //Prints the cy graph. Note that function use should be avoided in production code
 function printSuggestions(users, items, suggestionsStruct) {
-    printGraph(users, items);
     var suggestions = suggestionsStruct.suggestions
     var dijkstra = suggestionsStruct.dijkstra
 
