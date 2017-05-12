@@ -1048,9 +1048,6 @@ mongoose.connect(url, function(err, db) {
     // deleteAllItems();
     // deleteAllImages();
 
-    findAllUsers(function(users) {
-        console.log(users)
-    });
     //Begin checking if lotteries should be performed
     lotteryModule.checkIfServerShouldPerformLottery();
 });
