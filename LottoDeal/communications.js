@@ -13,7 +13,6 @@ exports.emailBiddersForItem = function(item, subject, message, winner) {
             sendEmailToAddress(user.email, subject, message);
         }, function() {
             console.log('Error in emailBiddersForItem');
-            // send404(response, request);
         });
     }
 }
@@ -32,13 +31,6 @@ exports.communicateToLosers = function(item, subject, message, date, winner, sol
         else {
             communicationsModule.communicateToSingleUser(item, subject, message, date, bidderID);
         }
-        // databaseModule.findUser(bidderID, function(user) {
-        //     sendEmailToAddress(user.email, subject, message);
-        //     communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date);
-        // }, function() {
-        //     console.log('Error in emailBiddersForItem');
-        //     // send404(response, request);
-        // });
     }
 }
 
@@ -47,8 +39,6 @@ exports.communicateToSingleUser = function(item, subject, message, date, userID,
     databaseModule.findUser(userID, function(user) {
         sendEmailToAddress(user.email, subject, message);
         if (sold != undefined && sold == true) {
-            console.log("printing winner");
-            console.log(winner)
             communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date, true, winner);
         }
         else {
@@ -56,7 +46,6 @@ exports.communicateToSingleUser = function(item, subject, message, date, userID,
         }
     }, function() {
         console.log('Error in communicateToSingleUser');
-        // send404(response, request);
     });
 }
 
@@ -65,27 +54,20 @@ var ADMIN_FBIDS = ['1641988472497790', '1355884977768129', '10208239805023661', 
 
 //Emails and adds notifications to all admins, appending the winners name to the message.
 exports.communicateToAdmins = function(item, subject, message, date, winnerID) {
-    console.log('emailing admins');
     databaseModule.findUser(winnerID, function(winner) {
         for (var j = 0; j < ADMIN_FBIDS.length; j++) {
             var adminID = ADMIN_FBIDS[j];
             databaseModule.findUser(adminID, function(user) {
-                console.log('emailing ' + user.fullName);
                 var appendMessage = "    The winner of this lottery was... " + winner.fullName + "!!!";
                 sendEmailToAddress(user.email, subject, message + appendMessage);
                 communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message + appendMessage, date);
             }, function() {
                 console.log('Error in communicateToAdmins');
-                // send404(response, request);
             });
         }
     }, function() {
         console.log('Error in communicateToSingleUser');
-        // send404(response, request);
     });
-
-
-
 }
 
 
@@ -106,9 +88,9 @@ function sendEmailToAddress(email, subjectText, contentText) {
     });
 
     sg.API(request, function(error, response) {
-        console.log(response.statusCode);
-        console.log(response.body);
-        console.log(response.headers);
+        if (error != null) {
+            console.log("Error sending email via sendgrid:" + error)
+        }
     })
 }
 
@@ -132,7 +114,7 @@ exports.addNotificationToUser = function(itemID, userID, titleText, descriptionT
                 user.notifications.push(data);
                 user.save();
             }, function() {
-            console.log('Error in addNotificationToUser');
+                console.log('Error in addNotificationToUser');
             })
         }
         else {
