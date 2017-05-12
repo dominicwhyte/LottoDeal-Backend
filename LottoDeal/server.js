@@ -123,7 +123,6 @@ app.post('/performPaymentAndAddBid', function(request, response) {
             amountToCharge *= 1
             if (item != null && isInt(amountToCharge) && (!item.expired) && (!item.sold) && (item.amountRaised + amountToCharge <= item.price)) {
                 addBidForItem(itemID, userID, amountToCharge, function(status) {
-                    console.log('Adding payment for ' + amountToCharge);
                     var token = request.body.stripeToken; // Using Express
                     // Charge the user's card:
                     var charge = stripe.charges.create({
@@ -134,7 +133,6 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                     }, function(err, charge) {
                         if (charge != null) {
                             dollarAmount = (charge.amount / 100);
-                            console.log('Charging payment for ' + dollarAmount);
                             if (err != null) {
                                 console.log("Error: " + err);
                             }
@@ -424,21 +422,6 @@ app.get('/verifyAccessToken', function(request, response) {
     });
 })
 
-// send back all the bids of a user
-app.get('/getBidsOfUsers', function(request, response) {
-    var userID = request.query["userID"];
-    getBidsForUsers(userID, function(bids) {
-        if (bids != null) {
-            response.send(JSON.stringify(bids));
-        } else {
-            console.log('Error: bids is null in getBidsofUsers');
-        }
-
-    });
-})
-
-
-
 // adds up all the reviews for a given seller into its respective accounts
 // array
 function compileReviews(item, users, accounts) {
@@ -524,6 +507,7 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
 })
 
 // send back all the items that user has listed
+//This is for a public profile - no accesstoken needed
 app.get('/getListedItemsForUsers', function(request, response) {
 
     var userID = request.query["userID"];
@@ -540,6 +524,7 @@ app.get('/getListedItemsForUsers', function(request, response) {
 })
 
 // send back all the items that a user has sold
+//This is for a public profile - no accesstoken needed
 app.get('/getSoldItemsForUsers', function(request, response) {
     var userID = request.query["userID"];
     getSoldItemsForUsers(userID, function(items) {
