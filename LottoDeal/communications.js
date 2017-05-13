@@ -108,7 +108,7 @@ exports.addNotificationToUser = function(itemID, userID, titleText, descriptionT
                 if (sold != undefined && sold != null) {
                     data["sold"] = true;
                     data["winnerName"] = winner.fullName;
-                    data["title"] = "LottoDeal:"
+                    data["title"] = "LottoDeal"
                     data["description"] = "A winner has been chosen for " + itemTitle + ", click to see who won!"
                 }
                 user.notifications.push(data);
