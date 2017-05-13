@@ -442,7 +442,6 @@ function compileReviews(item, users, accounts) {
                     }
                     var average = total / length;
                     var averageRounded = Math.round(average * 10) / 10
-
                 }
                 var account = {
                     averageRating: averageRounded,
@@ -454,6 +453,7 @@ function compileReviews(item, users, accounts) {
                 }
                 accounts.push(account);
             }
+            break;
         }
     }
     return accounts;
@@ -834,6 +834,9 @@ app.get('/getAccountsForPosts', function(request, response) {
                         // listed items
                         if (!item.sold && !item.expired) {
                             listedAccounts = compileReviews(item, users, listedAccounts);
+                            for (var j = 0; j < listedAccounts.length; j++) {
+                                console.log(listedAccounts[j])
+                            }
                         }
                         // sold items
                         else if (item.sold && !item.expired) {
