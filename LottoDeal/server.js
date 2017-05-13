@@ -934,8 +934,10 @@ app.delete('/deleteItem', function(request, response) {
                 //Check that the user has the right to delete this item
                 var isCorrectUser = (item.sellerID == userID);
                 if (isCorrectUser && (!item.sold) && (!item.expired)) {
-                    deleteItem(itemIDToDelete, function(message) {
-                        response.send(message);
+                    deleteItem(itemIDToDelete, function(status) {
+                        if (status) {
+                            response.send("Success");
+                        }
                     });
                 } else {
                     console.log('Error: Item cannot be deleted');
@@ -1572,7 +1574,7 @@ var deleteItem = function(id, callback) {
                     }
                 }
                 //Delete the item
-                callback("1");
+                callback(true);
                 item.remove(function(err) {
                     if (err) {
                         console.log('Error: removing item');
