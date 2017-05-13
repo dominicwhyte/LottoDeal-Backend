@@ -782,7 +782,7 @@ app.post('/updateSettings', function(request, response) {
     var accessToken = request.body["accessToken"];
 
     var email = request.body.email;
-    if (!validateEmail()) {
+    if (!validateEmail(email)) {
         console.log('Error: invalid email');
         response.send("Error: invalid email");
 
