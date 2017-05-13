@@ -446,7 +446,7 @@ function compileReviews(item, users, accounts) {
                     var averageRounded = Math.round(average * 10) / 10
                 }
                 var account = {
-                    averageRating: averageRounded,
+                    averageRating: String(averageRounded) + "/5",
                 }
                 accounts.push(account);
             } else {
