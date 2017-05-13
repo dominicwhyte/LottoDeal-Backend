@@ -11,6 +11,7 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 
+const PROD_URL = "www.lottodeal.us"
 const suggestionsModule = require('./suggestionsAlgorithm');
 const lotteryModule = require('./lottery');
 const databaseModule = require('./server');
@@ -574,7 +575,7 @@ app.post('/debugPost', function(request, response) {
                 var longDescription = request.body.longDescription;
                 var sellerID = request.body.userID;
                 createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
-                    response.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
+                    response.redirect(PROD_URL + '/sell.html#!/?value=success&id=' + id);
                 }, function() {
                     send404(response, request);
                 }, imageData, response, request);
@@ -1204,14 +1205,11 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
 
                 callback(newItem["_id"])
             });
-            newItem.save(function(err) {
-                if (err) throw err;
-            });
         } else {
             console.log('Error: Item saved unsuccessfully');
         }
     }, function() {
-        send404(response, request);
+        errorCallback();
     });
 }
 
