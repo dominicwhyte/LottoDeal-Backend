@@ -833,11 +833,7 @@ app.get('/getAccountsForPosts', function(request, response) {
                         var item = items[i];
                         // listed items
                         if (!item.sold && !item.expired) {
-                            console.log("Getting a listed item")
                             listedAccounts = compileReviews(item, users, listedAccounts);
-                            for (var j = 0; j < listedAccounts.length; j++) {
-                                console.log(listedAccounts[j])
-                            }
                         }
                         // sold items
                         else if (item.sold && !item.expired) {
