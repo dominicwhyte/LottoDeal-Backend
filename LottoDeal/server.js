@@ -90,11 +90,10 @@ app.post('/createReview', function(request, response) {
     var stars = request.body.stars;
     var reviewDes = request.body.reviewDes;
     var date = new Date();
-    if (!isInt(stars) || (stars < 1) || stars > 5) {
-        console.log('Error: attempting to review with invalid star count');
-        response.send("Error: attempting to review with invalid star count")
-    }
-    else if (accessToken != undefined) {
+    if (!isInt(stars) || (stars < 1) || stars > 5 || reviewDes.length > 500) {
+        console.log('Error: attempting to review with invalid star count or invalid description');
+        response.send("Error: attempting to review with invalid star count or invalid description")
+    } else if (accessToken != undefined) {
         // create Review
         validateAccessToken(accessToken, response, request, function(userID) {
             if (userID != undefined && sellerID != userID) {
@@ -781,29 +780,39 @@ app.post('/createUser', function(request, response) {
 // Will add a new user to our database
 app.post('/updateSettings', function(request, response) {
     var accessToken = request.body["accessToken"];
-    validateAccessToken(accessToken, response, request, function(userID) {
-        if (userID != null) {
-            // Parse the response
-            var email = request.body.email;
-            findUser(userID, function(user) {
-                if (user != null) {
-                    user.email = email;
-                    user.save();
-                    response.send("updated settings");
-                } else {
-                    console.log("Error: Failed to update settings");
-                    response.send("Failed to update settings");
-                }
 
-            }, function() {
-                send404(response, request);
-            });
-        }
-    });
+    var email = request.body.email;
+    if (!validateEmail()) {
+        console.log('Error: invalid email');
+        response.send("Error: invalid email");
 
+    } else {
+        validateAccessToken(accessToken, response, request, function(userID) {
+            if (userID != null) {
+                // Parse the response
+                findUser(userID, function(user) {
+                    if (user != null) {
+                        user.email = email;
+                        user.save();
+                        response.send("updated settings");
+                    } else {
+                        console.log("Error: Failed to update settings");
+                        response.send("Failed to update settings");
+                    }
 
+                }, function() {
+                    send404(response, request);
+                });
+            }
+        });
+    }
 })
 
+// copied from http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
+function validateEmail(email) {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
 
 // Send back all posts
 app.get('/getPosts', function(request, response) {
