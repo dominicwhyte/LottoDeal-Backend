@@ -299,6 +299,7 @@ app.get('/checkIfUser', function(request, response) {
 // mark all notifications read
 app.get('/markRead', function(request, response) {
     var accessToken = request.query["accessToken"];
+    console.log('Markread running');
     validateAccessToken(accessToken, response, request, function(userID) {
         if (userID != undefined) {
             User.find({
@@ -326,6 +327,7 @@ app.get('/markRead', function(request, response) {
 //Get account, where account is the private account with all info of the logged in user
 app.get('/getAccount', function(request, response) {
     var accessToken = request.query["accessToken"];
+    console.log('accessToken running');
     validateAccessToken(accessToken, response, request, function(userID) {
         findUser(userID, function(user) {
             if (user != null) {
@@ -401,6 +403,7 @@ function send404(response, request) {
 // send back all the notifications
 app.get('/getNotifications', function(request, response) {
     var accessToken = request.query["accessToken"];
+    console.log('notifications running');
     validateAccessToken(accessToken, response, request, function(userID) {
         getNotificationsForUsers(userID, function(notifications) {
             if (notifications != null) {
@@ -416,6 +419,7 @@ app.get('/getNotifications', function(request, response) {
 //Verifies an access token and returns the userID associated to it
 app.get('/verifyAccessToken', function(request, response) {
     var accessToken = request.query["accessToken"];
+    console.log('verifyAccessToken running');
     validateAccessToken(accessToken, response, request, function(userID) {
         if (userID != null) {
             response.send(userID);
