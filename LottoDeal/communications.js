@@ -39,7 +39,7 @@ exports.communicateToSingleUser = function(item, subject, message, date, userID,
     databaseModule.findUser(userID, function(user) {
         sendEmailToAddress(user.email, subject, message);
         if (sold != undefined && sold == true) {
-            communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date, true, winner);
+            communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date, true, winner, item.title);
         }
         else {
             communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, null, null);
@@ -94,7 +94,7 @@ function sendEmailToAddress(email, subjectText, contentText) {
     })
 }
 
-exports.addNotificationToUser = function(itemID, userID, titleText, descriptionText, date, sold, winnerID) {
+exports.addNotificationToUser = function(itemID, userID, titleText, descriptionText, date, sold, winnerID, itemTitle) {
     databaseModule.findUser(userID, function(user) {
         if (sold != null && sold != undefined) {
             databaseModule.findUser(winnerID, function(winner) {
@@ -109,7 +109,7 @@ exports.addNotificationToUser = function(itemID, userID, titleText, descriptionT
                     data["sold"] = true;
                     data["winnerName"] = winner.fullName;
                     data["title"] = "LottoDeal:"
-                    data["description"] = "A winner has been chosen, click to see who won!"
+                    data["description"] = "A winner has been chosen for " + itemTitle + ", click to see who won!"
                 }
                 user.notifications.push(data);
                 user.save();
