@@ -1,0 +1,9 @@
+Things to fix:
+logging out/back in sends 404
+reviews should check numerical 1-5
+trash can should not show on sold item
+Make winning popup appear on every page
+Detect changes to location on item
+Detect that emails are valid on the backend
+no rating/5
+max size for rating on front/backend

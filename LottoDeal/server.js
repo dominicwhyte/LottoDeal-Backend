@@ -358,7 +358,6 @@ app.get('/getPublicAccount', function(request, response) {
 // send back all the suggested items
 app.get('/getSuggestions', function(request, response) {
     var accessToken = request.query["accessToken"];
-    console.log('Getting suggestions');
     validateAccessToken(accessToken, response, request, function(userID) {
         findUser(userID, function(user) {
             if (user != null) {
