@@ -15,14 +15,17 @@ exports.checkIfServerShouldPerformLottery = function() {
 
 //Check database for if lotteries should be performed. Performs lottery and communicates to users if necessary
 var checkLotteries = function() {
+    console.log('checking lotteries');
     databaseModule.findAllItems(function(items) {
         for (i = 0; i < items.length; i++) {
             var item = items[i];
             if (item.expired || item.sold) {
                 continue;
             }
+            console.log('checking ' + item.title + " " + item.amountRaised + " " + item.price);
             var expirDate = new Date(item.expirationDate);
             if (item.amountRaised >= item.price) {
+                console.log('performing');
                 performLottery(item, function(winner) {
                     var date = new Date();
                     communicationsModule.communicateToLosers(item, "LottoDeal: You lost!", "Sorry, you lost your bid for " + item.title + ". Bid again on LottoDeal!", date, winner, true);

@@ -90,8 +90,11 @@ app.post('/createReview', function(request, response) {
     var stars = request.body.stars;
     var reviewDes = request.body.reviewDes;
     var date = new Date();
-
-    if (accessToken != undefined) {
+    if (!isInt(stars) || (stars < 1) || stars > 5) {
+        console.log('Error: attempting to review with invalid star count');
+        response.send("Error: attempting to review with invalid star count")
+    }
+    else if (accessToken != undefined) {
         // create Review
         validateAccessToken(accessToken, response, request, function(userID) {
             if (userID != undefined && sellerID != userID) {
