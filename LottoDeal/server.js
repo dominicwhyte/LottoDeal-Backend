@@ -220,14 +220,14 @@ function validateAccessToken(accessToken, response, request, callback) {
         maxRedirects: 10
     }, function(error, validateResponse, body) {
         if (body == undefined || body === "undefined") {
-            console.log('Error in validating accessToken. Error is not null or userID is null: ' + error);
+            console.log('Error in validating accessToken: ' + accessToken + ' . Error is not null or userID is null: ' + error);
             send404(response, request);
         } else {
             body = JSON.parse(body);
             var userID = body.id;
 
             if (error != null || userID == null) {
-                console.log('Error in validating accessToken. Error is not null or userID is null: ' + error);
+                console.log('Error in validating accessToken: ' + accessToken + ' . Error is not null or userID is null: ' + error);
                 send404(response, request);
             } else {
                 callback(userID);
@@ -279,19 +279,19 @@ app.get('/getReviewsOfSeller', function(request, response) {
 // Check if a user is already registered in the database
 app.get('/checkIfUser', function(request, response) {
     var accessToken = request.query["accessToken"];
+    console.log('checkifuser running');
     validateAccessToken(accessToken, response, request, function(userID) {
         if (userID != undefined) {
-            User.find({
-                fbid: userID
-            }, function(err, user) {
-                if (user.length > 1) {
-                    console.log('Error: multiple users with FBID')
-                } else if (user.length == 1) {
+            findUser(userID, function(user) {
+                if (user != null) {
                     response.send(true);
                 } else {
                     console.log("Error: returning false in checkIfUser")
                     response.send(false);
                 }
+            }, function() {
+                console.log("Error: returning false in checkIfUser")
+                response.send(false);
             });
         }
     });
