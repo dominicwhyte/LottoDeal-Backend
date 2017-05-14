@@ -1204,9 +1204,9 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
                     errorCallback();
                 }
 
-                createImage(newItem["_id"], buffer);
+                createImage(newItem["_id"], buffer, callback, errorCallback);
 
-                callback(newItem["_id"])
+                // callback(newItem["_id"])
             });
         } else {
             console.log('Error: Item saved unsuccessfully');
