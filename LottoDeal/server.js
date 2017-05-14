@@ -607,13 +607,13 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 
     // CHECK FOR SIZE OF IMAGE
     if (req.files == null || req.files['picture'] == null || req.files['picture'].length == 0 || req.files['picture'][0].size == null) {
-        res.redirect(PROD_URL + "/sell.html#!/?value=improperFormat")
+        res.redirect(PREVIOUS_PROD_URL + "/sell.html#!/?value=improperFormat")
         return;
     }
 
     var imgSize = req.files['picture'][0].size;
     if (imgSize > maxSize) {
-        res.redirect(PROD_URL + '/sell.html#!/?value=sizeTooLarge');
+        res.redirect(PREVIOUS_PROD_URL + '/sell.html#!/?value=sizeTooLarge');
         return;
     }
 
@@ -626,16 +626,16 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var accessToken = req.body.accessToken;
 
     if (title == null || price == null || !isInt(price) || offset == null || shortDescription == null || longDescription == null || accessToken == null) {
-        res.redirect(PROD_URL + "/sell.html#!/?value=improperFormat")
+        res.redirect(PREVIOUS_PROD_URL + "/sell.html#!/?value=improperFormat")
         return;
     }
 
     if (title.length > 100 || price > 1000000000 || (offset < 0 || offset > 4) || shortDescription.length > 200 || longDescription.length > 2000) {
-        res.redirect(PROD_URL + "/sell.html#!/?value=improperFormat")
+        res.redirect(PREVIOUS_PROD_URL + "/sell.html#!/?value=improperFormat")
         return;
     }
     if (title.length < 0 || price < 1 || shortDescription.length < 0 || longDescription.length < 0) {
-        res.redirect(PROD_URL + "/sell.html#!/?value=improperFormat")
+        res.redirect(PREVIOUS_PROD_URL + "/sell.html#!/?value=improperFormat")
         return;
     }
 
@@ -644,7 +644,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     validateAccessToken(accessToken, res, req, function(sellerID) {
         var picture = req.files['picture'][0]
         if (picture.mimetype != "image/jpeg" && picture.mimetype != "image/png") {
-            res.redirect(PROD_URL + "/sell.html#!/?value=improperFormat")
+            res.redirect(PREVIOUS_PROD_URL + "/sell.html#!/?value=improperFormat")
             return;
         }
 
@@ -693,7 +693,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
                     var shortDescription = req.body.shortDescription;
                     var longDescription = req.body.longDescription;
                     createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
-                        res.redirect(PROD_URL + '/sell.html#!/?value=success&id=' + id);
+                        res.redirect(PREVIOUS_PROD_URL + '/sell.html#!/?value=success&id=' + id);
                     }, function() {
                         send404(res, req, 'createPost');
                     }, imageData, res, req);
