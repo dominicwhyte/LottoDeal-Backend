@@ -37,9 +37,11 @@ exports.communicateToSingleUser = function(item, subject, message, date, userID,
     databaseModule.findUser(userID, function(user) {
         sendEmailToAddress(user.email, subject, message);
         if (sold != undefined && sold == true) {
+            console.log('Sending notification to: ' + user.fullName);
             communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date, true, winner, item.title);
         }
         else {
+            console.log('Sending regular notification to: ' + user.fullName);
             communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, null, null);
         }
     }, function() {
