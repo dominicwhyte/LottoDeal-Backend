@@ -25,16 +25,15 @@ var checkLotteries = function() {
             if (item.amountRaised >= item.price) {
                 performLottery(item, function(winner) {
                     var date = new Date();
-                    communicationsModule.communicateToLosers(item, "LottoDeal: You lost!", "Sorry, you lost your bid on " + item.title + ". Bid again on LottoDeal!", date, winner, true);
-                    communicationsModule.communicateToSingleUser(item, "LottoDeal: You won!", "Congratulations, you won " + item.title + "! We'll be in contact shortly to arrange item delivery.", date, winner, true, winner );
                     communicationsModule.communicateToAdmins(item, "Admin", "New winner for " + item.title + ".", date, winner);
                     communicationsModule.communicateToSingleUser(item, "LottoDeal: Your item " + item.title + " has been sold!", "Click here to view who won:", date, item.sellerID, true, winner);
+                    communicationsModule.communicateToBidders(item, "LottoDeal", "A winner has been chosen for " + item.title + ", click to see who won!", date, true);
                 });
             } else if (expirDate < Date.now()) {
                 //Refund and notify users
                 lotteryModule.refundUsers(item);
                 var date = new Date();
-                communicationsModule.communicateToLosers(item, "LottoDeal:" + item.title + " expired", "You have been fully refunded", date, "");
+                communicationsModule.communicateToBidders(item, "LottoDeal:" + item.title + " expired", "You have been fully refunded", date, false);
                 item.expired = true;
                 item.save();
             } else {

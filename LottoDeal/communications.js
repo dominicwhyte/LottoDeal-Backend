@@ -43,7 +43,7 @@ exports.communicateSoldToSingleUser = function(item, subject, message, date, use
     databaseModule.findUser(userID, function(user) {
         console.log('Sending sold notification to: ' + user.fullName);
         sendEmailToAddress(user.email, subject, message);
-        communicationsModule.addSoldNotificationToUser(item._id, user.fbid, date, winner, item.winnerID, item.title);
+        communicationsModule.addSoldNotificationToUser(item._id, user.fbid, subject, message, date, winner, item.winnerID, item.title);
     }, function() {
         console.log('Error in communicateToSingleUser');
     });
@@ -111,15 +111,15 @@ exports.addRegularNotificationToUser = function(itemID, userID, titleText, descr
 }
 
 //Adds a notification to a user with userID, for an itemID, for when an item has been sold
-exports.addSoldNotificationToUser = function(itemID, userID, date, winnerID, itemTitle) {
+exports.addSoldNotificationToUser = function(itemID, userID, titleText, descriptionText, date, winnerID, itemTitle) {
     databaseModule.findUser(userID, function(user) {
         databaseModule.findUser(winnerID, function(winner) {
             var data = {
                 itemID: itemID,
                 datePosted: date,
                 read: false,
-                title: "LottoDeal",
-                description: "A winner has been chosen for " + itemTitle + ", click to see who won!",
+                title: titleText,
+                description: descriptionText,
                 sold: true,
                 winnerName: winner.fullName
             };
