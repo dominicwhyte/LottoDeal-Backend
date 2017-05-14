@@ -1301,7 +1301,6 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
                 img: picture
             });
             newItem.save(function(err, newItem) {
-                // if (err) throw err; // THERE SHOULD BE AN ERROR CALLBACK HERE
                 if (err) {
                     errorCallback();
                 }
@@ -1627,12 +1626,10 @@ var deleteUser = function(id, callback) {
     User.find({
         fbid: id
     }, function(err, user) {
-        // if (err) throw err;
         if (err) console.log(err);
         if (user != null) {
             // delete
             user[0].remove({}, function(err) {
-                // if (err) throw err;
                 if (err) console.log(err);
                 // removes all its corresponding items
                 Item.remove({
@@ -1717,7 +1714,6 @@ var findUser = function(fbid, callback, errorCallback) {
             errorCallback();
             return;
         }
-        // if (err) throw err;
         if (user.length != 0) {
             callback(user[0]);
         } else {
