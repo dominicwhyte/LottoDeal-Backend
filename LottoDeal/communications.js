@@ -43,7 +43,7 @@ exports.communicateSoldToSingleUser = function(item, subject, message, date, use
     databaseModule.findUser(userID, function(user) {
         console.log('Sending sold notification to: ' + user.fullName);
         sendEmailToAddress(user.email, subject, message);
-        communicationsModule.addSoldNotificationToUser(item._id, user.fbid, subject, message, date, winner, item.winnerID, item.title);
+        communicationsModule.addSoldNotificationToUser(item._id, user.fbid, subject, message, date, item.winnerID, item.title);
     }, function() {
         console.log('Error in communicateToSingleUser');
     });
