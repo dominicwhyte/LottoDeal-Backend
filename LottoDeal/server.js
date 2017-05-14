@@ -176,7 +176,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                                 })
                             } else {
                                 addChargeIDToItem(itemID, userID, charge.id);
-                                communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
+                                communicationsModule.addRegularNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
                                 response.send("charge is" + charge.amount);
                             }
                         } else {
