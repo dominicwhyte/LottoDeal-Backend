@@ -16,34 +16,34 @@ exports.emailBiddersForItem = function(item, subject, message, winner) {
     }
 }
 
-//Email and add notifications to all bidders, except the winner
-exports.communicateToLosers = function(item, subject, message, date, winner, sold) {
+//Email and add notifications to all bidders. Sold represents if the item was sold
+exports.communicateToBidders = function(item, subject, message, date, sold) {
     for (var j = 0; j < item.bids.length; j++) {
         var bidderID = item.bids[j].ID;
-        if (bidderID == winner) {
-            continue;
-        }
         if (sold == true) {
-            communicationsModule.communicateToSingleUser(item, subject, message, date, bidderID, true, winner);
-        }
-        else {
+            communicationsModule.communicateSoldToSingleUser(item, subject, message, date, bidderID, winner);
+        } else {
             communicationsModule.communicateToSingleUser(item, subject, message, date, bidderID);
         }
     }
 }
 
-//Email and add notifications to all bidders, except the winner
-exports.communicateToSingleUser = function(item, subject, message, date, userID, sold, winner) {
+//Send communications to a single user
+exports.communicateToSingleUser = function(item, subject, message, date, userID) {
     databaseModule.findUser(userID, function(user) {
         sendEmailToAddress(user.email, subject, message);
-        if (sold != undefined && sold == true) {
-            console.log('Sending notification to: ' + user.fullName);
-            communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, date, true, winner, item.title);
-        }
-        else {
             console.log('Sending regular notification to: ' + user.fullName);
-            communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message, null, null);
-        }
+            communicationsModule.addRegularNotificationToUser(item._id, user.fbid, subject, message);
+    }, function() {
+        console.log('Error in communicateToSingleUser');
+    });
+}
+
+exports.communicateSoldToSingleUser = function(item, subject, message, date, userID) {
+    databaseModule.findUser(userID, function(user) {
+        console.log('Sending sold notification to: ' + user.fullName);
+        sendEmailToAddress(user.email, subject, message);
+        communicationsModule.addSoldNotificationToUser(item._id, user.fbid, date, winner, item.winnerID, item.title);
     }, function() {
         console.log('Error in communicateToSingleUser');
     });
@@ -60,7 +60,7 @@ exports.communicateToAdmins = function(item, subject, message, date, winnerID) {
             databaseModule.findUser(adminID, function(user) {
                 var appendMessage = "    The winner of this lottery was... " + winner.fullName + "!!!";
                 sendEmailToAddress(user.email, subject, message + appendMessage);
-                communicationsModule.addNotificationToUser(item._id, user.fbid, subject, message + appendMessage, date);
+                communicationsModule.addRegularNotificationToUser(item._id, user.fbid, subject, message + appendMessage, date);
             }, function() {
                 console.log('Error in communicateToAdmins');
             });
@@ -93,41 +93,41 @@ function sendEmailToAddress(email, subjectText, contentText) {
     })
 }
 
-exports.addNotificationToUser = function(itemID, userID, titleText, descriptionText, date, sold, winnerID, itemTitle) {
+//Adds a notification to a user with userID, for an itemID. 
+exports.addRegularNotificationToUser = function(itemID, userID, titleText, descriptionText, date) {
     databaseModule.findUser(userID, function(user) {
-        if (sold != null && sold != undefined) {
-            databaseModule.findUser(winnerID, function(winner) {
-                var data = {
-                    itemID: itemID,
-                    datePosted: date,
-                    read: false,
-                    title: titleText,
-                    description: descriptionText
-                };
-                if (sold != undefined && sold != null) {
-                    data["sold"] = true;
-                    data["winnerName"] = winner.fullName;
-                    data["title"] = "LottoDeal"
-                    data["description"] = "A winner has been chosen for " + itemTitle + ", click to see who won!"
-                }
-                user.notifications.push(data);
-                user.save();
-            }, function() {
-                console.log('Error in addNotificationToUser');
-            })
-        }
-        else {
+        var data = {
+            itemID: itemID,
+            datePosted: date,
+            read: false,
+            title: titleText,
+            description: descriptionText
+        };
+        user.notifications.push(data);
+        user.save();
+    }, function() {
+        console.log('Error in addNotificationToUser');
+    });
+}
+
+//Adds a notification to a user with userID, for an itemID, for when an item has been sold
+exports.addSoldNotificationToUser = function(itemID, userID, date, winnerID, itemTitle) {
+    databaseModule.findUser(userID, function(user) {
+        databaseModule.findUser(winnerID, function(winner) {
             var data = {
                 itemID: itemID,
                 datePosted: date,
                 read: false,
-                title: titleText,
-                description: descriptionText
+                title: "LottoDeal",
+                description: "A winner has been chosen for " + itemTitle + ", click to see who won!",
+                sold: true,
+                winnerName: winner.fullName
             };
-            
             user.notifications.push(data);
             user.save();
-        }
+        }, function() {
+            console.log('Error in addNotificationToUser');
+        })
     }, function() {
         console.log('Error in addNotificationToUser');
     });
