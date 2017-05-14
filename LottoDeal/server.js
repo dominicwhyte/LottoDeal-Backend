@@ -199,7 +199,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                 return;
             }
         }, function() {
-            send404(response, request);
+            send404(response, request, 'performPaymentAndAddBid');
         });
     });
 })
@@ -223,14 +223,14 @@ function validateAccessToken(accessToken, response, request, callback) {
     }, function(error, validateResponse, body) {
         if (body == undefined || body === "undefined") {
             console.log('Error in validating accessToken: ' + accessToken + ' . Error is not null or userID is null: ' + error);
-            send404(response, request);
+            send404(response, request, 'validateAccessToken');
         } else {
             body = JSON.parse(body);
             var userID = body.id;
 
             if (error != null || userID == null) {
                 console.log('Error in validating accessToken: ' + accessToken + ' . Error is not null or userID is null: ' + error);
-                send404(response, request);
+                send404(response, request, 'validateAccessToken');
             } else {
                 callback(userID);
             }
@@ -253,7 +253,7 @@ app.get('/getReviews', function(request, response) {
             console.log('Error: user is null in getReviews');
         }
     }, function() {
-        send404(response, request);
+        send404(response, request, 'getReviews');
     });
 })
 
@@ -267,13 +267,13 @@ app.get('/getReviewsOfSeller', function(request, response) {
                 response.send(JSON.stringify(user.reviews));
 
             }, function() {
-                send404(response, request);
+                send404(response, request, 'getReviewsOfSeller');
             });
         } else {
             console.log('Error: user is null in getReviews');
         }
     }, function() {
-        send404(response, request);
+        send404(response, request, 'getReviewsOfSeller');
     });
 })
 
@@ -336,7 +336,7 @@ app.get('/getAccount', function(request, response) {
                 console.log('Error: user is null in getAccount');
             }
         }, function() {
-            send404(response, request);
+            send404(response, request, 'getAccount');
         });
     });
 })
@@ -351,7 +351,7 @@ app.get('/getPublicAccount', function(request, response) {
             console.log('Error: user is null in getAccount');
         }
     }, function() {
-        send404(response, request);
+        send404(response, request, 'getPublicAccount');
     });
 })
 
@@ -369,10 +369,8 @@ app.get('/getSuggestions', function(request, response) {
                 console.log('Error: user is null in getAccount');
             }
         }, function() {
-            send404(response, request);
+            send404(response, request, 'getSuggestions');
         });
-
-
     })
 })
 
@@ -522,7 +520,7 @@ app.get('/getListedItemsForUsers', function(request, response) {
         }
 
     }, function() {
-        send404(response, request);
+        send404(response, request, 'getListedItemsForUsers');
     });
 })
 
@@ -533,7 +531,7 @@ app.get('/getSoldItemsForUsers', function(request, response) {
     getSoldItemsForUsers(userID, function(items) {
         response.send(JSON.stringify(trimItems(items)));
     }, function() {
-        send404(response, request);
+        send404(response, request, 'getSoldItemsForUsers');
     });
 })
 
@@ -577,7 +575,7 @@ app.post('/debugPost', function(request, response) {
                 createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
                     response.redirect(PROD_URL + '/sell.html#!/?value=success&id=' + id);
                 }, function() {
-                    send404(response, request);
+                    send404(response, request, 'debugPost');
                 }, imageData, response, request);
             })
     })
@@ -611,7 +609,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
         res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
         return;
     }
-    
+
     var imgSize = req.files['picture'][0].size;
     if (imgSize > maxSize) {
         res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=sizeTooLarge');
@@ -696,7 +694,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
                     createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
                         res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
                     }, function() {
-                        send404(res, req);
+                        send404(res, req, 'createPost');
                     }, imageData, res, req);
                 })
         })
@@ -743,7 +741,7 @@ app.get('/getReviewerImagesAndNames', function(request, response) {
             console.log('Error: User is null in getReviewerImagesandNames');
         }
     }, function() {
-        send404(response, request);
+        send404(response, request, 'getReviewerImagesAndNames');
     });
 });
 
@@ -807,7 +805,7 @@ app.post('/updateSettings', function(request, response) {
                     }
 
                 }, function() {
-                    send404(response, request);
+                    send404(response, request, 'updateSettings');
                 });
             }
         });
@@ -895,14 +893,14 @@ app.get('/getItem', function(request, response) {
                 item.img.compressed = buffer;
                 response.send(JSON.stringify(trimItem(item)));
             }, function() {
-                send404(response, request);
+                send404(response, request, 'getItem');
             })
         } else {
             console.log("Error: item is null in getItem");
         }
 
     }, function() {
-        send404(response, request);
+        send404(response, request, 'getItem');
     });
 })
 
@@ -947,22 +945,22 @@ app.delete('/deleteItem', function(request, response) {
                     });
                 } else {
                     console.log('Error: Item cannot be deleted');
-                    send404(response, request);
+                    send404(response, request, 'deleteItem');
                 }
 
             } else {
-                send404(response, request);
+                send404(response, request, 'deleteItem');
             }
         }, function() {
             console.log('Error: user is null in getAccount');
-            send404(response, request);
+            send404(response, request, 'deleteItem');
         });
 
         findUser(userID, function(user) {
 
         }, function() {
             console.log('Error in deleteItem');
-            send404(response, request);
+            send404(response, request, 'deleteItem');
         });
     });
 })
@@ -1014,7 +1012,7 @@ app.get('/getImagesForNotifications', function(request, response) {
             response.send(JSON.stringify(imagesCompressed));
 
         }, function() {
-            send404(response, request);
+            send404(response, request, 'getImagesForNotifications');
         });
     } else {
         response.send([]);
@@ -1350,7 +1348,7 @@ var createReview = function(sellerID, userID, stars, reviewDes, date) {
             console.log('Error: user is null in create review');
         }
     }, function() {
-        send404(response, request);
+        send404(response, request, 'createReview');
     });
 }
 
