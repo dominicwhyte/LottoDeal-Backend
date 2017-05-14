@@ -504,7 +504,7 @@ function compileReviews(item, users, accounts) {
                 accounts.push(account);
             } else {
                 var account = {
-                    averageRating: "No Ratings Yet",
+                    averageRating: "N/A"
                 }
                 accounts.push(account);
             }
