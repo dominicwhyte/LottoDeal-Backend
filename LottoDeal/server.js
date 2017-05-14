@@ -785,7 +785,7 @@ function isInt(value) {
 // and names of the people that reviewed the given perosn 
 app.get('/getReviewerImagesAndNames', function(request, response) {
     var userID = request.query["userID"];
-    
+
     if (userID == null) {
         respons.send(JSON.stringify([]));
     }
@@ -1156,8 +1156,12 @@ mongoose.connect(url, function(err, db) {
 
 
     //crash the server
-    var test = null
-    console.log(test.test);
+    setTimeout(function() {
+        console.log('Crashing server');
+        var test = null
+        console.log(test.test);
+    }, 5000);
+
 
 
     //Begin checking if lotteries should be performed
