@@ -26,7 +26,7 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
 var maxSize = 1.2 * Math.pow(10, 7); // 12MB
-
+ 
 var multer = require('multer')
 var upload = multer({
     dest: 'uploads/',
