@@ -72,7 +72,6 @@ exports.communicateToAdmins = function(item, subject, message, date, winnerID) {
 
 
 function sendEmailToAddress(email, subjectText, contentText) {
-    console.log('sending email');
     var helper = require('sendgrid').mail;
     from_email = new helper.Email("info@lottodeal.com");
     to_email = new helper.Email(email);
