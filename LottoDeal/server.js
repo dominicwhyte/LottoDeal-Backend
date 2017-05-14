@@ -1154,16 +1154,6 @@ mongoose.connect(url, function(err, db) {
     // deleteAllImages();
     // cleanseUsers();
 
-
-    //crash the server
-    setTimeout(function() {
-        console.log('Crashing server');
-        var test = null
-        console.log(test.test);
-    }, 5000);
-
-
-
     //Begin checking if lotteries should be performed
     lotteryModule.checkIfServerShouldPerformLottery();
 });
