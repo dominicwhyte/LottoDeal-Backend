@@ -996,7 +996,7 @@ app.get('/getItem', function(request, response) {
 // Send back either a serialized or full version of all users
 app.get('/getUsers', function(request, response) {
 
-    var users = findAllUsers(function(users) {
+    findAllUsers(function(users) {
         if (users != null) {
             response.send(JSON.stringify(users))
         } else {
@@ -1152,6 +1152,7 @@ mongoose.connect(url, function(err, db) {
     // deleteAllUsers();
     // deleteAllItems();
     // deleteAllImages();
+
 
     //Begin checking if lotteries should be performed
     lotteryModule.checkIfServerShouldPerformLottery();
@@ -1745,6 +1746,17 @@ var deleteAllUsers = function() {
         if (err) {
             console.log('Error: removing user');
         }
+    });
+}
+
+var cleanseUsers = function() {
+    findAllUsers(function(users) {
+        if (users != null) {
+            response.send(JSON.stringify(users))
+        } else {
+            console.log("Error: users is null in cleanseUsers");
+        }
+
     });
 }
 
