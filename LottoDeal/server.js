@@ -1155,6 +1155,11 @@ mongoose.connect(url, function(err, db) {
     // cleanseUsers();
 
 
+    //crash the server
+    var test = null
+    console.log(test.test);
+
+
     //Begin checking if lotteries should be performed
     lotteryModule.checkIfServerShouldPerformLottery();
 });
