@@ -148,15 +148,14 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                                 //remove the bid that was added
                                 removeBidForItem(itemID, userID, amountToCharge, function(status) {
                                     //Refund the user
-                                    if (charge != null) {
-                                        stripe.refunds.create({
-                                            charge: charge._id,
-                                        }, function(err, refund) {
-                                            if (refund == null || err != null) {
-                                                console.log('Refund failed in ' + performPaymentAndAddBid)
-                                            }
-                                        });
-                                    }
+
+                                    stripe.refunds.create({
+                                        charge: charge.id,
+                                    }, function(err, refund) {
+                                        if (refund == null || err != null) {
+                                            console.log('Refund failed in ' + performPaymentAndAddBid)
+                                        }
+                                    });
 
                                     if (!status) {
                                         console.log('Error: removeBidForItem');
@@ -165,7 +164,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                                     response.type('txt').send('Error bidding on item');
                                 })
                             } else {
-                                addChargeIDToItem(itemID, userID, charge._id);
+                                addChargeIDToItem(itemID, userID, charge.id);
                                 communicationsModule.addNotificationToUser(itemID, userID, "New Bid", "You just bid $" + Number(dollarAmount).toFixed(2), date);
                                 response.send("charge is" + charge.amount);
                             }
@@ -175,7 +174,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                                 //Refund the user
                                 if (charge != null) {
                                     stripe.refunds.create({
-                                        charge: charge._id,
+                                        charge: charge.id,
                                     }, function(err, refund) {
                                         if (refund == null || err != null) {
                                             console.log('Refund failed in ' + performPaymentAndAddBid);
