@@ -26,7 +26,7 @@ var checkLotteries = function() {
                 performLottery(item, function(winner) {
                     var date = new Date();
                     communicationsModule.communicateToAdmins(item, "Admin", "New winner for " + item.title + ".", date, winner);
-                    communicationsModule.communicateToSingleUser(item, "LottoDeal: Your item " + item.title + " has been sold!", "Click here to view who won:", date, item.sellerID, true, winner);
+                    communicationsModule.communicateSoldToSingleUser(item, "LottoDeal: Your item " + item.title + " has been sold!", "Click here to view who won:", date, item.sellerID);
                     communicationsModule.communicateToBidders(item, "LottoDeal", "A winner has been chosen for " + item.title + ", click to see who won!", date, true);
                 });
             } else if (expirDate < Date.now()) {
