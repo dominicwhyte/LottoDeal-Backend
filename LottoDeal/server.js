@@ -606,13 +606,13 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 
     // CHECK FOR SIZE OF IMAGE
     if (req.files == null || req.files['picture'] == null || req.files['picture'].length == 0 || req.files['picture'][0].size == null) {
-        res.redirect(PROD_URL + "/sell.html#!/?value=improperFormat")
+        res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
         return;
     }
 
     var imgSize = req.files['picture'][0].size;
     if (imgSize > maxSize) {
-        res.redirect(PROD_URL + '/sell.html#!/?value=sizeTooLarge');
+        res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=sizeTooLarge');
         return;
     }
 
@@ -625,16 +625,16 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     var accessToken = req.body.accessToken;
 
     if (title == null || price == null || !isInt(price) || offset == null || shortDescription == null || longDescription == null || accessToken == null) {
-        res.redirect(PROD_URL + "/sell.html#!/?value=improperFormat")
+        res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
         return;
     }
 
     if (title.length > 100 || price > 1000000000 || (offset < 0 || offset > 4) || shortDescription.length > 200 || longDescription.length > 2000) {
-        res.redirect(PROD_URL + "/sell.html#!/?value=improperFormat")
+        res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
         return;
     }
     if (title.length < 0 || price < 1 || shortDescription.length < 0 || longDescription.length < 0) {
-        res.redirect(PROD_URL + "/sell.html#!/?value=improperFormat")
+        res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
         return;
     }
 
@@ -643,7 +643,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
     validateAccessToken(accessToken, res, req, function(sellerID) {
         var picture = req.files['picture'][0]
         if (picture.mimetype != "image/jpeg" && picture.mimetype != "image/png") {
-            res.redirect(PROD_URL + "/sell.html#!/?value=improperFormat")
+            res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
             return;
         }
 
@@ -692,7 +692,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
                     var shortDescription = req.body.shortDescription;
                     var longDescription = req.body.longDescription;
                     createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
-                        res.redirect(PROD_URL + '/sell.html#!/?value=success&id=' + id);
+                        res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=success&id=' + id);
                     }, function() {
                         send404(res, req, 'createPost');
                     }, imageData, res, req);
@@ -977,7 +977,7 @@ app.post('/editItem', function(request, response) {
 
     var imgSize = request.files['picture'][0].size;
     if (imgSize > maxSize) {
-        res.redirect(PROD_URL + '/sell.html#!/?value=sizeTooLarge');
+        res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=sizeTooLarge');
     }
 
     var picture = request.files['picture'][0]
@@ -1204,9 +1204,9 @@ var createItem = function(title, price, datePosted, expirationDate, shortDescrip
                     errorCallback();
                 }
 
-                createImage(newItem["_id"], buffer, callback, errorCallback);
+                createImage(newItem["_id"], buffer);
 
-                // callback(newItem["_id"])
+                callback(newItem["_id"])
             });
         } else {
             console.log('Error: Item saved unsuccessfully');
@@ -1354,8 +1354,9 @@ var createReview = function(sellerID, userID, stars, reviewDes, date) {
 
 // adds stripes charge ID to an item given the item's ID, a user's ID, and their chargeID
 var addChargeIDToItem = function(itemID, userID, chargeID) {
-    Item.findById(itemID, function(err, item) {
-        if (item.bids != null) {
+    console.log("Adding charge: itemID " + itemID + "  userID: " + userID + " chargeID: " + chargeID);
+    findItemByID(itemID, function(item) {
+        if (item != null && item.bids != null) {
             for (i = 0; i < item.bids.length; i++) {
                 if (item.bids[i].ID == userID) {
                     item.bids[i].chargeIDs.push(chargeID);
@@ -1366,6 +1367,8 @@ var addChargeIDToItem = function(itemID, userID, chargeID) {
         } else {
             console.log('Error, bids is null in addChargeIDToItem');
         }
+    }, function() {
+        console.log('Error, bids is null in addChargeIDToItem');
     });
 }
 
@@ -1689,13 +1692,8 @@ var editItem = function(title, price, expirationDate, shortDescription, longDesc
 }
 
 // create an Image
-var createImage = function(id, buffer, callback, errorCallback) {
+var createImage = function(id, buffer) {
     Jimp.read(buffer, function(err, img) {
-        if (err) {
-            console.log("Error in createImage for reading in buffer");
-            errorCallback();
-            return;
-        }
         img.scaleToFit(1000, 1000).getBase64(Jimp.AUTO, function(err, src) {
             var newImage = new Image({
                 itemID: id,
@@ -1706,13 +1704,7 @@ var createImage = function(id, buffer, callback, errorCallback) {
             // call the built-in save method to save to the database
             newImage.save(function(err) {
                 if (err) {
-                    console.log("Error in createImage");
-                    errorCallback();
-                    return;
-                }
-                else {
-                    callback(id);
-
+                    console.log("Image saved successfully");
                 }
             });
         });
