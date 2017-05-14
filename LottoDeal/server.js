@@ -11,7 +11,8 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 
-const PROD_URL = "www.lottodeal.us"
+const PROD_URL = "www.lottodeal.us";
+const PREVIOUS_PROD_URL = "https://dominicwhyte.github.io/LottoDeal-Frontend";
 const suggestionsModule = require('./suggestionsAlgorithm');
 const lotteryModule = require('./lottery');
 const databaseModule = require('./server');
@@ -26,7 +27,7 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
 var maxSize = 1.2 * Math.pow(10, 7); // 12MB
- 
+
 var multer = require('multer')
 var upload = multer({
     dest: 'uploads/',
@@ -573,7 +574,7 @@ app.post('/debugPost', function(request, response) {
                 var longDescription = request.body.longDescription;
                 var sellerID = request.body.userID;
                 createItem(title, price, date, expirationDate, shortDescription, longDescription, sellerID, image, function(id) {
-                    response.redirect(PROD_URL + '/sell.html#!/?value=success&id=' + id);
+                    response.redirect(PREVIOUS_PROD_URL + '/sell.html#!/?value=success&id=' + id);
                 }, function() {
                     send404(response, request, 'debugPost');
                 }, imageData, response, request);
@@ -977,7 +978,7 @@ app.post('/editItem', function(request, response) {
 
     var imgSize = request.files['picture'][0].size;
     if (imgSize > maxSize) {
-        res.redirect(PROD_URL + '/sell.html#!/?value=sizeTooLarge');
+        res.redirect(PREV_PROD_URL + '/sell.html#!/?value=sizeTooLarge');
     }
 
     var picture = request.files['picture'][0]
@@ -1354,8 +1355,9 @@ var createReview = function(sellerID, userID, stars, reviewDes, date) {
 
 // adds stripes charge ID to an item given the item's ID, a user's ID, and their chargeID
 var addChargeIDToItem = function(itemID, userID, chargeID) {
-    Item.findById(itemID, function(err, item) {
-        if (item.bids != null) {
+    console.log("Adding charge: itemID " + itemID + "  userID: " + userID + " chargeID: " + chargeID);
+    findItemByID(itemID, function(item) {
+        if (item != null && item.bids != null) {
             for (i = 0; i < item.bids.length; i++) {
                 if (item.bids[i].ID == userID) {
                     item.bids[i].chargeIDs.push(chargeID);
@@ -1366,6 +1368,8 @@ var addChargeIDToItem = function(itemID, userID, chargeID) {
         } else {
             console.log('Error, bids is null in addChargeIDToItem');
         }
+    }, function() {
+        console.log('Error, bids is null in addChargeIDToItem');
     });
 }
 
@@ -1709,8 +1713,7 @@ var createImage = function(id, buffer, callback, errorCallback) {
                     console.log("Error in createImage");
                     errorCallback();
                     return;
-                }
-                else {
+                } else {
                     callback(id);
 
                 }
