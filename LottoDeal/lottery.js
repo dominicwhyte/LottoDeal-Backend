@@ -103,7 +103,6 @@ exports.refundUsers = function(item) {
         for (var i = 0; i < bid.chargeIDs.length; i++) {
             var chargeID = bid.chargeIDs[i];
             var stripe = require("stripe")("sk_test_eg2HQcx67oK4rz5G57XiWXgG");
-            console.log('performing refund for chargeID: ' + chargeID);
             stripe.refunds.create({
                 charge: chargeID,
             }, function(err, refund) {

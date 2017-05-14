@@ -1354,7 +1354,6 @@ var createReview = function(sellerID, userID, stars, reviewDes, date) {
 
 // adds stripes charge ID to an item given the item's ID, a user's ID, and their chargeID
 var addChargeIDToItem = function(itemID, userID, chargeID) {
-    console.log("Adding charge: itemID " + itemID + "  userID: " + userID + " chargeID: " + chargeID);
     findItemByID(itemID, function(item) {
         if (item != null && item.bids != null) {
             for (i = 0; i < item.bids.length; i++) {
