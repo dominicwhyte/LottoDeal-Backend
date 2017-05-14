@@ -8,7 +8,6 @@ exports.emailBiddersForItem = function(item, subject, message, winner) {
         if (bidderID == winner) {
             continue;
         }
-        console.log('searching for user' + bidderID);
         databaseModule.findUser(bidderID, function(user) {
             sendEmailToAddress(user.email, subject, message);
         }, function() {
@@ -24,7 +23,6 @@ exports.communicateToLosers = function(item, subject, message, date, winner, sol
         if (bidderID == winner) {
             continue;
         }
-        console.log('searching for user' + bidderID);
         if (sold == true) {
             communicationsModule.communicateToSingleUser(item, subject, message, date, bidderID, true, winner);
         }
