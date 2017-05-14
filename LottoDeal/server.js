@@ -1150,9 +1150,9 @@ mongoose.connect(url, function(err, db) {
     var postmark = require("postmark");
 
     // deleteAllUsers();
-    deleteAllItems();
-    deleteAllImages();
-    cleanseUsers();
+    // deleteAllItems();
+    // deleteAllImages();
+    // cleanseUsers();
 
 
     //Begin checking if lotteries should be performed
