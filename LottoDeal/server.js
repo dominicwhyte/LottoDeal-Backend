@@ -1689,8 +1689,13 @@ var editItem = function(title, price, expirationDate, shortDescription, longDesc
 }
 
 // create an Image
-var createImage = function(id, buffer) {
+var createImage = function(id, buffer, callback, errorCallback) {
     Jimp.read(buffer, function(err, img) {
+        if (err) {
+            console.log("Error in createImage for reading in buffer");
+            errorCallback();
+            return;
+        }
         img.scaleToFit(1000, 1000).getBase64(Jimp.AUTO, function(err, src) {
             var newImage = new Image({
                 itemID: id,
@@ -1701,7 +1706,13 @@ var createImage = function(id, buffer) {
             // call the built-in save method to save to the database
             newImage.save(function(err) {
                 if (err) {
-                    console.log("Image saved successfully");
+                    console.log("Error in createImage");
+                    errorCallback();
+                    return;
+                }
+                else {
+                    callback(id);
+
                 }
             });
         });
