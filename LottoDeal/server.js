@@ -152,7 +152,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                                             charge: charge._id,
                                         }, function(err, refund) {
                                             if (refund == null || err != null) {
-                                                console.log('Refund failed')
+                                                console.log('Refund failed in ' + performPaymentAndAddBid)
                                             }
                                         });
                                     }
@@ -177,7 +177,7 @@ app.post('/performPaymentAndAddBid', function(request, response) {
                                         charge: charge._id,
                                     }, function(err, refund) {
                                         if (refund == null || err != null) {
-                                            console.log('Refund failed')
+                                            console.log('Refund failed in ' + performPaymentAndAddBid);
                                         }
                                     });
                                 }
@@ -377,8 +377,8 @@ app.get('/getSuggestions', function(request, response) {
 })
 
 //Send 404 ERROR
-function send404(response, request) {
-    console.log('Error: Sending 404');
+function send404(response, request, functionName) {
+    console.log('Error: Sending 404 from function: ' + functionName);
     response.status(404);
 
     // respond with html page
@@ -607,6 +607,11 @@ var cpUpload = upload.fields([{
 app.post('/createPost', cpUpload, function(req, res, next) {
 
     // CHECK FOR SIZE OF IMAGE
+    if (req.files == null || req.files['picture'] == null || req.files['picture'].length == 0 || req.files['picture'][0].size == null) {
+        res.redirect("https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=improperFormat")
+        return;
+    }
+    
     var imgSize = req.files['picture'][0].size;
     if (imgSize > maxSize) {
         res.redirect('https://dominicwhyte.github.io/LottoDeal-Frontend/sell.html#!/?value=sizeTooLarge');
