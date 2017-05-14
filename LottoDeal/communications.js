@@ -21,7 +21,7 @@ exports.communicateToBidders = function(item, subject, message, date, sold) {
     for (var j = 0; j < item.bids.length; j++) {
         var bidderID = item.bids[j].ID;
         if (sold == true) {
-            communicationsModule.communicateSoldToSingleUser(item, subject, message, date, bidderID, winner);
+            communicationsModule.communicateSoldToSingleUser(item, subject, message, date, bidderID);
         } else {
             communicationsModule.communicateToSingleUser(item, subject, message, date, bidderID);
         }
