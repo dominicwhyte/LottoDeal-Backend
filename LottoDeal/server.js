@@ -1150,8 +1150,9 @@ mongoose.connect(url, function(err, db) {
     var postmark = require("postmark");
 
     // deleteAllUsers();
-    // deleteAllItems();
-    // deleteAllImages();
+    deleteAllItems();
+    deleteAllImages();
+    cleanseUsers();
 
 
     //Begin checking if lotteries should be performed
@@ -1752,7 +1753,13 @@ var deleteAllUsers = function() {
 var cleanseUsers = function() {
     findAllUsers(function(users) {
         if (users != null) {
-            response.send(JSON.stringify(users))
+            for (var i = 0; i < users.length; i++) {
+                var user = users[i];
+                user.bids = [];
+                user.reviews = [];
+                user.notifications = [];
+                user.save();
+            }
         } else {
             console.log("Error: users is null in cleanseUsers");
         }
