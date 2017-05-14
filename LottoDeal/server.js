@@ -92,6 +92,12 @@ app.post('/createReview', function(request, response) {
     var stars = request.body.stars;
     var reviewDes = request.body.reviewDes;
     var date = new Date();
+
+    if (sellerID == null || accessToken == null || stars == null || reviewDes == null) {
+        send404(response, request, "createReview");
+    }
+
+
     if (!isInt(stars) || (stars < 1) || stars > 5 || reviewDes.length > 500) {
         console.log('Error: attempting to review with invalid star count or invalid description');
         response.send("Error: attempting to review with invalid star count or invalid description")
@@ -122,6 +128,11 @@ app.post('/performPaymentAndAddBid', function(request, response) {
     var accessToken = request.body["accessToken"];
     var itemID = request.body.itemID;
     var amountToCharge = request.body.amount; //Check that this is numerical
+
+    if (accessToken == null || itemID == null || amountToCharge == null) {
+        send404(response, request, 'performPaymentAndAddBid');
+    }
+
     validateAccessToken(accessToken, response, request, function(userID) {
         // get into database, access object, update it's bid field and add to user bids
         findItemByID(itemID, function(item) {
@@ -246,6 +257,10 @@ app.get('/getReviews', function(request, response) {
 
     var sellerID = request.query["sellerID"];
 
+    if (sellerID == null) {
+        send404(response, request, 'getReviews');
+    }
+
     findUser(sellerID, function(user) {
         if (user != null) {
             response.send(JSON.stringify(user.reviews));
@@ -260,6 +275,10 @@ app.get('/getReviews', function(request, response) {
 // send the reviews on the item page based on the seller of the item
 app.get('/getReviewsOfSeller', function(request, response) {
     var itemID = request.query["itemID"];
+
+    if (itemID == null) {
+        send404(response, request, 'getReviewsOfSeller');
+    }
 
     findItemByID(itemID, function(item) {
         if (item != null) {
@@ -281,6 +300,11 @@ app.get('/getReviewsOfSeller', function(request, response) {
 // Check if a user is already registered in the database
 app.get('/checkIfUser', function(request, response) {
     var accessToken = request.query["accessToken"];
+
+    if (accessToken == null) {
+        response.send(false);
+    }
+
     validateAccessToken(accessToken, response, request, function(userID) {
         if (userID != undefined) {
             findUser(userID, function(user) {
@@ -301,6 +325,11 @@ app.get('/checkIfUser', function(request, response) {
 // mark all notifications read
 app.get('/markRead', function(request, response) {
     var accessToken = request.query["accessToken"];
+
+    if (accessToken == null) {
+        response.send(JSON.stringify([]));
+    }
+
     validateAccessToken(accessToken, response, request, function(userID) {
         if (userID != undefined) {
             User.find({
@@ -328,6 +357,11 @@ app.get('/markRead', function(request, response) {
 //Get account, where account is the private account with all info of the logged in user
 app.get('/getAccount', function(request, response) {
     var accessToken = request.query["accessToken"];
+
+    if (accessToken == null) {
+        send404(response, request, 'getAccount');
+    }
+
     validateAccessToken(accessToken, response, request, function(userID) {
         findUser(userID, function(user) {
             if (user != null) {
@@ -344,6 +378,11 @@ app.get('/getAccount', function(request, response) {
 //Gets a public account for any FBID, with only public information returned
 app.get('/getPublicAccount', function(request, response) {
     var userID = request.query["userID"];
+
+    if (userID == null) {
+        response.send(JSON.stringify({}));
+    }
+
     findUser(userID, function(user) {
         if (user != null) {
             response.send(JSON.stringify(trimUser(user)));
@@ -358,6 +397,11 @@ app.get('/getPublicAccount', function(request, response) {
 // send back all the suggested items
 app.get('/getSuggestions', function(request, response) {
     var accessToken = request.query["accessToken"];
+
+    // if (accessToken == null) {
+    //     response.send(JSON.stringify({}))
+    // }
+
     validateAccessToken(accessToken, response, request, function(userID) {
         findUser(userID, function(user) {
             if (user != null) {
@@ -401,6 +445,11 @@ function send404(response, request, functionName) {
 // send back all the notifications
 app.get('/getNotifications', function(request, response) {
     var accessToken = request.query["accessToken"];
+
+    if (accessToken == null) {
+        response.send(JSON.stringify([]));
+    }
+
     validateAccessToken(accessToken, response, request, function(userID) {
         getNotificationsForUsers(userID, function(notifications) {
             if (notifications != null) {
@@ -416,6 +465,11 @@ app.get('/getNotifications', function(request, response) {
 //Verifies an access token and returns the userID associated to it
 app.get('/verifyAccessToken', function(request, response) {
     var accessToken = request.query["accessToken"];
+
+    if (accessToken == null) {
+        response.send("Error");
+    }
+
     validateAccessToken(accessToken, response, request, function(userID) {
         if (userID != null) {
             response.send(userID);
@@ -464,6 +518,11 @@ function compileReviews(item, users, accounts) {
 // and items that have already sold or expired.
 app.get('/getBiddedItemsOfUsers', function(request, response) {
     var accessToken = request.query["accessToken"];
+
+    if (accessToken == null) {
+        response.send(JSON.stringify([]));
+    }
+
     validateAccessToken(accessToken, response, request, function(userID) {
         getItemsForUsers(userID, function(items) {
             var curBidsAccounts = [];
@@ -512,6 +571,11 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
 app.get('/getListedItemsForUsers', function(request, response) {
 
     var userID = request.query["userID"];
+
+    if (userID == null) {
+        send404(response, request, 'getListedItemsForUsers');
+    }
+
     getListedItemsForUsers(userID, function(items) {
         if (items != null) {
             response.send(JSON.stringify(trimItems(items)));
@@ -528,6 +592,11 @@ app.get('/getListedItemsForUsers', function(request, response) {
 //This is for a public profile - no accesstoken needed
 app.get('/getSoldItemsForUsers', function(request, response) {
     var userID = request.query["userID"];
+
+    if (userID == null) {
+        send404(response, request, 'getSoldItemsForUsers');
+    }
+
     getSoldItemsForUsers(userID, function(items) {
         response.send(JSON.stringify(trimItems(items)));
     }, function() {
@@ -716,7 +785,13 @@ function isInt(value) {
 // and names of the people that reviewed the given perosn 
 app.get('/getReviewerImagesAndNames', function(request, response) {
     var userID = request.query["userID"];
+    
+    if (userID == null) {
+        respons.send(JSON.stringify([]));
+    }
+
     var reviewersID = []
+
     findUser(userID, function(user) {
         if (user != null) {
             var reviews = user.reviews;
@@ -756,6 +831,12 @@ app.post('/createUser', function(request, response) {
     var age = request.body.age;
     var gender = request.body.gender;
 
+    if (name == null || id == null || url == null || email == null || age == null || gender == null) {
+        console.log("Error in createUser, something is null");
+        response.send(null);
+    }
+
+
     var users = findAllUsers(function(users) {
         if (users != null) {
             var usersLength = users.length;
@@ -784,6 +865,10 @@ app.post('/createUser', function(request, response) {
 // Will add a new user to our database
 app.post('/updateSettings', function(request, response) {
     var accessToken = request.body["accessToken"];
+
+    if (accesToken == null) {
+        response.send("Error: invalid email");
+    }
 
     var email = request.body.email;
     if (!validateEmail(email)) {
@@ -887,6 +972,10 @@ app.get('/getAccountsForPosts', function(request, response) {
 app.get('/getItem', function(request, response) {
     var itemID = request.query.id;
 
+    if (itemID == null) {
+        send404(response, request, 'getItem');
+    }
+
     findItemByID(itemID, function(item) {
         if (item != null) {
             findImageByID(item["_id"], function(buffer) {
@@ -918,19 +1007,29 @@ app.get('/getUsers', function(request, response) {
 
 })
 
-// Delete a user account
+// Delete a user account (currently not in use)
 app.delete('/deleteUser', function(request, response) {
     var id = request.body.id;
+
+    if (id == null) {
+        send404(response, request, 'deleteUser');
+    }
+
     deleteUser(id, function(message) {
         response.send(message);
     })
 
 })
 
-// Delete an Item
+// Delete an Item, takes an accessToken and itemID
 app.delete('/deleteItem', function(request, response) {
     var accessToken = request.body.accessToken;
     var itemIDToDelete = request.body.id
+
+    if (accessToken == null || itemIDToDelete == null) {
+        send404(response, request, 'deleteItem');
+    }
+
     validateAccessToken(accessToken, response, request, function(userID) {
         findItemByID(itemIDToDelete, function(item) {
             if (item != null) {
@@ -965,6 +1064,7 @@ app.delete('/deleteItem', function(request, response) {
     });
 })
 
+// DEPRECATED
 app.post('/editItem', function(request, response) {
     // get into database, access object, update it's bid field and add to user bids
 
@@ -997,7 +1097,7 @@ app.post('/editItem', function(request, response) {
 
 app.get('/getImagesForNotifications', function(request, response) {
     var itemIDs = request.query["itemIDs"];
-    if (itemIDs != undefined) {
+    if (itemIDs != undefined && itemIDs != null) {
 
         Item.find({}, function(err, items) {
             var imagesCompressed = [];
@@ -1335,7 +1435,10 @@ var createReview = function(sellerID, userID, stars, reviewDes, date) {
         fbid: sellerID
     }, function(err, user) {
         if (user != null) {
-            if (err) throw err;
+            if (err) {
+                console.log(err);
+                console.log("Error in createReview");
+            }
             var data = {
                 userID: userID,
                 stars: stars,
@@ -1377,7 +1480,10 @@ var addBidForItem = function(itemID, userID, newAmount, completion) {
     // get a item with ID and update the userID array
     if (userID != undefined) {
         Item.findById(itemID, function(err, item) {
-            if (err) throw err;
+            if (err) {
+                console.log(err);
+                console.log("Error in addBidForItem");
+            }
             if (item != null) {
                 var array = item.bids;
                 var found = false;
@@ -1530,7 +1636,10 @@ var deleteUser = function(id, callback) {
                 Item.remove({
                     sellerID: id
                 }, function(err) {
-                    if (err) throw err;
+                    if (err) {
+                        console.log(err);
+                        console.log("Error in deleteUser");
+                    }
                     callback('User successfully deleted')
                 });
             });
@@ -1548,7 +1657,11 @@ var deleteItem = function(id, callback) {
     // Remove Item
     Item.findById(id, function(err, item) {
         //TODO: Need to replace this error by an error callback
-        if (err) throw err;
+        if (err) {
+            console.log(err);
+            console.log("Error in deleteItem");
+            return;
+        }
 
         if (item != null) {
             //delete the bid from the users bids
