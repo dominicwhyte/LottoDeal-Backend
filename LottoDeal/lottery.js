@@ -48,6 +48,7 @@ var checkLotteries = function() {
 
 //Performs the lottery for item, calling completion with the userID of the winner
 var performLottery = function(item, completion) {
+    console.log("Start of lottery: " + item.title);
     var bids = item.bids;
     //Shuffle to ensure no bias (extra precaution)
     var shuffledBids = shuffleArray(bids);
@@ -72,10 +73,12 @@ var performLottery = function(item, completion) {
     item.sold = true;
     item.winnerID = winner;
 
+    console.log("middle of lottery: " + item.title);
     databaseModule.findUser(winner, function(user) {
         if (user != null) {
             item.winnerName = user.fullName;
             item.save();
+            console.log("End of lottery: " + item.title);
             completion(winner);
         } else {
             console.log('User not successfully found')
