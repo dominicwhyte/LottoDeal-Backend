@@ -1,9 +1,11 @@
-/* SERVER FUNCTIONALITY */
+/* SERVER REQUIRED MODULES */
 var express = require('express')
 var app = express()
 var https = require('https')
 var fs = require('fs')
 var http = require("http");
+var Jimp = require("jimp");
+var multer = require('multer')
 
 var json = require('express-json')
 var bodyParser = require("body-parser")
@@ -18,7 +20,7 @@ const lotteryModule = require('./lottery');
 const databaseModule = require('./server');
 const communicationsModule = require('./communications');
 
-var Jimp = require("jimp");
+
 
 app.use(bodyParser.json())
 app.use(json())
@@ -28,7 +30,7 @@ app.set('view engine', 'html');
 
 var maxSize = 1.2 * Math.pow(10, 7); // 12MB
 
-var multer = require('multer')
+
 var upload = multer({
     dest: 'uploads/',
     limits: {
@@ -48,10 +50,7 @@ module.exports = {
             console.log(debug);
         }
     }
-    // exports.goToDebugMode = function() {
-    //  debug = true;
-    //  console.log(debug);
-    // }
+
 
 
 var helmet = require("helmet")
@@ -59,6 +58,7 @@ app.use(helmet())
 
 var fs = require('fs');
 
+// possible HTTPS upgrade
 // var options = {
 //     key: fs.readFileSync('domain.key'),
 //     cert: fs.readFileSync('server.crt')
@@ -96,7 +96,6 @@ app.post('/createReview', function(request, response) {
     if (sellerID == null || accessToken == null || stars == null || reviewDes == null) {
         send404(response, request, "createReview");
     }
-
 
     if (!isInt(stars) || (stars < 1) || stars > 5 || reviewDes.length > 500) {
         console.log('Error: attempting to review with invalid star count or invalid description');
@@ -354,7 +353,7 @@ app.get('/markRead', function(request, response) {
     });
 })
 
-//Get account, where account is the private account with all info of the logged in user
+// Get account of a user, where account is the private account with all info of the logged in user
 app.get('/getAccount', function(request, response) {
     var accessToken = request.query["accessToken"];
 
@@ -394,13 +393,9 @@ app.get('/getPublicAccount', function(request, response) {
     });
 })
 
-// send back all the suggested items
+// Send back all the suggested items
 app.get('/getSuggestions', function(request, response) {
     var accessToken = request.query["accessToken"];
-
-    // if (accessToken == null) {
-    //     response.send(JSON.stringify({}))
-    // }
 
     validateAccessToken(accessToken, response, request, function(userID) {
         findUser(userID, function(user) {
@@ -442,7 +437,7 @@ function send404(response, request, functionName) {
     response.type('txt').send('Not found');
 }
 
-// send back all the notifications
+// send back all the notifications given request
 app.get('/getNotifications', function(request, response) {
     var accessToken = request.query["accessToken"];
 
@@ -478,7 +473,7 @@ app.get('/verifyAccessToken', function(request, response) {
 })
 
 // adds up all the reviews for a given seller into its respective accounts
-// array
+// array. Helper function to calculate average rating.
 function compileReviews(item, users, accounts) {
     var sellerID = item.sellerID;
     for (var j = 0; j < users.length; j++) {
@@ -567,7 +562,7 @@ app.get('/getBiddedItemsOfUsers', function(request, response) {
 })
 
 // send back all the items that user has listed
-//This is for a public profile - no accesstoken needed
+// This is for a public profile - no accesstoken needed
 app.get('/getListedItemsForUsers', function(request, response) {
 
     var userID = request.query["userID"];
@@ -589,7 +584,7 @@ app.get('/getListedItemsForUsers', function(request, response) {
 })
 
 // send back all the items that a user has sold
-//This is for a public profile - no accesstoken needed
+// This is for a public profile - no accesstoken needed
 app.get('/getSoldItemsForUsers', function(request, response) {
     var userID = request.query["userID"];
 
@@ -610,7 +605,8 @@ app.get('/', function(request, response) {
     response.send("API is working!")
 })
 
-
+// adds a standardized 6mb image and item for quick item posting
+// during testing.
 app.post('/debugPost', function(request, response) {
     var imagePath = './uploads/debug.png';
     var imageData = fs.readFileSync(imagePath);
@@ -773,6 +769,7 @@ app.post('/createPost', cpUpload, function(req, res, next) {
 })
 
 //modified from http://stackoverflow.com/questions/14636536/how-to-check-if-a-variable-is-an-integer-in-javascript
+// check to see if a given value is an integer
 function isInt(value) {
     if (isNaN(value)) {
         return false;
@@ -862,7 +859,7 @@ app.post('/createUser', function(request, response) {
 })
 
 
-// Will add a new user to our database
+// Will update the settings for a given user
 app.post('/updateSettings', function(request, response) {
     var accessToken = request.body["accessToken"];
 
@@ -898,6 +895,7 @@ app.post('/updateSettings', function(request, response) {
 })
 
 // copied from http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
+// checks whether the given string is an email
 function validateEmail(email) {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
@@ -1064,7 +1062,7 @@ app.delete('/deleteItem', function(request, response) {
     });
 })
 
-// DEPRECATED
+// DEPRECATED NO LONGER USED BECAUSE WE ONLY REMOVE ITEMS
 app.post('/editItem', function(request, response) {
     // get into database, access object, update it's bid field and add to user bids
 
@@ -1139,7 +1137,6 @@ var mongoose = require('mongoose');
 var url = 'mongodb://localhost:27017/LottoDeal';
 
 // Use connect method to connect to the server
-
 mongoose.Promise = global.Promise;
 
 
@@ -1162,7 +1159,7 @@ mongoose.connect(url, function(err, db) {
 
 var Schema = mongoose.Schema;
 
-// create a schema
+// create a user schema
 var userSchema = new Schema({
     fullName: String, // facebook given (String)
     fbid: String, // facebook given
@@ -1197,10 +1194,9 @@ var userSchema = new Schema({
 
 var User = mongoose.model('User', userSchema);
 
-exports.Item = Item;
 exports.User = User;
 
-// create a schema
+// create an item schema
 var itemSchema = new Schema({
     title: String, // title of the item being sold (String)
     price: Number, //price in USD (int)
@@ -1229,8 +1225,9 @@ var itemSchema = new Schema({
 });
 
 var Item = mongoose.model('Item', itemSchema);
+exports.Item = Item;
 
-
+// create an image schema
 var imageSchema = new Schema({
     itemID: String, // item associated with the image
     img: {
@@ -1361,6 +1358,7 @@ function trimItem(item) {
     return item;
 }
 
+// trims important information from a given array of users
 function trimUsers(users) {
     var trimmedUsers = []
     for (var i = 0; i < users.length; i++) {
@@ -1369,7 +1367,7 @@ function trimUsers(users) {
     return trimmedUsers;
 }
 
-// trims a given users important information
+// trims a given user's important information
 function trimUser(user) {
     user.userInfo = null;
     user.notifications = null;
@@ -1745,6 +1743,7 @@ var deleteAllUsers = function() {
     });
 }
 
+// get rid of all of a users bids, reviews, and notifications
 var cleanseUsers = function() {
     findAllUsers(function(users) {
         if (users != null) {
@@ -1799,7 +1798,7 @@ var findAllItems = function(callback) {
 
 }
 
-// edit the item ?? i thought we got rid of this functionality 
+// DEPRACATED NO LONGER USES THIS BECAUSE WE HAVE A REMOVE FUNCTION
 var editItem = function(title, price, expirationDate, shortDescription, longDescription, itemID, image) {
 
     Item.findById(itemID, function(err, item) {
