@@ -23,8 +23,10 @@ var checkLotteries = function() {
             }
             var expirDate = new Date(item.expirationDate);
             if (item.amountRaised >= item.price) {
+                console.log('Performing Lottery for: ' + item.title);
                 performLottery(item, function(winner) {
                     var date = new Date();
+                    console.log('Lottery completed. Sending notifications for: ' + item.title);
                     communicationsModule.communicateToAdmins(item, "Admin", "New winner for " + item.title + ".", date, winner);
                     communicationsModule.communicateSoldToSingleUser(item, "LottoDeal: Your item " + item.title + " has been sold!", "Click here to view who won:", date, item.sellerID);
                     communicationsModule.communicateToBidders(item, "LottoDeal", "A winner has been chosen for " + item.title + ", click to see who won!", date, true);
