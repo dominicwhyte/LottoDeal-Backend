@@ -828,10 +828,11 @@ app.post('/createUser', function(request, response) {
     var age = request.body.age;
     var gender = request.body.gender;
 
-    if (name == null || id == null || url == null || email == null || age == null || gender == null) {
-        console.log("Error in createUser, something is null");
-        response.send(null);
-    }
+    // if (name == null || id == null || url == null || email == null || age == null || gender == null) {
+    //     console.log("Error in createUser, something is null");
+    //     response.send(null);
+    //     return;
+    // }
 
 
     var users = findAllUsers(function(users) {
