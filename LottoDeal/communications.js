@@ -32,8 +32,8 @@ exports.communicateToBidders = function(item, subject, message, date, sold) {
 exports.communicateToSingleUser = function(item, subject, message, date, userID) {
     databaseModule.findUser(userID, function(user) {
         sendEmailToAddress(user.email, subject, message);
-            console.log('Sending regular notification to: ' + user.fullName);
-            communicationsModule.addRegularNotificationToUser(item._id, user.fbid, subject, message);
+        console.log('Sending regular notification to: ' + user.fullName + " for date: " + date);
+        communicationsModule.addRegularNotificationToUser(item._id, user.fbid, subject, message, date);
     }, function() {
         console.log('Error in communicateToSingleUser');
     });
@@ -106,7 +106,7 @@ exports.addRegularNotificationToUser = function(itemID, userID, titleText, descr
         user.notifications.push(data);
         user.save();
     }, function() {
-        console.log('Error in addNotificationToUser');
+        console.log('Error in addRegularNotificationToUser');
     });
 }
 
@@ -126,9 +126,9 @@ exports.addSoldNotificationToUser = function(itemID, userID, titleText, descript
             user.notifications.push(data);
             user.save();
         }, function() {
-            console.log('Error in addNotificationToUser');
+            console.log('Error in addSoldNotificationToUser');
         })
     }, function() {
-        console.log('Error in addNotificationToUser');
+        console.log('Error in second addSoldNotificationToUser');
     });
 }

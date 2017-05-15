@@ -36,7 +36,7 @@ var checkLotteries = function() {
                 lotteryModule.refundUsers(item);
                 var date = new Date();
                 communicationsModule.communicateToBidders(item, "LottoDeal:" + item.title + " expired", "You have been fully refunded", date, false);
-                communicationsModule.communicateSoldToSingleUser(item, "LottoDeal: Your item " + item.title + " expired", "Bidders have been fully refunded", date, item.sellerID);
+                communicationsModule.communicateToSingleUser(item, "LottoDeal: Your item " + item.title + " expired", "Bidders have been fully refunded", date, item.sellerID);
                 item.expired = true;
                 item.save();
             } else {
