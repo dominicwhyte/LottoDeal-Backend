@@ -24,12 +24,12 @@ var checkLotteries = function() {
             var expirDate = new Date(item.expirationDate);
             if (item.amountRaised >= item.price) {
                 console.log('Performing Lottery for: ' + item.title);
-                performLottery(item, function(winner) {
+                performLottery(item, function(winner, soldItem) {
                     var date = new Date();
-                    console.log('Lottery completed. Sending notifications for: ' + item.title);
-                    communicationsModule.communicateToAdmins(item, "Admin", "New winner for " + item.title + ".", date, winner);
-                    communicationsModule.communicateSoldToSingleUser(item, "LottoDeal: Your item " + item.title + " has been sold!", "Click here to view who won:", date, item.sellerID);
-                    communicationsModule.communicateToBidders(item, "LottoDeal", "A winner has been chosen for " + item.title + ", click to see who won!", date, true);
+                    console.log('Lottery completed. Sending notifications for: ' + soldItem.title);
+                    communicationsModule.communicateToAdmins(soldItem, "Admin", "New winner for " + soldItem.title + ".", date, winner);
+                    communicationsModule.communicateSoldToSingleUser(soldItem, "LottoDeal: Your item " + soldItem.title + " has been sold!", "Click here to view who won:", date, soldItem.sellerID);
+                    communicationsModule.communicateToBidders(soldItem, "LottoDeal", "A winner has been chosen for " + soldItem.title + ", click to see who won!", date, true);
                 });
             } else if (expirDate < Date.now()) {
                 //Refund and notify users
@@ -79,10 +79,10 @@ var performLottery = function(item, completion) {
             item.winnerName = user.fullName;
             item.save();
             console.log("End of lottery: " + item.title);
-            completion(winner);
+            completion(winner, item);
         } else {
             console.log('User not successfully found')
-            completion(null);
+            completion(null, item);
         }
     }, function() {
         console.log('Error in performLottery');
